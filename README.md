@@ -98,4 +98,5 @@
       cv2.destroyAllWindows # close all cv2's windows
       ```
 
-    - 実行結果は以下の通りで， 2つ目のウィンドウは[Mandrill.bmp]をブラー（平滑化）した結果となります．
+    - 実行結果は以下の通りで， 2つ目のウィンドウは[Mandrill.bmp]をブラー（平滑化）した結果となります．<br>
+        ![fig003](./fig003.png)
