@@ -80,10 +80,10 @@
       ```
 
 6. OpenCVライブラリのサンプルの実行
-    - [SourceCode]フォルダに新規に[img]フォルダを作成し，以下の<br>
+    - [SourceCode]フォルダに新規に[img]フォルダを作成し，以下の[Mandrill.bmp]をダウンロードして[img]フォルダに保存します．<br>
         ![Mandrill](./Mandrill.bmp)
         
-    - 以下の実行結果が出力されれば成功です．
+    - 新規ファイルとして[sample_cv2.py]を作成し，以下のコードを入力して実行してみましょう．
       ```python
       # sample_cv2.py
       import cv2
@@ -97,3 +97,5 @@
       cv2.waitKey(0) # pause until press any key
       cv2.destroyAllWindows # close all cv2's windows
       ```
+
+    - 実行結果は以下の通りで， 2つ目のウィンドウは[Mandrill.bmp]をブラー（平滑化）した結果となります．
