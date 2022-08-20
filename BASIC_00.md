@@ -28,10 +28,10 @@
   # -*- coding: utf-8 -*-
   print("Hello python")
   
-  def func_hoge():
+  def func_hoge(): # 関数hoge
     print("hoge hoge")
   
-  def func_fuga():
+  def func_fuga(): # 関数fuga
     print("fuga fuga")
   
   func_hoge()
@@ -47,10 +47,10 @@
   ```python
   # script2.py
   # -*- coding: utf-8 -*-  
-  def func_hoge():
+  def func_hoge(): # 関数hoge
     print("hoge hoge")
   
-  def func_fuga():
+  def func_fuga(): # 関数fuga
     print("fuga fuga")
   
   if __name__=='__main__': # スクリプトとして実行された場合にのみ実行する処理をまとめるif文
