@@ -20,10 +20,11 @@
   >>> exit(0) #対話モードの終了
   %
   ```
- 2. スクリプトモード<br>
-  .pyファイルにコマンドをまとめて記述し，プログラムを実行する，
+ 2. スクリプトモード(1)<br>
+  .pyファイルにコマンドをまとめて記述し，pythonコマンドを使ってプログラムを実行する．<br>
+  プログラムはファイルの上から順に実行される．
   ```python
-  ## script.py
+  # script1.py
   # -*- coding: utf-8 -*-
   print("Hello python")
   
@@ -35,10 +36,31 @@
   
   func_hoge()
   ```
-  出力結果
   ```python
-  % python script.py
+  % python script1.py
   Hello python
   hoge hoge
   ```
+ 3. スクリプトモード(2)<br>
+  その.pyファイルがスクリプトとして実行された場合にのみ実行する処理をまとめるif文を記述する．<br>
+  if文のブロックには，呼び出す関数や実行する処理の手順をまとめて記述する．
+  ```python
+  # script2.py
+  # -*- coding: utf-8 -*-  
+  def func_hoge():
+    print("hoge hoge")
   
+  def func_fuga():
+    print("fuga fuga")
+  
+  if __name__=='__main__': # スクリプトとして実行された場合にのみ実行する処理をまとめるif文
+    print("Hello python")
+    func_fuga()
+    func_hoge()
+  ```
+  ```python
+  % python script2.py
+  Hello python
+  fuga fuga
+  hoge hoge
+  ```
