@@ -54,6 +54,8 @@
    - [dlibの学習済みサンプル等へのリンク](http://dlib.net/files/)
    - [OpenCV FaceMark APIの説明へのリンク](https://docs.opencv.org/4.x/d7/dec/tutorial_facemark_usage.html)
 
+  それぞれDLして解凍し，スクリプトと同じフォルダに配置しておく．
+
   ## Haar-like特徴量を用いた顔検出
   
   ```python
