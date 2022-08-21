@@ -40,10 +40,22 @@
     main()
   ```
   
-  # Haar-like特徴量による顔検出
-  
-  #[ip81]顔検出プログラム
+  # 顔検出
+  ## 準備
+  dlibはpipでインストール可能だが， *setup.py* が走るので，Cコンパイラ環境とcmakeが必要．<br>
+  [Visual Studio Community (無償版)](https://visualstudio.microsoft.com/ja/free-developer-offers/) のVisual C++アプリケーションのインストールを事前に行っておく．
 
+  ```
+  % pip insall cmake
+  % pip install dlib
+  ```
+
+   - [OpenCVのHaar Cascadeの学習済みサンプルへのリンク](https://github.com/opencv/opencv/tree/master/data/haarcascades)
+   - [dlibの学習済みサンプル等へのリンク](http://dlib.net/files/)
+   - [OpenCV FaceMark APIの説明へのリンク](https://docs.opencv.org/4.x/d7/dec/tutorial_facemark_usage.html)
+
+  ## Haar-like特徴量を用いた顔検出
+  
   ```python
   #-*- coding: utf-8 -*-
   import cv2
