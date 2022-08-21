@@ -20,6 +20,7 @@
   >>> exit(0) #対話モードの終了
   %
   ```
+ 
  2. スクリプトモード(1)<br>
   .pyファイルにコマンドをまとめて記述し，pythonコマンドを使ってプログラムを実行する．<br>
   プログラムはファイルの上から順に実行される．
@@ -41,6 +42,7 @@
   Hello python
   hoge hoge
   ```
+ 
  3. スクリプトモード(2)<br>
   その.pyファイル（モジュールと呼ぶ）がスクリプトとして実行された場合にのみ実行する処理をまとめるif文を記述する．<br>
   if文のブロックには，呼び出す関数や実行する処理の手順をまとめて記述する．他のファイルからimportされた場合，if文のブロックは無視される．
@@ -64,6 +66,7 @@
   fuga fuga
   hoge hoge
   ```
+  
 # 関数の引数と戻り値
  関数は，引数では，
  
@@ -98,16 +101,72 @@
     print(sm, e)
   ```
   ```sh
-  % python script2.py
+  % python script3.py
   hoge        # func_msgの出力
   hoge
   hoge
   [15, 1, 5]  # func_sumの戻り値をリストで受け取る
   6 3         # func_sumの第1と第3戻り値を変数で受け取る
   ```
+
+# クラス
+  ```python
+  # script4.py
+  # -*- coding: utf-8 -*-  
+
+  class Twice:
+    cnum = 10
+    def __init__(self):
+      print("constructor")
+
+    def twice(self):
+      print(self.cnum*2)
+
+    def setnum(self, num):
+      self.cnum = num
+
+  if __name__=='__main__':
+    tw = Twice()  
+    tw.twice()
+    tw.setnum(15)
+    tw.twice()
+  ```
+  ```sh
+  % python script4.py
+  constructor
+  20
+  30
+  ```
+
+# 大域変数
+  ```python
+  # script5.py
+  # -*- coding: utf-8 -*-  
+
+  def twice():
+    global gnum
+    print(gnum*2)
+
+  def main():
+    global gnum
+    gnum = 10 # gnumはここで定義されている
+    twice()
+
+  if __name__=='__main__':
+      global gnum
+      # print(gnum)-> NameError: name 'gnum' is not defined
+      main()
+      print(gnum)
+  ```
+  ```sh
+  % python script5.py
+  20
+  10
+  ```
+
 # List，Tuple，辞書
   ```python
-  # script3.py
+  # script6.py
   # -*- coding: utf-8 -*-  
 
   #所謂配列リスト
@@ -140,11 +199,62 @@
   print('辞書追加',dic)
   ```
   ```sh
-  % python script3.py
+  % python script6.py
   子 子 子
   ('子', '丑', '寅', '卯') ['子', '丑', '寅', '卯', '猫'] ['子', '丑', '寅', '卯', '猫']
   {'2月', '1月', '3月'}
   辞書追加 {'十二支': ['子', '丑', '寅', '卯', '猫'], '十二月': ['睦月', '如月', '弥生'], '十二刻': ['子', '丑', '寅', '卯']}
   ```
 
+# for文，内包標記
+  ```python
+  # script7.py
+  # -*- coding: utf-8 -*-  
 
+  lst = ['子','丑','寅','卯']
+  tpl = ('子','丑','寅','卯')
+  dic = {'十二支': ['子','丑','寅','卯'], '十二月':['睦月', '如月', '弥生']}
+
+  for i in range(len(lst)):
+    print(lst[i])
+
+  tmp = [lst[i] for i in range(len(lst))] #内包標記
+  print(tmp)
+
+  for elm in enumerate(tpl):
+    print(elm)
+
+  for i, elm in enumerate(tpl):
+    print(i, ": ", elm)
+
+  for kw in dic.keys():
+    print(kw)
+
+  for val in dic.values():
+    print(val)
+
+  for itm in dic.items():
+    print(itm[0], itm[1])
+  ```
+  ```sh
+  % python script7.py  
+  子
+  丑
+  寅
+  卯
+  ['子', '丑', '寅', '卯']
+  (0, '子')
+  (1, '丑')
+  (2, '寅')
+  (3, '卯')
+  0 :  子
+  1 :  丑
+  2 :  寅
+  3 :  卯
+  十二支
+  十二月
+  ['子', '丑', '寅', '卯']
+  ['睦月', '如月', '弥生']
+  十二支 ['子', '丑', '寅', '卯']
+  十二月 ['睦月', '如月', '弥生']
+  ```sh
