@@ -9,7 +9,7 @@
   Type "help", "copyright", "credits" or "license" for more information.
   >>> print("Hello python")
   Hello python
-  >>> for i in range(5):
+  >>> for i in range(5): # range(5)は0～4までのリストを生成
   ...   print(i)  # print文の前にスペースが必要
   ... # 空のEnterでfor文のブロックを抜ける
   0
