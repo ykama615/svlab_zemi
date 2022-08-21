@@ -259,3 +259,27 @@
   十二月 ['睦月', '如月', '弥生']
   ```
 
+  # モジュールimport
+  .pyのファイル名はモジュール名として扱われ，importによってモジュールの読み込みが可能．<br>
+  .pyファイルをフォルダにまとめ，__init__.pyファイルを入れることでパッケージ（ライブラリ？）として扱うことができる．
+  ```python
+  # mul_module.py
+  # -*- coding: utf-8 -*-  
+  def twice(num):
+  print(num*2)
+  ```
+  ```python
+  # script8.py
+  # -*- coding: utf-8 -*-  
+  import mul_module
+
+  mul_module.twice(10)
+  ```
+  ```sh
+  % python script8.py
+  20
+  ```
+  __init__.pyの例は，
+  ```python
+  from モジュール名 import *
+  ```
