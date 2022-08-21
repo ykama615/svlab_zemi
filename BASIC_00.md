@@ -88,7 +88,7 @@
     for i in range(st, ed+1):
       sum = sum + i
 
-    return sum, st, ed
+    return [sum, st, ed] # []を付けない場合タプルになる
 
   if __name__=='__main__':
     func_msg(3)
@@ -101,6 +101,6 @@
   hoge        # func_msgの出力
   hoge
   hoge
-  (15, 1, 5)  # func_sumの戻り値をリストで受け取る
+  [15, 1, 5]  # func_sumの戻り値をリストで受け取る
   6 3         # func_sumの第1と第3戻り値を変数で受け取る
   ```
