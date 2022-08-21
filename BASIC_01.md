@@ -45,7 +45,7 @@
   dlibはpipでインストール可能だが， *setup.py* が走るので，Cコンパイラ環境とcmakeが必要．<br>
   [Visual Studio Community (無償版)](https://visualstudio.microsoft.com/ja/free-developer-offers/) のVisual C++アプリケーションのインストールを事前に行っておく．
 
-  ```
+  ```sh
   % pip insall cmake
   % pip install dlib
   ```
