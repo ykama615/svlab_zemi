@@ -3,7 +3,7 @@
   入出力環境（PowerShell）を起動後にpythonと入力し，入力プロンプト（>>>）の後ろにコマンドを入力していく．<br>
   変数や条件分岐，繰り返し処理などを使用したものもファイルなどに記述することなく対話的に実行することができる．<br>
   終了時はexitコマンドを入力する．
-  ```python
+  ```sh
   % python
   Python 3.X.X (tags/v3.X.X:...) [MSC v.XXXX 64 bit (AMD64)] on win32
   Type "help", "copyright", "credits" or "license" for more information.
@@ -36,7 +36,7 @@
   
   func_hoge()
   ```
-  ```python
+  ```sh
   % python script1.py
   Hello python
   hoge hoge
@@ -58,10 +58,45 @@
     func_fuga()
     func_hoge()
   ```
-  ```python
+  ```sh
   % python script2.py
   Hello python
   fuga fuga
   hoge hoge
   ```
 # 関数の引数と戻り値
+ 関数は，引数では，
+  ・仮引数に初期値を設定して，実引数未指定で利用したり（実引数の指定も可能）
+  ・仮引数名を使って実引数を指定することで引数の順序を無視したり
+ でき，戻り値では，
+  ・複数の戻り値を指定してリストで受け取ったり，
+  ・戻り値の受け取りをそれぞれ変数で受け取ったり（不要な戻り値は_で飛ばすことも可能）
+ できる
+  ```python
+  # script3.py
+  # -*- coding: utf-8 -*-  
+  def func_msg(num, str="hoge"):
+    for i in range(num):
+        print(str)
+
+  def func_sum(st, ed):
+    sum = 0
+    for i in range(st, ed+1):
+      sum = sum + i
+
+    return sum, st, ed
+
+  if __name__=='__main__':
+    func_msg(3)
+    all = func_sum(1,5)
+    sm, _, e = func_sum(ed=3,st=1)
+    print(all)
+    print(sm, e)
+  ```
+  ```sh
+  hoge        # func_msgの出力
+  hoge
+  hoge
+  (15, 1, 5)  # func_sumの戻り値をリストで受け取る
+  6 3         # func_sumの第1と第3戻り値を変数で受け取る
+  ```
