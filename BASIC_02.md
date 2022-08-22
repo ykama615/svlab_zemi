@@ -62,3 +62,7 @@
   if __name__ == '__main__':
     main()
   ``` 
+
+ | 元画像 | 検出結果 |
+ |:-- |:-- |
+ | ![Girl](./Girl.bmp) | ![Haar-Girl](./haar-Girl.bmp) |
