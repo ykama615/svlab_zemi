@@ -119,6 +119,41 @@
 
   ## dlib を用いた顔パーツ検出
   dlib C++ Libraryに実装されたアルゴリズム（ [KAZEMIによる論文, CVPR 2014](https://openaccess.thecvf.com/content_cvpr_2014/html/Kazemi_One_Millisecond_Face_2014_CVPR_paper.html) ）を使った顔と顔パーツ検出です．<br>
-  学習済みファイルには shape_predictor_68_face_landmarks.dat を利用します．
+  学習済みファイルには shape_predictor_68_face_landmarks.dat を利用します．なお，顔パーツの型変換のために imutils ライブラリを利用しています．
   ```python
+  #-*- coding: utf-8 -*-
+  import cv2
+  import dlib
+  from imutils import face_utils
+  import numpy as np
+
+  mdl_folder = "mylibs/myPhysiology/learned_model/"  # 学習済みファイルのまでのパス
+  img_folder = "img/" # 画像ファイルまでのパス
+
+  def main():
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor(mdl_folder+"shape_predictor_68_face_landmarks.dat")
+    img = cv2.imread(img_folder + "Girl.bmp")
+
+    # 顔の検出
+    dets, scores, _ = detector.run(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), 1)
+
+    for i, face in enumerate(dets): # detsの中に四角形情報として検出された顔が順に格納
+      [x, y, w, h] = [face.left(), face.top(), face.width(), face.height()]
+      cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 2)
+
+      # 顔の中から68点の顔の特徴点を検出
+      parts = face_utils.shape_to_np(predictor(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), face), dtype=np.int32)
+
+      for j, point in enumerate(parts): # parts[i][0]にx，parts[i][1]にy
+        cv2.circle(img, (point[0], point[1]), 2,(0,255, 0), -1)
+
+    cv2.imshow("dlib", img)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+  if __name__ == '__main__':
+    main()
+
   ```
