@@ -66,3 +66,39 @@
  | 元画像 | 検出結果 |
  |:-- |:-- |
  | ![Girl](./Girl.bmp) | ![Haar-Girl](./haar-Girl.bmp) |
+ 
+  ## LBF（Local Binary Features）を用いた顔パーツ検出
+  Local Binary Features（輝度値の差分情報）を使った顔パーツ検出です．OpenCVのFaceMark APIに標準実装されています．<br>
+  下記サンプルは，静止画像に対してHaar-likeによる人の正面顔検出の後，顔パーツ検出を行い，検出した頂点（ランドマーク）を描画する例です．
+  
+  ```python
+  #-*- coding: utf-8 -*-
+  import cv2
+  import numpy as np
+  def main():
+  face_cascade = cv2.CascadeClassifier(
+  "haarcascades/haarcascade_frontalface_default.xml")
+  fmdetector = cv2.face.createFacemarkLBF()
+  fmdetector.loadModel("lbfmodel.yaml")
+  img  = cv2.imread("./img/Girl.bmp")
+  gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  ######## 顔の検出 ########
+  # カスケードを10%ずつ縮小しながら検出，最低何個の近傍矩形を検出すれば採用するか
+  faces = face_cascade.detectMultiScale(gray, 1.1, 5)
+  # facesの中にある顔と認識した領域を順に取り出す
+  for face in faces:
+  [x, y, w, h] = face
+  cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 2)
+  ######## 顔の中から68点の顔の特徴点を検出 ########
+  landmarks = fmdetector.fit(img, np.array([face]))
+  _, list = landmarks
+  parts = np.array(list[0][0], dtype=np.int32)
+  for i in range(len(parts)):
+  cv2.circle(img, (parts[i][0], parts[i][1]), 2,(0,255, 0), -1)
+  cv2.imshow("haar-like", img)
+  while True:
+  if cv2.waitKey(1) & 0xFF == ord('q'):
+   break
+  cv2.destroyAllWindows()
+  if __name__ == '__main__':
+  main()
