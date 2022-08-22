@@ -166,4 +166,53 @@
    - 学習済みモデルの読み込みは，フレームの読み込みのループの外で行います
    - 顔・顔パーツの検出対象を，画像ではなく，毎回読み込むフレームに変更します
 
-  ##
+  ## [エクストラ] 配布環境の自作ライブラリの利用
+  配布環境には，OpenCV，dlibなどによる顔・顔パーツ検出を補助するライブラリ（パッケージ）が用意してあります．
+   - mylibs\\myPhysiology パッケージ内の cv_face_detector.py モジュール（cvFaceDetectorクラス）
+   - mylibs\\myPhysiology パッケージ内の dlib_face_detector.py モジュール（DlibFaceDetectorクラス）
+   - CameraSelectorクラスの利用方法は [カメラへのアクセスと動画処理](BASIC_01.md) の章を確認してください
+
+  ```python
+  # -*- coding: utf-8 -*-
+  import os
+  os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+  import cv2
+  import numpy as np
+  import myCapture as mycap
+  import myPhysiology as myphy
+  import time
+
+  dev = 0
+
+  def main():
+      cap = mycap.CameraSelector(dnum=dev, fps=30, size=[720, 1280])
+      dlib = myphy.DlibFaceDetector()
+
+      while cap.isOpened():
+        ret, fnum, frame = cap.read()
+
+        if ret:
+          ## Dlib and OpenCV Facemark API ######
+          start = time.perf_counter()
+          dets, _, _ = dlib.getFace(frame)
+          print("dlib {:.3f}".format(time.perf_counter()-start))
+
+          if len(dets)>0:
+            for i, face in enumerate(dets):
+              cv2.rectangle(frame, (face[0], face[1]), (face[0]+face[2], face[1]+face[3]), [0, 0, 255], 1)
+
+              parts = dlib.getFacemark_detection(frame, face)
+              for x,y in parts:
+                cv2.circle(frame, (x,y), 3, [128, 128, 255], -1)
+
+              cv2.imshow("video", frame)
+
+          if cv2.waitKey(int(1000/cap.fps)) == ord('q'):
+              break
+
+      cap.release()
+      cv2.destroyAllWindows()
+
+  if __name__=='__main__':
+      main()
+
