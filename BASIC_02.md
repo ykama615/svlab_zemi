@@ -157,3 +157,7 @@
     main()
 
   ```
+ | 検出結果 |
+ |:-- |
+ | ![dlib-Girl](./dlib-Girl.png) |
+
