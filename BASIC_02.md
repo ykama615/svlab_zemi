@@ -116,3 +116,9 @@
  | 検出結果 |
  |:-- |
  | ![LBF-Girl](./lbf-Girl.png) |
+
+  ## dlib を用いた顔パーツ検出
+  dlib C++ Libraryに実装されたアルゴリズム（ [KAZEMIによる論文, CVPR 2014](https://openaccess.thecvf.com/content_cvpr_2014/html/Kazemi_One_Millisecond_Face_2014_CVPR_paper.html) ）を使った顔と顔パーツ検出です．<br>
+  学習済みファイルには shape_predictor_68_face_landmarks.dat を利用します．
+  ```python
+  ```
