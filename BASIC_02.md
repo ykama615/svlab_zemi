@@ -2,7 +2,8 @@
 
 1. [環境の設定](README.md)
 2. [基本概要](BASIC_00.md)
-3. カメラ，顔・手・ポーズ検出（↓）
+3. [カメラへのアクセスと動画処理](BASIC_01.md)
+4. 顔・手・ポーズ検出（↓）
 
 <hr>
 
@@ -68,8 +69,9 @@
  | ![Girl](./Girl.bmp) | ![Haar-Girl](./haar-Girl.bmp) |
  
   ## LBF（Local Binary Features）を用いた顔パーツ検出
-  Local Binary Features（輝度値の差分情報）を使った顔パーツ検出です．OpenCVのFaceMark APIに標準実装されています．<br>
-  下記サンプルは，静止画像に対してHaar-likeによる人の正面顔検出の後，顔パーツ検出を行い，検出した頂点（ランドマーク）を描画する例です．
+  Local Binary Features（輝度値の差分情報）を使った顔パーツ検出です．<br>
+  下記サンプルは，静止画像に対してHaar-likeによる人の正面顔検出の後，顔パーツ検出を行い，検出した頂点（ランドマーク）を描画する例です．<br>
+  メソッドはOpenCVのFaceMark APIに標準実装されており，学習済みファイルには lbfmodel.yaml を利用します．
   
   ```python
   #-*- coding: utf-8 -*-
