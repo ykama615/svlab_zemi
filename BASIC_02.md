@@ -98,10 +98,10 @@
       ######## 顔の中から68点の顔の特徴点を検出 ########
       landmarks = fmdetector.fit(img, np.array([face]))
       _, list = landmarks
-      parts = np.array(list[0][0], dtype=np.int32)
+      parts = np.array(list[0][0], dtype=np.int32) # parts[0]～[67]にランドマークの頂点座標が格納されている
 
-      for i in range(len(parts)):
-        cv2.circle(img, (parts[i][0], parts[i][1]), 2,(0,255, 0), -1)
+      for i, point in enumerate(parts): # parts[i][0]にx，parts[i][1]にy
+        cv2.circle(img, (point[0], point[1]), 2,(0,255, 0), -1)
 
     cv2.imshow("LBF", img)
 
@@ -111,3 +111,6 @@
   if __name__ == '__main__':
     main()
   ```
+ | 検出結果 |
+ |:-- |
+ | ![LBF-Girl](./lbf-Girl.png) |
