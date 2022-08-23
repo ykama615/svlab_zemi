@@ -3,13 +3,14 @@
 1. [環境の設定](README.md)
 2. [基本概要](BASIC_00.md)
 3. [カメラへのアクセスと動画処理](BASIC_01.md)
-4. 顔・手・ポーズ検出（↓）
+4. 顔と顔パーツの検出（↓）(BASIC_02.md)
+5. [顔・手・ポーズ検出](BASIC_03.md)
 
 <hr>
 
 # 顔検出
   ## 準備
-  __※配布環境を使用している場合は， .\\mylibs\\myPhysiology\\learned_model 以下に配置されているのでこの作業は不要です．__<br>
+  __※配布環境を使用している場合は， .\\mylibs\\myPhysiology\\learned_model 以下に学習済みデータが配置されているので準備作業は不要です．__<br>
   dlibはpipでインストール可能だが， *setup.py* が走るので，Cコンパイラ環境とcmakeが必要です．<br>
   [Visual Studio Community (無償版)](https://visualstudio.microsoft.com/ja/free-developer-offers/) のVisual C++アプリケーションのインストールを事前に行っておきましょう．
 
