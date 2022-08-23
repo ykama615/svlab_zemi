@@ -294,3 +294,83 @@
   ```python
   from モジュール名 import *
   ```
+
+  # collection（コンテナデータ型）モジュールの deque
+ リストより高速，高機能なデータ構造として，「deque(デック)」（double-ended queue）があります．<br>
+ 数値だけでなく，配列(リスト)や画像など様々なデータを格納でき，格納と取り出しが非常に高速です．下記のサンプルを実行して結果を確認しましょう．<br>
+ ```python
+ # -*- coding: utf-8 -*-
+ import numpy as np
+ from collections import deque # dequeの利用に必要
+
+ def main():
+   queue = deque()
+   for num in range(10, 21, 2):
+     queue.append(num) #末尾に追加
+   print(queue)
+
+   for num in range(11, 20, 2):
+     queue.appendleft(num) #先頭に挿入（左に追加）
+   print(queue)
+
+   queue.insert(5, 0) #添字4と5の間に0を挿入
+   print(queue)
+
+   queue.reverse() #要素を逆順にする
+   print(queue)
+
+   print(queue.pop()) #末尾からpop
+   print(queue)
+
+   print(queue.popleft()) #先頭からpop
+   print(queue)
+
+   for num in queue: #すべての要素を参照
+     print(num, queue)
+
+ if __name__ == '__main__':
+   main()
+ ```
+ ```sh
+ deque([10, 12, 14, 16, 18, 20])
+ deque([19, 17, 15, 13, 11, 10, 12, 14, 16, 18, 20])
+ deque([19, 17, 15, 13, 11, 0, 10, 12, 14, 16, 18, 20])
+ deque([20, 18, 16, 14, 12, 10, 0, 11, 13, 15, 17, 19])
+ 19
+ deque([20, 18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 20
+ deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 18 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 16 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 14 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 12 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 10 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 0 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 11 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 13 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 15 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ 17 deque([18, 16, 14, 12, 10, 0, 11, 13, 15, 17])
+ ```
+
+ - 要素を1つ先頭に追加する appendleft() ，末尾に追加する append() がありますが，それ以外に複数の要素を末尾に連結する extend() ， extendleft もあります
+  ```python
+  a = deque([1,2,3])
+  b = [4,5,6] # b=deque([4,5,6])でも可
+  a.extend(b)
+  print(a)
+  ```
+  ```sh
+  deque([1,2,3,4,5])
+  ```
+  - dequeではキューの最大サイズを指定することができ，その場合その数を超えて要素を格納すると，あふれた分は反対側から押し出されます
+　a = deque([1,2,3], maxlen=5)
+  b = [4,5,6]
+  a.extend(b)
+  print(a)
+  a.extendleft(b)
+  print(a)
+  ```
+  ```sh
+  deque([2, 3, 4, 5, 6], maxlen=5)
+  deque([6, 5, 4, 2, 3], maxlen=5)
+  ```
