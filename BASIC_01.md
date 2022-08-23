@@ -41,6 +41,55 @@
   if __name__=='__main__':
     main()
   ```
-  
+
   # タイムラプス
+  - 15フレームに1回（30FPSであれば0.5秒に1回）ずつ，フレームを deque に追加していくことでタイムラプス動画を作成してみましょう
+  - \'q\' ボタンを押すことでタイムラプスの収録を終了し，収録した内容が再生されます
+  - 色々なタイミングでフレームを収録していくプログラムに変更してみましょう
   
+  ```python
+  # -*- coding: utf-8 -*-
+  import cv2
+  import numpy as np
+  from collections import deque # dequeの利用に必要
+
+  dev = 0
+
+  def main():
+    cap = cv2.VideoCapture(dev)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    timelapse = deque()
+    fnum = 0
+
+    while cap.isOpened():
+      ret, frame = cap.read()
+      if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q') or ret == False:
+        break
+
+      cv2.imshow("video", frame)
+      if fnum%15==0:
+        # (1)dequeの末尾にframeを追加する
+        timelapse.append(frame)
+      fnum = fnum + 1
+
+    # dequeの内容を再生
+    for frame in timelapse:
+      cv2.imshow("timelapsex2", frame)
+      if cv2.waitKey(int(1000/30)) & 0xFF == ord('q'):
+        break
+
+    cv2.waitKey(0)      
+    cv2.destroyAllWindows()
+    cap.release()
+
+  if __name__ == '__main__':
+    main()
+  ```
+
+  ## [エクストラ] 配布環境の自作ライブラリの利用
+  配布環境には，カメラ制御と画面キャプチャを補助するライブラリ（パッケージ）が用意してあります．
+   - mylibs\\myCapture パッケージ内の　camera_selector.py モジュール（CameraSelectorクラス）
+
+  ```python
+  ```
