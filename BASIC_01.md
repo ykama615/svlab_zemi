@@ -90,6 +90,41 @@
   ## [エクストラ] 配布環境の自作ライブラリの利用
   配布環境には，カメラ制御と画面キャプチャを補助するライブラリ（パッケージ）が用意してあります．
    - mylibs\\myCapture パッケージ内の　camera_selector.py モジュール（CameraSelectorクラス）
+   - CameraSelectorのコンストラクタは次の通り
+      ```python
+      CameraSelector(dnum='デバイス番号', fps='FPS', size='描画画面サイズ', box='キャプチャエリア')
+      ```
+  - 次のサンプルは，プログラム引数でカメラやそのプロパティを指定できるようにしたものです
 
   ```python
+  # -*- coding: utf-8 -*-
+  import cv2
+  import argparse
+  import myCapture as mycap
+
+  def main(args):
+    cap = mycap.CameraSelector(args.device, args.fps, args.size, args.box)
+
+    while cap.isOpened():
+      ret, fnum, frame = cap.read()
+
+      if ret:
+        cv2.imshow("video", frame)
+        if cv2.waitKey(int(1000/cap.fps)) == ord('q'):
+          break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+  if __name__=='__main__':
+    parser = argparse.ArgumentParser(
+      description="--name \'window_name\' \n --device \'camera_num(99 is screen capture)\' \n--fps num")
+    parser.add_argument('--device', type=int,
+       help="--device \'camera_num(99 is screen capture)\'")
+    parser.add_argument('--fps', type=int)
+    def stype(ssize): return list(map(int, ssize.split(',')))
+    parser.add_argument('--size', type=stype, help="width,height")
+    parser.add_argument('--box', type=stype, help="x,y,width,height")
+    args = parser.parse_args()
+    main(args)
   ```
