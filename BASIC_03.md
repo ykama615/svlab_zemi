@@ -18,7 +18,11 @@
   - Selfie Segmentation
   - Objectron
 
-## Selfie Segmentationを例とした基本的な使い方
+  ## Selfie Segmentationを例とした基本的な使い方
+  以下は，MediaPipe の Selfie Segmentation 機能を利用した例です．他の機能を利用する場合も基本手順は同じとなります．
+  1. mp.solutionsパッケージから使いたい機能を呼び出す
+  2. processメソッドを用いて検出を行う
+  3. processの戻り値（results）を分解して必要な情報を抽出する
 
   ```python
   #-*- coding: utf-8 -*-
