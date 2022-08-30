@@ -9,7 +9,9 @@
 <hr>
 
 # 環境のインストール
--- ポータブル環境自体を作る場合の [メモ](https://github.com/ykama615/svlab/blob/8ce061b8d7bbab7cbea188d19b001b9d872c40b8/README.md)
+
+ - ポータブル環境自体を作る場合の [メモ](https://github.com/ykama615/svlab/blob/8ce061b8d7bbab7cbea188d19b001b9d872c40b8/README.md)
+
 1. exeファイルを展開します
     - C:\oit\oitpy22\以下に，python，VS Code，ソースコード用フォルダが展開されます．
  
