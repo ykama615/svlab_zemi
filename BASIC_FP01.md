@@ -7,28 +7,34 @@
    - 逆コサインには numpy.arccos 関数，角速度から角度への変換には numpy.rad2deg 関数を利用できます
       -- 逆三角関数は mathパッケージにも実装されています（acos，asin，atan）
   
+  ```python
+  # -*- coding: utf-8 -*-
   import numpy as np
 
-def calcAngle(v1, v2):
-  v1_n = np.linalg.norm(v1)
-  v2_n = np.linalg.norm(v2)
+  def calcAngle(v1, v2):
+    v1_n = np.linalg.norm(v1)
+    v2_n = np.linalg.norm(v2)
 
-  cos_theta = np.inner(v1, v2) / (v1_n * v2_n)
+    cos_theta = np.inner(v1, v2) / (v1_n * v2_n)
 
-  return np.rad2deg(np.arccos(cos_theta))
+    return np.rad2deg(np.arccos(cos_theta))
 
-def main():
-  v1 = np.array([1, 1, 1])
-  v2 = np.array([1, 1, 0])
+  def main():
+    v1 = np.array([1, 1, 1])
+    v2 = np.array([1, 1, 0])
 
-  print(calcAngle(v1, v2))  
+    print(calcAngle(v1, v2))  
 
-  v1 = np.array([3, 1])
-  v2 = np.array([4, 5])
+    v1 = np.array([3, 1])
+    v2 = np.array([4, 5])
 
-  print(calcAngle(v1, v2))  
+    print(calcAngle(v1, v2))  
 
-
-if __name__ == '__main__':
-  main()
-  
+  if __name__ == '__main__':
+    main()
+  ```
+  ```sh
+  % python deg_sample.py
+  35.26438968275466
+  32.905242922987895
+  ```
