@@ -350,9 +350,12 @@
 配布環境には，mediapipeのうち，フレーム画像を渡すと，Face Detection，Hands，Poseの結果の座標リスト，Selfie Segmentationの結果画像を返却する補助するライブラリ（パッケージ）が用意してあります．
  - 準備
    - パッケージをimportし，インスタンスを生成しておきます 
+   - フレーム画像は反転，色変換（RGBにする）をしておきます
+    - imshowする際に，色を再変換（BGRに戻す）する必要があります 
    ```python
    import myPhysiology as mp
    mpd = mp.MpDetector()
+   frame = cv2.flip(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 1)
    ```
    
  - getFace(frame, bool=ランドマーク座標返却の要・不要) -> 検出した顔の領域の座標とランドマーク座標
@@ -364,4 +367,28 @@
      if keys!=[]:
        for points in keys:
          cv2.circle(frame, points, 3, [255,0,0], -1)
+   ```
+
+ - getHand(frame) -> 左右の指の座標リストのリスト
+   ```python
+   hands = mpd.getHand(frame)
+   for hand in hands:
+     left = hand[0]
+     right = hand[1]
+     for point in left:
+       x, y, z = point
+       cv2.circle(frame, [x, y], 3, [255,0,255], -1)
+     for point in right:
+       x, y, z = point
+       cv2.circle(frame, [x, y], 3, [0,255,0], -1)
+   ```
+   
+   - getPose(frame) -> ポーズの座標リスト
+   ```python
+   poses = mpd.getPose(frame)
+   for point in poses:
+     x, y, z, ret = point
+     if ret:
+       scale = abs(int(5 * (z/cap.wt-1.0)))
+       cv2.circle(frame, [x, y], scale, [0,0,255], -1)
    ```
