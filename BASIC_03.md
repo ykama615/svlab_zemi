@@ -382,8 +382,8 @@
        x, y, z = point
        cv2.circle(frame, [x, y], 3, [0,255,0], -1)
    ```
-   
-   - getPose(frame) -> ポーズの座標リスト
+ 
+ - getPose(frame) -> ポーズの座標リスト
    ```python
    poses = mpd.getPose(frame)
    for point in poses:
