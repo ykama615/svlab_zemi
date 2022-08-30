@@ -69,6 +69,10 @@
   ```
 
   ## どの手が挙がっているかを評価するサンプル
+  - MediaPipeのPoseを使って左右どちらの手を挙げているか（または両方）を画面上に
+  - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
+  - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
+   -- cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
   ```python
   import cv2
   import mediapipe as mp
