@@ -69,7 +69,7 @@
   ```
 
   ## どの手が挙がっているかを評価するサンプル
-  - MediaPipeのPoseを使って左右どちらの手を挙げているか（または両方）を画面上に
+  - MediaPipeのPoseを使って左右どちらの手を挙げているか（または両方）を画面上に表示します
   - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
   - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
    -- cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
@@ -144,3 +144,105 @@
   if __name__ == '__main__':
     main()
   ```
+  
+  ## 人差し指の座標を表示するサンプル
+  - MediaPipeのHandsを使って左右の人差し指の位置座標を表示します
+  - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
+  - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
+   -- cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
+  - 人差し指の先はLandmarkリスト（配列）の添字8に割り当てられています
+   -- 他のLandmarkは，[マニュアル](https://google.github.io/mediapipe/solutions/hands.html) で確認してください 
+  ```python
+  #-*- coding: utf-8 -*-
+ import cv2
+ import mediapipe as mp
+ import numpy as np
+ import time
+ mp_drawing = mp.solutions.drawing_utils
+ mp_hands = mp.solutions.hands
+
+ device = 0 # cameera device number
+
+ def getFrameNumber(start:float, fps:int):
+   now = time.perf_counter() - start
+   frame_now = int(now * 1000 / fps)
+
+   return frame_now
+
+ # Draw a circle on index finger
+ def drawFingertip(image, landmarks):
+   image_width, image_height = image.shape[1], image.shape[0]
+   landmark_point = []
+
+   for index, landmark in enumerate(landmarks.landmark):
+     if landmark.visibility < 0 or landmark.presence < 0:
+         continue
+
+     # Convert the obtained landmark values x, y, z to the coordinates on the image
+     landmark_x = min(int(landmark.x * image_width), image_width - 1)
+     landmark_y = min(int(landmark.y * image_height), image_height - 1)
+     landmark_z = landmark.z
+
+     landmark_point.append(np.array([landmark_x, landmark_y, landmark_z], dtype=int))
+
+   # Draw a circle on index finger and display the coordinate value
+   cv2.circle(image, (landmark_point[8][0], landmark_point[8][1]), 7, (0, 0, 255), 3)
+   cv2.putText(image, "(" + str(landmark_point[8][0]) + ", " + str(landmark_point[8][1]) + ")", 
+     (landmark_point[8][0] - 20, landmark_point[8][1] - 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+
+
+ def main():
+   # For webcam input:
+   global device
+
+   cap = cv2.VideoCapture(device)
+   fps = cap.get(cv2.CAP_PROP_FPS)
+   wt  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+   ht  = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
+   print("Size:", ht, "x", wt, "/Fps: ", fps)
+
+   start = time.perf_counter()
+   frame_prv = -1
+
+   cv2.namedWindow('MediaPipe Hands', cv2.WINDOW_NORMAL)
+
+   hands = mp_hands.Hands(
+   min_detection_confidence=0.5,
+   min_tracking_confidence=0.5)
+
+   while cap.isOpened():
+     frame_now=getFrameNumber(start, fps)
+     if frame_now == frame_prv:
+         continue
+     frame_prv = frame_now
+
+     ret, frame = cap.read()
+     if not ret:
+       print("Ignoring empty camera frame.")
+       # If loading a video, use 'break' instead of 'continue'.
+       continue
+
+     # Flip the image horizontally for a later selfie-view display, and convert
+     # the BGR image to RGB.
+     frame = cv2.cvtColor(cv2.flip(frame, 1), cv2.COLOR_BGR2RGB)
+
+     # To improve performance, optionally mark the image as not writeable to
+     # pass by reference.
+     frame.flags.writeable = False
+     results = hands.process(frame)
+
+     # Draw the index finger annotation on the image.
+     frame.flags.writeable = True
+     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+     if results.multi_hand_landmarks:
+         for hand_landmarks in results.multi_hand_landmarks:
+             drawFingertip(frame, hand_landmarks)
+     cv2.imshow('MediaPipe Hands', frame)
+     if cv2.waitKey(5) & 0xFF == 27:
+           break
+   cap.release()
+
+ if __name__ == '__main__':
+   main()
+ ```
