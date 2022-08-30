@@ -72,7 +72,7 @@
   - MediaPipeのPoseを使って左右どちらの手を挙げているか（または両方）を画面上に表示します
   - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
   - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
-   -- cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
+   - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
   ```python
   import cv2
   import mediapipe as mp
@@ -149,9 +149,9 @@
   - MediaPipeのHandsを使って左右の人差し指の位置座標を表示します
   - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
   - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
-   -- cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
+   - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
   - 人差し指の先はLandmarkリスト（配列）の添字8に割り当てられています
-   -- 他のLandmarkは，[マニュアル](https://google.github.io/mediapipe/solutions/hands.html) で確認してください 
+   - 他のLandmarkは，[マニュアル](https://google.github.io/mediapipe/solutions/hands.html) で確認してください 
   ```python
   #-*- coding: utf-8 -*-
  import cv2
@@ -251,7 +251,7 @@
  - MediaPipeのFaceMeshを使って468点の顔の3D特徴点を表示します
  - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
  - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
-  -- cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
+  - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
  - Landmarkの詳しい情報は，[マニュアル](https://google.github.io/mediapipe/solutions/face_mesh.html) で確認してください 
  ```python
  # -*- coding: utf-8 -*-
