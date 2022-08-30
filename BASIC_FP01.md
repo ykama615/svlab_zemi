@@ -5,7 +5,7 @@
 
    - ベクトルの大きさは numpy.linalg.norm 関数で，内積は numpy.inner 関数で求めることができます
    - 逆コサインには numpy.arccos 関数，角速度から角度への変換には numpy.rad2deg 関数を利用できます
-      -- 逆三角関数は mathパッケージにも実装されています（acos，asin，atan）
+      - 逆三角関数は mathパッケージにも実装されています（acos，asin，atan）
   
   ```python
   # -*- coding: utf-8 -*-
