@@ -44,7 +44,7 @@
       ret, frame = cap.read()
 
       # frameへのmediapipe(SelfieSegmentation)の適用
-      results = segment.process(frame)
+      results = segment.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 
       # 検出結果(results)が存在した場合
       if results.segmentation_mask is not None:
