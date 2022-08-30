@@ -82,34 +82,33 @@
     # For webcam input:
     cap = cv2.VideoCapture(device)
     pose = mp_pose.Pose( min_detection_confidence=0.5, min_tracking_confidence=0.5 )
-      
+
     while cap.isOpened():
       ret, frame = cap.read()
-      if not success:
+      if not ret:
         print("Ignoring empty camera frame.")
         # If loading a video, use 'break' instead of 'continue'.
         continue
 
-        # Flip the image horizontally for a later selfie-view display, and convert the BGR image to RGB.
-        image = cv2.cvtColor( cv2.flip(image, 1), cv2.COLOR_BGR2RGB )
-          
-        # To improve performance, optionally mark the image as not writeable to pass by reference.
-        image.flags.writeable = False
-        results = pose.process( image )
+      # Flip the image horizontally for a later selfie-view display, and convert the BGR image to RGB.
+      image = cv2.cvtColor( cv2.flip(frame, 1), cv2.COLOR_BGR2RGB )
 
-        # Draw the pose annotation on the image.
-        image.flags.writeable = True
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        if results.pose_landmarks:
-          mp_drawing.draw_landmarks(
-          image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+      # To improve performance, optionally mark the image as not writeable to pass by reference.
+      image.flags.writeable = False
+      results = pose.process( image )
 
-          # judge
-          cv2.putText(image, judge_raise_hand(image, results.pose_landmarks), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+      # Draw the pose annotation on the image.
+      image.flags.writeable = True
+      image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+      if results.pose_landmarks:
+        mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
-        cv2.imshow('MediaPipe Pose', image)
-        if cv2.waitKey(5) & 0xFF == 27:
-          break
+        # judge
+        cv2.putText(image, judge_raise_hand(image, results.pose_landmarks), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+
+      cv2.imshow('MediaPipe Pose', image)
+      if cv2.waitKey(5) & 0xFF == 27:
+        break
     cap.release()
 
   # Judgment of raising hand
