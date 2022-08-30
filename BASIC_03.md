@@ -344,3 +344,24 @@
  if __name__ == '__main__':
    main()
  ```
+
+## [エクストラ] 配布環境の自作ライブラリの利用
+
+配布環境には，mediapipeのうち，フレーム画像を渡すと，Face Detection，Hands，Poseの結果の座標リスト，Selfie Segmentationの結果画像を返却する補助するライブラリ（パッケージ）が用意してあります．
+ - 準備
+   - パッケージをimportし，インスタンスを生成しておきます 
+   ```python
+   import myPhysiology as mp
+   mpd = mp.MpDetector()
+   ```
+   
+ - getFace(frame, bool=ランドマーク座標返却の要・不要) -> 検出した顔の領域の座標とランドマーク座標
+   ```python
+   detections = mpd.getFace(frame, True)
+   for [box, keys] in detections:
+     if box!=[]:
+       cv2.rectangle(frame, (box[0], box[1]), (box[0]+box[2], box[1]+box[3]), [0,255,0], 1)
+     if keys!=[]:
+       for points in keys:
+         cv2.circle(frame, points, 3, [255,0,0], -1)
+   ```
