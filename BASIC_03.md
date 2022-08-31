@@ -470,8 +470,8 @@
    2. 適当なタイミングでコンピュータの手を決定し，カメラに映った人の手と比較して勝敗を判定しじゃんけんができるようにしてみましょう
      - 0以上3未満（0,1,2）の整数乱数を発生させるサンプルは以下のようになります
     
-    ```python
-    import random
+  ```python
+  import random
 
-    cpu = random.randint(0,3)
-    ```
+  cpu = random.randint(0,3)
+  ```
