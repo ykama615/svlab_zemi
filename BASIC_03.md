@@ -253,6 +253,7 @@
  - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
    - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
  - Landmarkの詳しい情報は，[マニュアル](https://google.github.io/mediapipe/solutions/face_mesh.html) で確認してください 
+
  ```python
  # -*- coding: utf-8 -*-
  import cv2
@@ -392,3 +393,75 @@
        scale = abs(int(5 * (z/cap.wt-1.0)))
        cv2.circle(frame, [x, y], scale, [0,0,255], -1)
    ```
+
+  ## チョキを判定するサンプル
+  - MediaPipe Handには配布環境のパッケージの関数を使っています（基本の検出方法に置き換え可能です）
+  - ベクトルの長さ，角度の算出方法については [こちら]() を確認してください
+
+ ```python
+ # -*- coding: utf-8 -*-
+ import cv2
+ import numpy as np
+ import myCapture as mycap
+ import myPhysiology as mp
+ import time
+ import math
+ dev = 0
+
+ def main():
+     cap = mycap.CameraSelector(dnum=dev, fps=60, size=[640, 480])
+     mpd = mp.MpDetector()
+
+     while cap.isOpened():
+         ret, fnum, frame = cap.read()
+         start = time.perf_counter()
+         frame = cv2.flip(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),1)
+
+         if ret:
+           hands = mpd.getHand(frame)
+           for hand in hands:
+             right = hand[1]
+
+             if len(right)>0: 
+               for point in right:
+                 x, y, _ = point
+                 cv2.circle(frame, [x, y], 3, [0,255,0], -1)
+
+               # 手の付け根と指の先端，第2関節までの長さを算出（指を閉じているかどうかの判定）
+               third_m = np.linalg.norm(np.array(right[0])-np.array(right[14])) # 手の付根-薬指第２関節
+               pinky_m = np.linalg.norm(np.array(right[0])-np.array(right[18])) # 手の付根-子指第２関節
+               third_t = np.linalg.norm(np.array(right[0])-np.array(right[16])) # 手の付根-薬指先端
+               pinky_t = np.linalg.norm(np.array(right[0])-np.array(right[20])) # 手の付根-薬指先端
+
+               # 手のひらの幅，手のひらの外側から親指の先端までの長さを算出（親指を折り曲げているかどうかの判定）
+               thumb_l = np.linalg.norm(np.array(right[17])-np.array(right[4]))
+               hand_wt = np.linalg.norm(np.array(right[17])-np.array(right[5]))
+
+               # 第2関節-第3関節と第2関節-先端のなす角を算出（指を伸ばしているかどうかの判定）
+               first_d = calcAngle(np.array(right[7])-np.array(right[6]),np.array(right[5])-np.array(right[6]))
+               secnd_d = calcAngle(np.array(right[11])-np.array(right[10]),np.array(right[9])-np.array(right[10]))
+
+               if (third_t < third_m) and (pinky_t < pinky_m) and (thumb_l < hand_wt) and (first_d > 140) and (secnd_d > 140):
+                 print("choki")
+
+           frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+           cv2.imshow("video", frame)
+           if cv2.waitKey(int(1000/cap.fps)) == ord('q'):
+             break
+
+     cap.release()
+     cv2.destroyAllWindows()
+
+ def calcAngle(v1, v2):
+   v1_n = np.linalg.norm(v1)
+   v2_n = np.linalg.norm(v2)
+
+   cos_theta = np.inner(v1, v2) / (v1_n * v2_n)
+
+   return np.rad2deg(np.arccos(cos_theta))
+
+ if __name__=='__main__':
+     main()
+ ```
+
+  ## 
