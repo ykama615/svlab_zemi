@@ -409,7 +409,7 @@
   dev = 0
 
   def main():
-      cap = mycap.CameraSelector(dnum=dev, fps=60, size=[640, 480])
+      cap = mycap.CameraSelector(dnum=dev, size=[640, 480])
       mpd = mp.MpDetector()
 
       while cap.isOpened():
