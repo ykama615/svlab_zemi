@@ -29,7 +29,7 @@
       main()
   ```
 
-   2. pyautogui でキー入力
+  2. pyautogui でキー入力
      - win32gui モジュールを利用してウィンドウを最前面に表示し，アクティブにします
      - pyautogui.press 関数を利用してキー入力を行います
 
