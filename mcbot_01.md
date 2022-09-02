@@ -68,8 +68,10 @@
     agui.press('o')
     agui.press('n')
     agui.press('!')
-
+    agui.press('enter')
 
   if __name__=='__main__':
       main()
   ```
+
+    - pyautogui.pressの引数では，\'enter\'，\'esc\'，\'alt\' などが使用できますが，\'@\' を入力することができません
