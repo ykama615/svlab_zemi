@@ -32,6 +32,25 @@
   2. pyautogui でキー入力
      - win32gui モジュールを利用してウィンドウを最前面に表示し，アクティブにします
      - pyautogui.press 関数を利用してキー入力を行います
+        - 未編集のメモ帳を開いておきましょう
+        - 以下のサンプルを実行するとメモ帳のウィンドウが最前面に表示され，Hello python!と入力，改行されます
+     - pyautogui.pressの引数では，\'enter\'，\'esc\'，\'alt\' などが使用できますが，\'@\'，\'\^\'，\'\:\' を入力することができません
+        -  \_pyautogui\_win.py（WPy64-39100\\pyton-3.9.10.amd64\\Lib¥¥site-packages\\pyautogui\\）の\_keyDown(key)関数に以下のif文3行を追記しましょう
+
+          ```python
+          def _keyDown(key):
+              ##(略)##
+
+              needsShift = pyautogui.isShiftCharacter(key)
+
+              if key == '@': needsShift = False
+              if key == '^': needsShift = False
+              if key == ':': needsShift = False
+
+              """
+              # OLD CODE: The new code relies on having all keys be loaded in keyboardMapping from the start.
+          ```
+
 
   ```python
   # -*- coding: utf-8 -*-
@@ -73,5 +92,3 @@
   if __name__=='__main__':
       main()
   ```
-
-    - pyautogui.pressの引数では，\'enter\'，\'esc\'，\'alt\' などが使用できますが，\'@\' を入力することができません
