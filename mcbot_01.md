@@ -92,3 +92,63 @@
   if __name__=='__main__':
       main()
   ```
+
+# [MCBOT]移動
+  - キー押下を Threading.Timer で管理することで動作中に別動作を割り込めるようにしています
+  - Threading.Timer 関数の時間管理が不正確なため，引数の秒数も正確ではありません
+      - 第3引数 count は指定不要です 
+      ```python
+      move(動作の継続時間, 入力キー, count=0)
+      ```
+  
+  ```python
+  # -*- coding: utf-8 -*-
+  import win32gui, win32con
+  import pyautogui as agui
+  import threading
+  import time
+
+  def move(sec, c, count=0):
+    global t
+
+    if sec*10<=count:
+      t.cancel()
+      agui.keyUp(c)
+    else:
+      agui.keyDown(c) 
+      t = threading.Timer(0.005, move, (sec, c, count+1))
+      t.start()
+
+  def main():
+    # ウィンドウハンドルを取得
+    whand = win32gui.FindWindow(None, "Minecraft: Education Edition")
+    if whand==0:
+      return
+
+    # 最小化を解除
+    win32gui.ShowWindow(whand, win32con.SW_RESTORE )
+
+    # ウィンドウを左上に固定して最前面に
+    win32gui.SetWindowPos(whand, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOSIZE)
+
+    # ウィンドウ領域を取得して，メニューバーの中央あたりをクリック
+    # win32gui.SetForegroundWindow(whand)でもアクティブ化可能
+    box = win32gui.GetWindowRect(whand)
+    agui.click(box[0]+box[2]//2, box[1]+10)
+
+    agui.press('esc')
+
+    time.sleep(5) #起動待ち
+
+    move(5, 'w') #5秒前進
+
+    time.sleep(2) #2秒待ち
+
+    move(3, 'a') #前進開始2秒後から左移動を追加
+
+    print("おわり")
+
+  if __name__=='__main__':
+      main()
+  ```
+
