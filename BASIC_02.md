@@ -211,7 +211,7 @@
 
         cv2.imshow("video", frame)
 
-      if cv2.waitKey(int(1000/cap.fps)) == ord('q'):
+      if cv2.waitKey(1) == ord('q'):
         break
 
     cap.release()
