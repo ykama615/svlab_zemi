@@ -30,7 +30,7 @@
     while cap.isOpened():
       ret, frame = cap.read()
 
-      if cv2.waitKey(0) & 0xFF == ord('q') or ret == False:
+      if cv2.waitKey(1) & 0xFF == ord('q') or ret == False:
         break
 
       cv2.imshow("video", frame)
@@ -142,7 +142,7 @@
 
       if ret:
         cv2.imshow("video", frame)
-        if cv2.waitKey(0) == ord('q'):
+        if cv2.waitKey(1) == ord('q'):
           break
 
     cap.release()
