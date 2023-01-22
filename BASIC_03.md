@@ -56,7 +56,7 @@
         #conditionの切り分けに従って，frameのままとbgへの置き換えを行う
         frame = np.where(condition, frame, bg)
 
-      if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q') or ret == False:
+      if cv2.waitKey(1) & 0xFF == ord('q') or ret == False:
         break
 
       cv2.imshow("video", frame)
@@ -111,7 +111,7 @@
         cv2.putText(image, judge_raise_hand(image, results.pose_landmarks), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
 
       cv2.imshow('MediaPipe Pose', image)
-      if cv2.waitKey(5) & 0xFF == 27:
+      if cv2.waitKey(1) & 0xFF == 27:
         break
     cap.release()
 
@@ -239,7 +239,7 @@
          for hand_landmarks in results.multi_hand_landmarks:
              drawFingertip(frame, hand_landmarks)
      cv2.imshow('MediaPipe Hands', frame)
-     if cv2.waitKey(5) & 0xFF == 27:
+     if cv2.waitKey(1) & 0xFF == 27:
            break
    cap.release()
 
@@ -319,7 +319,7 @@
          #mp_drawing.draw_landmarks(image, face_landmarks, mp_face_mesh.FACE_CONNECTIONS)
          my_draw_face(frame, face_landmarks)
      cv2.imshow('MediaPipe FaceMesh', frame)
-     if cv2.waitKey(5) & 0xFF == 27:
+     if cv2.waitKey(1) & 0xFF == 27:
        break
    cap.release()
 
@@ -447,7 +447,7 @@
 
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             cv2.imshow("video", frame)
-            if cv2.waitKey(int(1000/cap.fps)) == ord('q'):
+            if cv2.waitKey(1) == ord('q'):
               break
 
       cap.release()
