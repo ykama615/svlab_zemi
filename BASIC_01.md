@@ -16,7 +16,6 @@
 
   ```python
   # script4.py
-  # -*- coding: utf-8 -*-  
   import cv2
 
   dev = 0
@@ -40,6 +39,16 @@
 
   if __name__=='__main__':
     main()
+  ```
+
+  #### 内蔵カメラ以外のWebカメラ等を利用する場合
+  USB接続のカメラの場合，cv2.VideoCaptureによるカメラの起動が遅くなります．これを回避するためにメインプログラムの先頭（import cv2より前）に以下の2行を記述します．
+  ```python
+  # cv2のインポート前にカメラに関する設定を行う
+  import os
+  os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
+  import cv2
   ```
 
   ## [課題] Let's Selfy プログラム
