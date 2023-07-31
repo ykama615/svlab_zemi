@@ -84,7 +84,6 @@
   - 色々なタイミングでフレームを収録していくプログラムに変更してみましょう
   
   ```python
-  # -*- coding: utf-8 -*-
   import cv2
   import numpy as np
   from collections import deque # dequeの利用に必要
@@ -138,7 +137,6 @@
   - 次のサンプルは，プログラム引数でカメラやそのプロパティを指定できるようにしたものです
 
   ```python
-  # -*- coding: utf-8 -*-
   import cv2
   import argparse
   import myCapture as mycap
