@@ -10,44 +10,34 @@
 
 # 環境のインストール
 
- - 以下は配布環境のインストール方法です（2022夏版）
-   （ ポータブル環境自体を作る場合のメモは [こちら](https://github.com/ykama615/svlab/blob/8ce061b8d7bbab7cbea188d19b001b9d872c40b8/README.md) ）
+ - 以下は配布環境のインストール方法です（2023r2）
 
 1. exeファイルを展開します
-    - C:\oit\oitpy22\以下に，python，VS Code，ソースコード用フォルダが展開されます．
+    - C:\oit\py23r2\以下に，python，VS Code，ソースコード用フォルダが展開されます．
  
  
 2. 環境の起動
-    - デスクトップにあるOITpy22のショートカットまたは C:\oit\oitpy22\OITpy22.bat をダブルクリックして起動します．
+    - デスクトップにあるpy23_startのショートカットまたは C:\oit\py23r2\py23_start.bat をダブルクリックして起動します．
  
  
 3. ディレクトリ構造
-    - C:\oit\oitpy22\SourceCode\以下のディレクトリ構造は次の通りです．新しい.pyファイルはSourceCodeフォルダに追加します．
+    - C:\oit\py23\SourceCode\以下のディレクトリ構造は次の通りです．新しい.pyファイルはSourceCodeフォルダに追加します．
       ```
       +[SourceCode]             <== ワーキングディレクトリ ("C:\oit\oitpy22\SourceCode")
       |
-      |-+[mylibs]               <== 独自ライブラリ
-      | |-+[myCapture]          <== 動画キャプチャ用のライブラリ関数
-      | | |--
-      | |
-      | |-+[myPhysiology]       <== 生体信号関連のライブラリ関数
-      | | |-+[learned_model]
-      | | | |-+[haarcascades]   <== haarcascades用の学習済みファイル
-      | | | | |--
-      | | | |
-      | | | |--lbfmodel.yaml    <== lbf顔パーツ検出用の学習済みファイル
-      | | | |--README.md        <== 
-      | | | |--shape_predictor_68_face_landmarks.dat  <== dlib顔パーツ検出用の学習済みファイル
-      | | | |--
-      | | |
-      | | |--
-      | |
-      | |--
+      |-+[.vscode]              <== （編集不要）ワークスペース設定のフォルダ
+      | |-launch.json           <== （編集不要）ローンチ用jsonファイル
       |
-      |--test_faceDetect.py     <== mylibsを使った顔検出サンプルpy
-      |--test_myCapture.py      <== mylibsを使った動画キャプチャサンプルpy
-      |--test_myMediapipe.py    <== mylibsを使ったmediapipeのサンプルpy
-      |--                       <== プログラムを追加していく場所
+      |-+[image]                <== 画像用フォルダ
+      | |-swan.jpg
+      | +[standard]             <== 標準画像用フォルダ
+      |   |-+[mono]             <== グレースケール画像用フォルダ
+      |   | |-- 
+      |   |
+      |   |--
+      |
+      |-+[samples]              <== サンプルファイル
+      | |--
       |
       ```
 
@@ -79,7 +69,7 @@
       
     - 以下の実行結果が出力されれば成功です．
       ```sh
-      C:\oit\oitpy22\SourceCode> python sample_basic.py
+      C:\oit\py23r2\SourceCode> python sample_basic.py
       0:0
       1:1
       2:3
@@ -94,14 +84,11 @@
       ```
 
 6. OpenCVライブラリのサンプルの実行
-    - [SourceCode]フォルダに新規に[img]フォルダを作成し，以下の[Mandrill.bmp]をダウンロードして[img]フォルダに保存します．<br>
-        ![Mandrill](./Mandrill.bmp)
-        
     - 新規ファイルとして[sample_cv2.py]を作成し，以下のコードを入力して実行してみましょう．
       ```python
       # sample_cv2.py
       import cv2
-      img = cv2.imread('./img/Mandrill.bmp') # read image file
+      img = cv2.imread('./image/standard/Mandrill.bmp') # read image file
       if img is None: # maybe Path is wrong
           print("image file is not opened.")
           exit(1)
