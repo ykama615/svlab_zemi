@@ -37,7 +37,6 @@
   プログラムはファイルの上から順に実行されます．
   ```python
   # script1.py
-  # -*- coding: utf-8 -*-
   print("Hello python")
   
   def func_hoge(): # 関数hoge
@@ -59,7 +58,6 @@
   if文のブロックには，呼び出す関数や実行する処理の手順をまとめて記述します．他のファイルからimportされた場合，if文のブロックは無視されます．
   ```python
   # script2.py
-  # -*- coding: utf-8 -*-  
   def func_hoge(): # 関数hoge
     print("hoge hoge")
   
@@ -93,7 +91,6 @@
  
   ```python
   # script3.py
-  # -*- coding: utf-8 -*-  
   def func_msg(num, str="hoge"):
     for i in range(num):
         print(str)
@@ -124,7 +121,6 @@
 # クラス
   ```python
   # script4.py
-  # -*- coding: utf-8 -*-  
 
   class Twice:
     cnum = 10
@@ -153,7 +149,6 @@
 # 大域変数
   ```python
   # script5.py
-  # -*- coding: utf-8 -*-  
 
   def twice():
     global gnum
@@ -221,7 +216,6 @@
 # for文，内包標記
   ```python
   # script7.py
-  # -*- coding: utf-8 -*-  
 
   lst = ['子','丑','寅','卯']
   tpl = ('子','丑','寅','卯')
@@ -276,7 +270,6 @@
   .pyファイルをフォルダにまとめ，\_\_init\_\_.pyファイルを入れることでパッケージ（ライブラリ？）として扱うことができます．
   ```python
   # mul_module.py
-  # -*- coding: utf-8 -*-  
   def twice(num):
   print(num*2)
   ```
@@ -301,7 +294,6 @@
  数値だけでなく，配列(リスト)や画像など様々なデータを格納でき，格納と取り出しが非常に高速です．下記のサンプルを実行して結果を確認しましょう．<br>
  ```python
  # deque_sample.py
- # -*- coding: utf-8 -*-
  import numpy as np
  from collections import deque # dequeの利用に必要
 
