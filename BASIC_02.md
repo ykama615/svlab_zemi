@@ -76,12 +76,11 @@
   メソッドはOpenCVのFaceMark APIに標準実装されており，学習済みファイルには lbfmodel.yaml を利用します．
   
   ```python
-  #-*- coding: utf-8 -*-
   import cv2
   import numpy as np
 
-  mdl_folder = "mylibs/myPhysiology/learned_model/"  # 学習済みファイルのまでのパス
-  img_folder = "img/" # 画像ファイルまでのパス
+  mdl_folder = "./learned_models/"  # 学習済みファイルのまでのパス
+  img_folder = "./image/standard/" # 画像ファイルまでのパス
 
   def main():
     face_cascade = cv2.CascadeClassifier(mdl_folder + "haarcascades/haarcascade_frontalface_default.xml")
