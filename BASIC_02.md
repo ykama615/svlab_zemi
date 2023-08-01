@@ -124,14 +124,13 @@
     - ランドマークの0-67の添字はインターネットの情報などを参考にしてください
     - 左右の目の両端と鼻の5点をランドマークとする shape_predictor_5_face_landmarks.dat というファイルも配布されています
   ```python
-  #-*- coding: utf-8 -*-
   import cv2
   import dlib
   from imutils import face_utils
   import numpy as np
 
-  mdl_folder = "mylibs/myPhysiology/learned_model/"  # 学習済みファイルのまでのパス
-  img_folder = "img/" # 画像ファイルまでのパス
+  mdl_folder = "./learned_model/"  # 学習済みファイルのまでのパス
+  img_folder = "./image/standard/" # 画像ファイルまでのパス
 
   def main():
     detector = dlib.get_frontal_face_detector()
