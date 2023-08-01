@@ -129,7 +129,7 @@
   from imutils import face_utils
   import numpy as np
 
-  mdl_folder = "./learned_model/"  # 学習済みファイルのまでのパス
+  mdl_folder = "./learned_models/"  # 学習済みファイルのまでのパス
   img_folder = "./image/standard/" # 画像ファイルまでのパス
 
   def main():
@@ -172,6 +172,7 @@
   顔パーツのうちで，上まぶたや下まぶた，口の両端を示すランドマークの番号を調べて，その位置の変化によってその時点のフレームを切り取るプログラムを作成してみましょう．
    - フレームの切り取りは[カメラへのアクセスと動画処理](BASIC_01.md) の章を確認してください
 
+  <!--
   ## [エクストラ] 配布環境の自作ライブラリの利用
   配布環境には，OpenCV（Haar-likeとLBF），dlibなどによる顔・顔パーツ検出を補助するライブラリ（パッケージ）が用意してあります．
    - mylibs\\myPhysiology パッケージ内の cv_face_detector.py モジュール（Haar-likeとLBFを実装したcvFaceDetectorクラス）
@@ -219,3 +220,4 @@
   if __name__=='__main__':
     main()
   ```
+  -->
