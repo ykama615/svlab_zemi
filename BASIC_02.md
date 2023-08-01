@@ -10,7 +10,9 @@
 
 # 顔検出
   ## 準備
-  __※配布環境を使用している場合は， .\\mylibs\\myPhysiology\\learned_model 以下に学習済みデータが配置されているので準備作業は不要です．__<br>
+  __※配布環境を使用している場合， learned_models.zip をダウンロードして解凍し，learned_modelsフォルダをSourceCodeフォルダに配置してください．__<br>
+  <!--
+  __※配布環境を使用している場合，以下の作業は不要です．__<br>
   dlibはpipでインストール可能だが， *setup.py* が走るので，Cコンパイラ環境とcmakeが必要です．<br>
   [Visual Studio Community (無償版)](https://visualstudio.microsoft.com/ja/free-developer-offers/) のVisual C++アプリケーションのインストールを事前に行っておきましょう．
 
@@ -24,17 +26,16 @@
    - [OpenCV FaceMark APIの説明へのリンク](https://docs.opencv.org/4.x/d7/dec/tutorial_facemark_usage.html)
 
   それぞれDLして解凍し，スクリプトと同じフォルダに配置しておきます．
-
+  -->
   ## Haar-like特徴量を用いた顔検出
   Haar-like特徴量（矩形領域の濃淡パターン）を使った顔検出です．OpenCVではHaar-like特徴を用いた分類器が配布されています．<br>
   下記サンプルは，静止画像に対する人の正面顔（haarcascade_frontalface_default.xml）と検出した顔領域の中から目領域（haarcascade_eye.xml）を検出する例です．
   
   ```python
-  #-*- coding: utf-8 -*-
   import cv2
 
-  mdl_folder = "mylibs/myPhysiology/learned_model/"  # 学習済みファイルのまでのパス
-  img_folder = "img/" # 画像ファイルまでのパス
+  mdl_folder = "./learned_models/"  # 学習済みファイルのまでのパス
+  img_folder = "./image/standard/" # 画像ファイルまでのパス
 
   def main():
     face_cascade = cv2.CascadeClassifier(mdl_folder + "haarcascades/haarcascade_frontalface_default.xml")
