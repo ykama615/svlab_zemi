@@ -8,7 +8,7 @@
 
 <hr>
 
-# MediaPipe
+# MediaPipe（旧バージョン用）
  MediaPipeで提供されている機能のうちPythonでサポートされているものは，2022.08現在，以下の通りである．
   - Face Detection
   - Face Mesh
@@ -25,7 +25,6 @@
   3. processの戻り値（results）を分解して必要な情報を抽出する
 
   ```python
-  #-*- coding: utf-8 -*-
   import cv2
   import numpy as np
   import mediapipe as mp
@@ -153,7 +152,6 @@
   - 人差し指の先はLandmarkリスト（配列）の添字8に割り当てられています
     - 他のLandmarkは，[マニュアル](https://google.github.io/mediapipe/solutions/hands.html) で確認してください 
   ```python
-  #-*- coding: utf-8 -*-
  import cv2
  import mediapipe as mp
  import numpy as np
@@ -255,7 +253,6 @@
  - Landmarkの詳しい情報は，[マニュアル](https://google.github.io/mediapipe/solutions/face_mesh.html) で確認してください 
 
  ```python
- # -*- coding: utf-8 -*-
  import cv2
  import mediapipe as mp
  import time
@@ -345,7 +342,7 @@
  if __name__ == '__main__':
    main()
  ```
-
+<!--
 ## [エクストラ] 配布環境の自作ライブラリの利用
 
 配布環境には，mediapipeのうち，フレーム画像を渡すと，Face Detection，Hands，Poseの結果の座標リスト，Selfie Segmentationの結果画像を返却する補助するライブラリ（パッケージ）が用意してあります．
@@ -477,3 +474,4 @@ import random
 
 cpu = random.randint(0,3)
 ```
+-->
