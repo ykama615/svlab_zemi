@@ -133,6 +133,9 @@ class myMrdiapipe:
 
  このクラスの使い方は次の通り．
  ```python
+import os
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
 import cv2
 from myMediapipe import myMrdiapipe
 
