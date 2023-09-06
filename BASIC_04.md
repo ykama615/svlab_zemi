@@ -207,19 +207,227 @@ def main():
     
 if __name__=='__main__':
     main()
+ ```
 
-  ## Selfie Segmentationを例とした基本的な使い方
-  以下は，MediaPipe の Selfie Segmentation 機能を利用した例です．他の機能を利用する場合も基本手順は同じとなります．
-  1. mp.solutionsパッケージから使いたい機能を呼び出す
-  2. processメソッドを用いて検出を行う
-  3. processの戻り値（results）を分解して必要な情報を抽出する
- 
- ## FaceMeshを表示するサンプル
- - MediaPipeのFaceMeshを使って468点の顔の3D特徴点を表示します
- - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
- - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
-   - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
- - Landmarkの詳しい情報は，[マニュアル](https://google.github.io/mediapipe/solutions/face_mesh.html) で確認してください 
+  ## Minecraftをジェスチャで動かすサンプル
+  ・以下のファイルと↑の myMediapipe.py を利用した例
+    ・mc_init.py（initクラス：ウィンドウの名前からハンドルを取得して，ウィンドウのサイズと位置を指定してアクティブにするクラス）
+    ・mc_movePlayer.py（movePlayerクラス：wasdのキーダウン，アップを行う関数を実装したクラス）
 
  ```python
+# mc_init.py
+import time
+
+import win32gui
+import ctypes
+import ctypes.wintypes
+from ctypes import windll
+
+################################
+game_name = 'Minecraft Education'
+sleep_time = 0.1
+################################
+
+def init():
+    mcapp = win32gui.FindWindow(None, game_name)
+    windll.user32.SetForegroundWindow(mcapp)         #ウィンドウの指定
+    time.sleep(sleep_time)
+    hwnd = windll.user32.GetForegroundWindow()
+    windll.user32.MoveWindow(hwnd, 0, 0, 1600, 900, True)
+    rect = ctypes.wintypes.RECT()
+    windll.user32.GetWindowRect(hwnd, ctypes.pointer(rect))
+
+    print(rect.left , rect.top , rect.right , rect.bottom)
+
+if __name__ == '__main__':
+    init()
+ ```
+
+ ```python
+# mc_movePrayer.py
+import ctypes
+import ctypes.wintypes
+from ctypes import windll
+
+class movePlayer:
+    def __init__(self):
+        self.press_fwd = False
+        self.press_bck = False
+        self.press_lft = False
+        self.press_rgt = False
+
+    def forward(self, bool):
+        if bool:
+            
+            if self.press_fwd==False:
+                self.press_fwd = True
+                windll.user32.keybd_event(0x57, 0, 0, 0)
+        else:
+            if self.press_fwd==True:
+                self.press_fwd = False
+                windll.user32.keybd_event(0x57, 0, 2, 0)
+
+    def backward(self, bool):
+        if bool:
+            if self.press_bck==False:
+                self.press_bck = True
+                windll.user32.keybd_event(0x53, 0, 0, 0)
+        else:
+            if self.press_bck==True:
+                self.press_bck = False
+                windll.user32.keybd_event(0x53, 0, 2, 0)
+
+    def left(self, bool):
+        if bool:
+            if self.press_lft==False:
+                self.press_lft = True
+                windll.user32.keybd_event(0x41, 0, 0, 0)
+        else:
+            if self.press_lft==True:
+                self.press_lft = False
+                windll.user32.keybd_event(0x41, 0, 2, 0)
+
+    def right(self, bool):
+        if bool:
+            if self.press_rgt==False:
+                self.press_rgt = True
+                windll.user32.keybd_event(0x44, 0, 0, 0)
+        else:
+            if self.press_rgt==True:
+                self.press_rgt = False
+                windll.user32.keybd_event(0x44, 0, 2, 0)
+
+
+if __name__=='__main__':
+    import time
+    import mc_init
+    mc_init.init()
+    windll.user32.keybd_event(0x1b, 0, 1, 0)
+    test = movePlayer()
+    for i in range(5):
+        time.sleep(3)    
+        test.forward(True)
+        time.sleep(1)    
+        test.right(True)
+        time.sleep(1)    
+        test.right(False)
+        test.left(True)
+        time.sleep(2)    
+        test.left(False)
+
+    time.sleep(3)    
+    test.forward(False)
+    test.backward(True)
+    time.sleep(2)
+    test.backward(False)
+ ```
+
+  動作サンプルプログラムは以下の通り．
+   1. mincraftのウィンドウをアクティブにする
+   2. 別のディスプレイにOpenCVのウィンドウを開いてカメラ映像に操作用のイラストを重畳して表示
+   3. 左手の人差し指の先端がどこにあるかによってwasdが押・離されてmincraft内のキャラクターが動く
+
+ ```python
+import os
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
+import cv2
+import numpy as np
+import math
+
+from myMediapipe import myMrdiapipe
+
+from mc_init import init
+from mc_movePlayer import movePlayer
+
+dev = 0
+
+def main():
+    mp = myMrdiapipe(detection=0.8, tracking=0.8)
+    move = movePlayer()
+
+    cap = cv2.VideoCapture(dev)
+    ht  = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    wt  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    cv2.namedWindow("video", cv2.WINDOW_NORMAL)
+    cv2.moveWindow("video", 1600, 0)
+
+    back = cv2.imread("./back2.bmp")
+    imh, imw, _ = back.shape
+    ratio = ht/imh
+    back = cv2.resize(back, None, fx=ratio, fy=ratio)
+    imh, imw, _ = back.shape
+    lx, ly = [wt//2-imw//2, 0]
+    cx, cy = [wt//2, ht//2]
+    white = np.ones((ht, wt, 3), dtype=np.uint8)*255
+    white[ly:ly+imh, lx:lx+imw] = back
+
+    init()
+    while cap.isOpened():
+        ret, frame = cap.read()
+        frame = cv2.flip(frame, 1)
+        image = mp.getMPImage(frame)
+
+        ## Hands #############################################################
+        hands = mp.getHand(image, wt, ht)
+
+        frame[white<=250] = white[white<=250]
+        if len(hands)==1:
+            left = hands[0][0]
+
+            r = 0
+            deg = 0
+            if len(left)>0:
+                cv2.circle(frame, (left[8][0], left[8][1]), 5, [0,0,255], -1)
+                dx = left[8][0] - cx
+                dy = left[8][1] - cy
+                r = int(math.dist([0, 0], [dx, dy]))
+                deg = int(math.degrees(math.atan2(-dy, dx)))
+
+                if (100*ratio<=r) and (r<=150*ratio):
+                    #print(r, deg)
+                    if (0<= abs(deg)) and (abs(deg)<=60):
+                        move.right(True)
+                    elif ( abs(deg)< 0 or 60 < abs(deg)):
+                        move.right(False)
+
+                    if (120<= abs(deg)) and (abs(deg)<=180):
+                        move.left(True)
+                    else:
+                        move.left(False)
+
+                    if (30<= deg) and (deg<=150):
+                        #print("foward")
+                        move.forward(True)
+                    else:
+                        move.forward(False)
+
+                    if (-150<= deg) and (deg<=-30):
+                        #print("backward")
+                        move.backward(True)
+                    else:
+                        move.backward(False)
+
+                else:
+                    move.forward(False)
+                    move.backward(False)
+                    move.left(False)
+                    move.right(False)
+            else:
+                move.forward(False)
+                move.backward(False)
+                move.left(False)
+                move.right(False)
+
+        if cv2.waitKey(1) & 0xFF == ord('q') or ret == False:
+            break
+
+        cv2.imshow("video", frame)
+
+    cv2.destroyAllWindows()
+    cap.release()
+
+if __name__=='__main__':
+    main()
  ```
