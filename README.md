@@ -11,39 +11,32 @@
 
 # 環境のインストール
 
- - 以下は配布環境のインストール方法です（2023r2）
+ - 以下は配布環境のインストール方法です（py24）
 
 1. exeファイルを展開します
-    - C:\oit\py23r2\以下に，python，VS Code，ソースコード用フォルダが展開されます．
+    - C:\oit\py24\以下に，python，VS Codeが， C:\oit\home\以下にpy24フォルダ（ソースコード用フォルダ）が展開されます．
  
  
 2. 環境の起動
-    - デスクトップにあるpy23_startのショートカットまたは C:\oit\py23r2\py23_start.bat をダブルクリックして起動します．
+    - デスクトップにあるpy24_startのショートカットまたは C:\oit\py24\py24_start.bat をダブルクリックして起動します．
  
  
 3. ディレクトリ構造
-    - C:\oit\py23\SourceCode\以下のディレクトリ構造は次の通りです．新しい.pyファイルはSourceCodeフォルダに追加します．
+    - C:\oit\home\py24\以下のディレクトリ構造は次の通りです．新しい.pyファイルはSourceCodeフォルダに追加します．
       ```
-      +[SourceCode]             <== ワーキングディレクトリ ("C:\oit\oitpy22\SourceCode")
+      +[py24]             <== ワーキングディレクトリ ("C:\oit\home\py24")
       |
-      |-+[.vscode]              <== （編集不要）ワークスペース設定のフォルダ
-      | |-launch.json           <== （編集不要）ローンチ用jsonファイル
-      |
-      |-+[image]                <== 画像用フォルダ
-      | |-swan.jpg
+      |-+[img]                <== 画像用フォルダ
       | +[standard]             <== 標準画像用フォルダ
       |   |-+[mono]             <== グレースケール画像用フォルダ
       |   | |-- 
       |   |
       |   |--
       |
-      |-+[samples]              <== サンプルファイル
-      | |--
-      |
       ```
 
 4. 実行ファイルの作り方とターミナルの起動
-    - VS Codeの[エクスプローラー]メニューの[SOURCECODE]フォルダの右に示される，新規ファイルの追加，新規フォルダの追加でファイルやフォルダの追加を行います．<br>
+    - VS Codeの[エクスプローラー]メニューの[PY24]フォルダの右に示される，新規ファイルの追加，新規フォルダの追加でファイルやフォルダの追加を行います．＊画像中の[SOURCECODE]を[PY24]に読み替えてください<br>
         ![fig001](./fig001.png)
     - ターミナルが開いていない場合，[ターミナル]メニューから[新しいターミナル]を選択してターミナルを起動します．<br>
         ![fig002](./fig002.png)
@@ -89,7 +82,7 @@
       ```python
       # sample_cv2.py
       import cv2
-      img = cv2.imread('./image/standard/Mandrill.bmp') # read image file
+      img = cv2.imread('./img/standard/Mandrill.bmp') # read image file
       if img is None: # maybe Path is wrong
           print("image file is not opened.")
           exit(1)
