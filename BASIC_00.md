@@ -374,3 +374,24 @@
   deque([2, 3, 4, 5, 6], maxlen=5)
   deque([6, 5, 4, 2, 3], maxlen=5)
   ```
+
+ - dequeでは\:を使って一部の要素を取り出すこと（スライス）ができません．itertoolsのisliceメソッドか，リストの内包表記でfor文を内包させます．
+  ```python
+  from collections import deque
+  import itertools
+  
+  queue = deque()
+  for num in range(21):
+      queue.append(num) #末尾に追加
+  print(queue)
+
+  #itertoolsのisliceを利用
+  print(list(itertools.islice(queue, 5,11)))
+  #リストの内包表記
+  print([queue[i] for i in range(5,11)])
+  ```
+  ```sh
+  deque([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
+  [5, 6, 7, 8, 9, 10]
+  [5, 6, 7, 8, 9, 10]
+  ```
