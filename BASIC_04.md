@@ -8,7 +8,8 @@
 6. 応用※未整理（↓）
 
 <hr>
-
+# REALSENSE（pyrealsense2）のクラス化サンプル
+# PyQtGraphのクラス化サンプル
 # MediaPipeのクラス化サンプル
  MediaPipe新バージョン（2023.4版，mediapipe0.10.0以降）でも旧バージョンの利用法で利用が可能です．<br>
   - FaceMeshにIris（中心1点，周辺4点x2の計10点）が追加されました（新・旧いずれの使い方でも利用可能）
