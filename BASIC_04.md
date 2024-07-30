@@ -13,6 +13,192 @@
 
 # PyQtGraphのクラス化サンプル
 
+ ```python
+ import cv2
+ import numpy as np
+ import pyqtgraph as qtg
+ import sys
+ from PyQt5 import QtWidgets, QtCore
+ from collections import deque
+ 
+ import random
+ 
+ class myGraph(qtg.GraphicsLayoutWidget):
+   __instance = None
+   canvas = None
+   curve  = None
+   cvmap = None
+   t1 = None
+   __xcap_list = {}
+   __ycap_list = {}
+   __xrange_list = {}
+   __yrange_list = {}
+ 
+   @staticmethod
+   def getInstance():
+     if myGraph.__instance == None:
+       myGraph()
+     return myGraph.__instance
+   
+   def __init__(self):
+     if myGraph.__instance == None:
+       myGraph.__instance = self
+       self.SOLIDLINE = QtCore.Qt.SolidLine
+       self.DASHLINE  = QtCore.Qt.DashLine    # 破線
+       self.DOTLINE   = QtCore.Qt.DotLine     # 点線
+       self.DASHDOTLINE = QtCore.Qt.DashDotLine   # 1点破線
+       self.DATHDOTDOTLINE = QtCore.Qt.DashDotDotLine # 2点は線
+     
+       self.initialize()
+     
+   def initialize(self):
+     self.app = QtWidgets.QApplication(sys.argv)
+     qtg.setConfigOptions(antialias=True, foreground='k', background='w')
+     self.win = qtg.GraphicsLayoutWidget()
+     self.win.show()
+     
+     self.canvas = {}
+     self.curve = {}
+   
+   def setWindowSize(self, width, height):
+     self.win.resize(width, height)
+   
+   def setPlotCanvas(self, title=[], col=0, row=0):
+     tmp = self.win.addPlot(show=False, size=None, title=title, col=col, row=row)
+     self.canvas[id(tmp)] = tmp
+     #tmp.setLabel('left', '(a.u.)', units='')
+     #tmp.setLabel('bottom', 'time (sec)', units='')
+     return id(tmp)
+   
+   def setCanvas(self, id):
+     return self.canvas[id]
+   
+   def setCurve(self, canvasid=None, maxdatasize=300, pen=None):
+     if pen==None:
+       mypen = qtg.mkPen(color=(0, 255, 0), style=self.SOLIDLINE, width=3)
+     else:
+       mypen = pen
+     
+     if self.canvas[canvasid]==None:
+       print('Canvas does not exist')
+       return None
+     
+     tmp = self.canvas[canvasid].plot([], [], pen=mypen)
+     self.curve[id(tmp)] = [tmp, deque(maxlen=maxdatasize), deque(maxlen=maxdatasize)]
+     
+     return id(tmp)
+   
+   def makePen(self, color, style, width):
+   return qtg.mkPen(color=color, style=style, width=width)
+   
+   
+   def setCurveData(self, curveid, xlist, ylist):
+     #print(xlist)
+     
+     self.curve[curveid][1].extend(xlist)
+     self.curve[curveid][2].extend(ylist)
+   
+   def setStatus(self, canvasid=None, xrange=[], yrange=[], xcap=[], ycap=[]):
+     if len(xcap)>0:
+       self.__xcap_list[canvasid] = xcap
+       if len(xcap)==2:
+         unit = xcap[1]
+       else:
+         unit = ''
+       self.canvas[canvasid].setLabel('bottom', xcap[0], units=unit)
+     
+     if len(ycap)>0:
+       self.__ycap_list[canvasid] = ycap
+       if len(xcap)==2:
+         unit = xcap[1]
+       else:
+         unit = ''
+       self.canvas[canvasid].setLabel('left', ycap[0], units='')
+     
+     if len(xrange)==2:
+       self.__xrange_list[canvasid] = xrange
+     
+     if len(yrange)==2:
+       self.__yrange_list[canvasid] = yrange
+   
+   def show(self):
+     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+       QtWidgets.QApplication.instance().exec_()
+   
+   def startRefresh(self, interval=1000):
+     self.t1 = QtCore.QTimer()
+     self.t1.setInterval(interval)
+     self.t1.timeout.connect(lambda:self.refresh())
+     self.t1.start()
+   
+   def refresh(self):
+     xlist = []
+     for curveid, curvepack in self.curve.items():
+       curve = curvepack[0]
+       xlist = [x for x in curvepack[1]]
+       ylist = [y for y in curvepack[2]]
+       curve.setData(xlist, ylist)
+     
+     for id, values in self.__xrange_list.items():
+       #self.canvas[id].setXRange(xlist[0], xlist[-1], padding=0)
+       if len(values)==2:
+         self.canvas[id].setXRange(values[0], values[1])
+     
+     for id, values in self.__yrange_list.items():
+       if len(values)==2:
+         self.canvas[id].setYRange(values[0], values[1])
+   
+   def stopRefresh(self):
+     self.t1.stop()
+   
+   def destroyRefresh(self):
+     self.t1.deleteLater()
+   
+   def destroyWindow(self):
+     self.win.deleteLater()
+ ```
+
+このクラスの使い方(1.静的グラフ)は次の通り．
+ ```python
+ import cv2
+ import numpy as np
+ import time
+ from collections import deque
+ 
+ from myQtGraph import myGraph
+ 
+ def main():
+   graphWindow = myGraph.getInstance() #ウィンドウは1つしか生成できない
+   graphWindow.setWindowSize(800,400)
+ 
+   canvas1 = graphWindow.setPlotCanvas(title='sin', col=0,row=0) #グラフはタイル表示
+   canvas2 = graphWindow.setPlotCanvas(title='cos', col=0,row=1) #グラフはタイル表示
+ 
+   pen = graphWindow.makePen([255,0,255], graphWindow.DASHLINE, 2) #ペンを指定しなければグリーン，実線，太さ2
+ 
+   #描画データを生成
+   x  = [x for x in range(0, 720, 10)]
+   sin_y = [np.sin(np.radians(y)) for y in x]
+   cos_y = [np.cos(np.radians(y)) for y in x]
+ 
+   curve1_1 = graphWindow.setCurve(canvasid=canvas1) #同じグラフに重ね描き
+   curve1_2 = graphWindow.setCurve(canvasid=canvas1, pen=pen) #同じグラフに重ね描き
+   curve2   = graphWindow.setCurve(canvas2)
+ 
+   graphWindow.setCurveData(curve1_1, x, sin_y) #グラフにデータを描画
+   graphWindow.setCurveData(curve1_2, x, cos_y) #グラフにデータを描画
+   graphWindow.setCurveData(curve2, x, sin_y)  #グラフにデータを描画 
+ 
+   graphWindow.setStatus(canvasid=canvas2, xrange=[0, 360], yrange=[-1, 1], xcap=['degree', '°'], ycap=['(a.u.)'])
+ 
+   graphWindow.refresh() #グラフをウィンドウに反映
+ 
+   graphWindow.show() #ウインドウの描画
+ 
+ if __name__=='__main__':
+   main()
+ ```
+
 # MediaPipeのクラス化サンプル
  MediaPipe新バージョン（2023.4版，mediapipe0.10.0以降）でも旧バージョンの利用法で利用が可能です．<br>
   - FaceMeshにIris（中心1点，周辺4点x2の計10点）が追加されました（新・旧いずれの使い方でも利用可能）
