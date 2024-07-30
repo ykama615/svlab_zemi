@@ -89,7 +89,7 @@
      return id(tmp)
    
    def makePen(self, color, style, width):
-   return qtg.mkPen(color=color, style=style, width=width)
+     return qtg.mkPen(color=color, style=style, width=width)
    
    
    def setCurveData(self, curveid, xlist, ylist):
