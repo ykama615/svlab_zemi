@@ -12,7 +12,7 @@
 
 # 顔検出
   ## 準備
-  __※配布環境を使用している場合， learned_models.zip をダウンロードして解凍し，learned_modelsフォルダをSourceCodeフォルダに配置してください．__<br>
+  __※配布環境を使用している場合， learned_models.zip をダウンロードして解凍し，learned_modelsフォルダをソースコードフォルダ（py24）に配置してください．__<br>
   <!--
   __※配布環境を使用している場合，以下の作業は不要です．__<br>
   dlibはpipでインストール可能だが， *setup.py* が走るので，Cコンパイラ環境とcmakeが必要です．<br>
