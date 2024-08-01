@@ -10,6 +10,12 @@
 <hr>
 
 
+<hr>
+
+ よりしっかり学習したい人は，[「Python ゼロからはじめるプログラミング」](https://mitani.cs.tsukuba.ac.jp/book_support/python/) のPDFなどを参考に
+
+<hr>
+
 # pythonの実行方法
  1. 対話（インタラクティブ）モード<br>
   入出力環境（PowerShell）を起動後にpythonと入力し，入力プロンプト（>>>）の後ろにコマンドを入力していきます．<br>
