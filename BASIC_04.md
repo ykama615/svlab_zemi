@@ -6,6 +6,9 @@
 4. [顔と顔パーツの検出](BASIC_02.md)
 5. [顔・手・ポーズ検出](BASIC_04.md)
 6. 各種クラス・応用（↓）
+   - [PyQtGraphのクラス化サンプル](#pyqtgraphのクラス化サンプル)
+   - [MediaPipeのクラス化サンプル](#mediapipeのクラス化サンプル)
+
 
 <hr>
 
