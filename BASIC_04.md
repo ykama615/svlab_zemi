@@ -6,7 +6,7 @@
 4. [顔と顔パーツの検出](BASIC_02.md)
 5. [顔・手・ポーズ検出](BASIC_04.md)
 6. 各種クラス・応用
-   - [REALSENSE（pyrealsense2）のクラス化サンプル](#realsense（pyrealsense2）のクラス化サンプル)
+   - [REALSENSE（pyrealsense2）のクラス化サンプル](#realsensepyrealsense2のクラス化サンプル)
    - [PyQtGraphのクラス化サンプル](#pyqtgraphのクラス化サンプル)
    - [MediaPipeのクラス化サンプル](#mediapipeのクラス化サンプル)
    - [キーボード入力のクラス化サンプル](#キーボード入力のクラス化サンプル)
