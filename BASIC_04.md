@@ -15,6 +15,72 @@
 <hr>
 
 # REALSENSE（pyrealsense2）のクラス化サンプル
+RGB-DカメラはRGB画像と同時に深度（距離）の計測が可能なカメラです．その一つである[Intel Realsense](https://www.intelrealsense.com/)はpyrealsense2ライブラリを追加すると利用可能となります．
+
+ ```python
+ import sys
+ import cv2
+ import numpy as np
+ import pyrealsense2 as rs
+
+ class myRealsense2:
+   RS_PROP_FRAME_WIDTH = 0
+   RS_PROP_FRAME_HEIGHT = 1
+   RS_PROP_FRAME_FPS = 2
+
+   def __init__(self, width=1280, height=720, fps=30, bag=None):
+     conf = rs.config()
+     if bag is not None:
+       rs.config.enable_device_from_file(conf, bag, repeat_playback=False)
+     else:
+       conf.enable_stream(rs.stream.color, width, height, rs.format.bgr8, fps)
+     conf.enable_stream(rs.stream.depth, width, height, rs.format.z16, fps)
+     self._wt = width
+     self._ht = height
+     self._fps = fps
+
+     self.pipeline = rs.pipeline()
+     self.profile = self.pipeline.start(conf)
+ 
+     align_to = rs.stream.color
+     self.align = rs.align(align_to)
+
+     #depth_sensor = profile.get_device().first_depth_sensor()
+     #depth_scale = depth_sensor.get_depth_scale()
+
+   def get(self, const_str):
+     if const_str == self.RS_PROP_FRAME_WIDTH:
+       return self._wt
+     elif const_str == self.RS_PROP_FRAME_HEIGHT:
+       return self._ht
+     elif const_str == self.RS_PROP_FRAME_FPS:
+       return self._fps
+     else:
+       sys.exit("Error: invalid configuration")
+
+   def read(self):
+     frames = self.pipeline.wait_for_frames()
+     aligned_frames = self.align.process(frames)
+
+     color_frame = aligned_frames.get_color_frame()
+     depth_frame = aligned_frames.get_depth_frame()
+
+     #if not depth_frame or not color_frame:
+     #    return False, []
+
+     color_image = np.asanyarray(color_frame.get_data())
+     depth_image = np.asanyarray(depth_frame.get_data())
+
+     #array = np.concatenate((color_image, depth_image.reshape(depth_image.shape[0], depth_image.shape[1], 1)), axis=2)
+
+     return True, {'rgb': cv2.cvtColor(color_image, cv2.COLOR_RGB2BGR), 'depth': depth_image}#array
+
+   def convert2DepthColorMap(self, depth):
+     return rs.colorizer().colorize(depth)    
+
+   def release(self):
+     self.pipeline.stop()
+ ```
 
 # PyQtGraphのクラス化サンプル
  Pythonでグラフを描くための代表的なものには，matplotlibを用いる方法とpyqtgraphを用いるものがあります．<br>
