@@ -122,9 +122,16 @@
 
   ## dlib を用いた顔パーツ検出
   dlib C++ Libraryに実装されたアルゴリズム（ [KAZEMIによる論文, CVPR 2014](https://openaccess.thecvf.com/content_cvpr_2014/html/Kazemi_One_Millisecond_Face_2014_CVPR_paper.html) ）を使った顔と顔パーツ検出です．<br>
-  学習済みファイルには shape_predictor_68_face_landmarks.dat を利用します．なお，顔パーツの型変換のために imutils ライブラリを利用しています．
-    - ランドマークの0-67の添字はインターネットの情報などを参考にしてください
-    - 左右の目の両端と鼻の5点をランドマークとする shape_predictor_5_face_landmarks.dat というファイルも配布されています
+  学習済みファイルには shape_predictor_68_face_landmarks.dat を利用します．なお，顔パーツの型変換のために imutils ライブラリ（*）を利用しています．
+  - ランドマークの0-67の添字はインターネットの情報などを参考にしてください
+  - 左右の目の両端と鼻の5点をランドマークとする shape_predictor_5_face_landmarks.dat というファイルも配布されています
+
+    > imutils ライブラリのインストールがない場合は以下の通りインストールしましょう．<br>
+    > ```sh
+    > > pip install imutils
+    > ```
+
+
   ```python
   import cv2
   import dlib
