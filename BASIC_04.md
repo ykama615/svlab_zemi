@@ -273,6 +273,8 @@ RGBのカメラと距離（Depth）センサは別々のため，alignment（位
  
  if __name__=='__main__':
    main()
+ ```
+
 
  ```python
 import os
