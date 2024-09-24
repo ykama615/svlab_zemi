@@ -234,7 +234,7 @@ RGBのカメラと距離（Depth）センサは別々のため，alignment（位
      self.win.deleteLater()
  ```
 
-このクラスの使い方(1.静的グラフ)は次の通り．描画ウィンドウを右クリックすると，グラフの一部や全部を.pngや.jpgなど種々の画像ファイルに保存することができます．
+このクラスの使い方(1.静的グラフ, 2.動的グラフ)は次の通り．描画ウィンドウを右クリックすると，グラフの一部や全部を.pngや.jpgなど種々の画像ファイルに保存することができます．
  ```python
  import cv2
  import numpy as np
@@ -273,6 +273,47 @@ RGBのカメラと距離（Depth）センサは別々のため，alignment（位
  
  if __name__=='__main__':
    main()
+
+ ```python
+import os
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
+import cv2
+import numpy as np
+import time
+from myQtGraph import myGraph
+
+def main():
+  graphWindow = myGraph.getInstance() #ウィンドウは1つしか生成できない
+  graphWindow.setWindowSize(800,400)
+
+  canvas1 = graphWindow.setPlotCanvas(title='sin+cos', col=0,row=0) #グラフはタイル表示
+  canvas2 = graphWindow.setPlotCanvas(title='cos', col=0,row=1) #グラフはタイル表示
+
+  pen = graphWindow.makePen([255,0,255], graphWindow.DASHLINE, 2) #ペンを指定しなければグリーン，実線，太さ2
+
+  curve1_1 = graphWindow.setCurve(canvasid=canvas1) #同じグラフに重ね描き
+  curve1_2 = graphWindow.setCurve(canvasid=canvas1, pen=pen) #同じグラフに重ね描き
+  curve2   = graphWindow.setCurve(canvas2)
+
+  graphWindow.startRefresh(interval=500) #500ミリ秒ごとに描画の繰り返しをスタート
+
+  #描画データを生成
+  for t in range(0, 9000, 10):
+    sin_y = np.sin(np.radians(t))
+    cos_y = np.cos(np.radians(t))
+
+    graphWindow.setCurveData(curve1_1, [t], [sin_y]) #グラフにデータを描画
+    graphWindow.setCurveData(curve1_2, [t], [cos_y]) #グラフにデータを描画
+    graphWindow.setCurveData(curve2, [t], [sin_y])  #グラフにデータを描画 
+
+    graphWindow.setStatus(canvasid=canvas1, xrange=[t-360, t], xcap=["degree"])
+    graphWindow.setStatus(canvasid=canvas2, xrange=[t-360, t], xcap=["degree"])
+
+    cv2.waitKey(100)
+
+if __name__=='__main__':
+  main()
  ```
 
 # MediaPipeのクラス化サンプル
