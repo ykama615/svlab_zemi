@@ -12,7 +12,7 @@
 
 # 顔検出
   ## 準備
-  __※配布環境を使用している場合， learned_models.zip をダウンロードして解凍し，learned_modelsフォルダをソースコードフォルダ（py24）に配置してください．__<br>
+  __※learned_modelsフォルダがない場合learned_models.zip をダウンロードして解凍し，learned_modelsフォルダをソースコードフォルダ（py25）に配置してください．__<br>
   <!--
   __※配布環境を使用している場合，以下の作業は不要です．__<br>
   dlibはpipでインストール可能だが， *setup.py* が走るので，Cコンパイラ環境とcmakeが必要です．<br>
@@ -37,7 +37,7 @@
   import cv2
 
   mdl_folder = "./learned_models/"  # 学習済みファイルのまでのパス
-  img_folder = "./image/standard/" # 画像ファイルまでのパス
+  img_folder = "./img/standard/" # 画像ファイルまでのパス
 
   def main():
     face_cascade = cv2.CascadeClassifier(mdl_folder + "haarcascades/haarcascade_frontalface_default.xml")
@@ -139,7 +139,7 @@
   import numpy as np
 
   mdl_folder = "./learned_models/"  # 学習済みファイルのまでのパス
-  img_folder = "./image/standard/" # 画像ファイルまでのパス
+  img_folder = "./img/standard/" # 画像ファイルまでのパス
 
   def main():
     detector = dlib.get_frontal_face_detector()
