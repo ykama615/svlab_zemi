@@ -19,6 +19,38 @@
   - Selfie Segmentation
   - Objectron
 
+  ※なお，MediaPipe v0.9.0以降に採用されたMediaPipe Tasks（新バージョン）では，以下のようなソリューションがあります．
+   - Vision Tasks（画像処理系）
+
+| タスク名                   | 説明                                     |
+|---------------------------|------------------------------------------|
+| Object Detection          | 物体検出（EfficientDetなど）             |
+| Image Classification      | 画像分類                                 |
+| Image Segmentation        | セルフィーや背景の分離                   |
+| Interactive Segmentation  | インタラクティブな領域分割               |
+| Image Embedding           | 画像の特徴ベクトル抽出                   |
+| Face Detection            | 顔検出                                   |
+| Face Landmark Detection   | 顔のランドマーク検出（478点など）       |
+| Face Stylization          | 顔画像のスタイル変換（アニメ風など）     |
+| Hand Landmark Detection   | 手のランドマーク検出                     |
+| Gesture Recognition       | 手のジェスチャー分類                     |
+| Pose Landmark Detection   | 姿勢のランドマーク検出                   |
+| Image Generation          | 画像生成（例：テキストから画像）         |
+
+   - Audio Tasks（音声処理系）
+
+| タスク名            | 説明                          |
+|---------------------|-------------------------------|
+| Audio Classification | 音声分類（例：YAMNet）        |
+
+   - Text Tasks（自然言語処理系）
+
+| タスク名            | 説明                                                 |
+|---------------------|------------------------------------------------------|
+| Text Classification | テキストの感情やカテゴリ分類                         |
+| Text Embedding      | 文のベクトル化（例：Universal Sentence Encoder）    |
+| Language Detection  | 言語の自動判定                                       |
+
   ## Selfie Segmentationを例とした基本的な使い方
   以下は，MediaPipe の Selfie Segmentation 機能を利用した例です．他の機能を利用する場合も基本手順は同じとなります．
   1. mp.solutionsパッケージから使いたい機能を呼び出す
