@@ -82,7 +82,7 @@
   import numpy as np
 
   mdl_folder = "./learned_models/"  # 学習済みファイルのまでのパス
-  img_folder = "./image/standard/" # 画像ファイルまでのパス
+  img_folder = "./img/standard/" # 画像ファイルまでのパス
 
   def main():
     face_cascade = cv2.CascadeClassifier(mdl_folder + "haarcascades/haarcascade_frontalface_default.xml")
