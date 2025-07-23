@@ -9,8 +9,8 @@
 
 <hr>
 
-# MediaPipe（旧バージョン用）
- MediaPipeで提供されている機能のうちPythonでサポートされているものは，2022.08現在，以下の通りとなります．
+# MediaPipe（Legacy Solution / 旧バージョン用）
+ MediaPipeで提供されている機能のうちPythonでサポートされているものは，2025.07現在，以下の通りとなります．
   - Face Detection
   - Face Mesh
   - Hands
