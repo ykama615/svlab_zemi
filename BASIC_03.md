@@ -109,6 +109,7 @@
   - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
    - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
   ```python
+  import math
   import cv2
   import mediapipe as mp
   import numpy as np
@@ -189,6 +190,7 @@
   - 人差し指の先はLandmarkリスト（配列）の添字8に割り当てられています
     - 他のLandmarkは，[マニュアル](https://google.github.io/mediapipe/solutions/hands.html) で確認してください 
   ```python
+ import math
  import cv2
  import mediapipe as mp
  import numpy as np
@@ -291,6 +293,7 @@
  - Landmarkの詳しい情報は，[マニュアル](https://google.github.io/mediapipe/solutions/face_mesh.html) で確認してください 
 
  ```python
+ import math
  import cv2
  import mediapipe as mp
  import time
