@@ -290,7 +290,7 @@
  - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
  - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
    - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
- - Landmarkの詳しい情報は，[マニュアル](https://ai.google.dev/edge/mediapipe/solutions/guide?hl=ja) で確認してください 
+ - Landmarkの詳しい情報は，[マニュアル](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker?hl=ja) で確認してください 
 
  ```python
  import math
