@@ -11,13 +11,16 @@
 
 # MediaPipe（Legacy Solution / 旧バージョン用）
  MediaPipeで提供されている機能のうちPythonでサポートされているものは，2025.07現在，以下の通りとなります．
-  - Face Detection
-  - Face Mesh
-  - Hands
-  - Pose
-  - Holistic
-  - Selfie Segmentation
-  - Objectron
+ 
+| ソリューション名       | 説明                                         |
+|------------------------|----------------------------------------------|
+| Face Detection         | 顔の位置を検出するモデル                     |
+| Face Mesh              | 顔の468点のランドマークを検出                |
+| Hands                  | 手の21点のランドマーク検出                   |
+| Pose                   | 姿勢（全身33点）のランドマーク検出           |
+| Holistic               | 顔・手・姿勢を統合して同時に検出するモデル   |
+| Selfie Segmentation    | セルフィー画像の背景分離                     |
+| Objectron              | 3D物体検出とトラッキング（例：靴、椅子など） |
 
   ※なお，MediaPipe v0.9.0以降に採用されたMediaPipe Tasks（新バージョン）では，以下のようなソリューションがあります．
    - Vision Tasks（画像処理系）
