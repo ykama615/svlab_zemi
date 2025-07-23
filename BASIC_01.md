@@ -29,10 +29,13 @@
     while cap.isOpened():
       ret, frame = cap.read()
 
-      if cv2.waitKey(1) & 0xFF == ord('q') or ret == False:
+      if ret == False:
         break
 
       cv2.imshow("video", frame)
+
+      if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
     cv2.destroyAllWindows()
     cap.release()
@@ -110,7 +113,8 @@
 
     while cap.isOpened():
       ret, frame = cap.read()
-      if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q') or ret == False:
+
+      if ret == False:
         break
 
       cv2.imshow("video", frame)
@@ -118,6 +122,9 @@
         # (1)dequeの末尾にframeを追加する
         timelapse.append(frame)
       fnum = fnum + 1
+
+    if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q'):
+      break
 
     # dequeの内容を再生
     for frame in timelapse:
@@ -160,7 +167,7 @@
 
       if ret:
         cv2.imshow("video", frame)
-        if cv2.waitKey(1) == ord('q'):
+      if cv2.waitKey(1) == ord('q'):
           break
 
     cap.release()
