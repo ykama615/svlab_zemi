@@ -155,6 +155,7 @@
     image_width, image_height = image.shape[1], image.shape[0]
     landmark_point = []
 
+    zt = math.sqrt(image_width*image_width + image_height*image_height)
     for index, landmark in enumerate(landmarks.landmark):
       if landmark.visibility < 0 or landmark.presence < 0:
         continue
@@ -162,7 +163,7 @@
       # Convert the obtained landmark values x, y, z to the coordinates on the image
       landmark_x = min(int(landmark.x * image_width), image_width - 1)
       landmark_y = min(int(landmark.y * image_height), image_height - 1)
-      landmark_z = landmark.z
+      landmark_z = int(landmark.z * zt)
 
       landmark_point.append(np.array([landmark_x, landmark_y, landmark_z], dtype=int))
 
@@ -208,6 +209,7 @@
    image_width, image_height = image.shape[1], image.shape[0]
    landmark_point = []
 
+   zt = math.sqrt(image_width*image_width + image_height*image_height)
    for index, landmark in enumerate(landmarks.landmark):
      if landmark.visibility < 0 or landmark.presence < 0:
          continue
@@ -215,7 +217,7 @@
      # Convert the obtained landmark values x, y, z to the coordinates on the image
      landmark_x = min(int(landmark.x * image_width), image_width - 1)
      landmark_y = min(int(landmark.y * image_height), image_height - 1)
-     landmark_z = landmark.z
+     landmark_z = int(landmark.z * zt)
 
      landmark_point.append(np.array([landmark_x, landmark_y, landmark_z], dtype=int))
 
@@ -360,6 +362,7 @@
    image_width, image_height = image.shape[1], image.shape[0]
    landmark_point = []
 
+   zt = math.sqrt(image_width*image_width + image_height*image_height)
    for index, landmark in enumerate(landmarks.landmark):
      if landmark.visibility < 0 or landmark.presence < 0:
        continue
@@ -367,7 +370,7 @@
      # Convert the obtained landmark values x, y, z to the coordinates on the image
      landmark_x = min(int(landmark.x * image_width), image_width - 1)
      landmark_y = min(int(landmark.y * image_height), image_height - 1)
-     landmark_z = landmark.z
+     landmark_z = int(landmark.z * zt)
 
      landmark_point.append(np.array([landmark_x, landmark_y, landmark_z], dtype=int))
 
