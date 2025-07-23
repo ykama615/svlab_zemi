@@ -47,7 +47,6 @@
   #### 内蔵カメラ以外のWebカメラ等を利用する場合
   1. MSMF(Microsoft Media Foundation)の設定
   USB接続のカメラの場合，cv2.VideoCaptureによるカメラの起動が遅くなります．これを回避するためにメインプログラムの先頭（import cv2より前）に以下の2行を記述します．
-  - 
   ```python
   # cv2のインポート前にカメラに関する設定を行う
   import os
@@ -58,7 +57,6 @@
 
   2. DirectShow経由で利用する方法
   1の他に，VideoCaptureに引数を指定する，以下の方法を使うこともできます
-  - 
   ```python
   # DirectShow経由でカメラ映像を取得する
   cap = cv2.VideoCapture(dev, cv2.CAP_DSHOW)
@@ -123,8 +121,8 @@
         timelapse.append(frame)
       fnum = fnum + 1
 
-    if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q'):
-      break
+      if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q'):
+        break
 
     # dequeの内容を再生
     for frame in timelapse:
