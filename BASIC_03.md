@@ -22,7 +22,7 @@
 | Selfie Segmentation    | セルフィー画像の背景分離                     |
 | Objectron              | 3D物体検出とトラッキング（例：靴、椅子など） |
 
-  ※なお，MediaPipe v0.9.0以降に採用されたMediaPipe Tasks（新バージョン）では，以下のようなソリューションがあります．
+  ※なお，2023.4版，mediapipe0.10.0以降に採用されたMediaPipe Tasks（新バージョン）では，以下のようなソリューションがあります．
    - Vision Tasks（画像処理系）
 
 | タスク名                   | 説明                                     |
