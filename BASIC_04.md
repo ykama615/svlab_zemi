@@ -15,235 +15,308 @@
 <hr>
 
 # REALSENSE（pyrealsense2）のクラス化サンプル
+※7/28UPDATEよりPython 3.12.9にも対応
 RGB-DカメラはRGB画像と同時に深度（距離）の計測が可能なカメラです．その一つである[Intel Realsense](https://www.intelrealsense.com/)はpyrealsense2ライブラリを追加すると利用可能となります．<br>
 RGBのカメラと距離（Depth）センサは別々のため，alignment（位置合わせ）が必要です．
 
+## クラスのサンプル
  ```python
- import sys
- import cv2
- import numpy as np
- import pyrealsense2 as rs
+import sys
+import cv2
+import numpy as np
+import pyrealsense2 as rs
 
- class myRealsense2:
-   RS_PROP_FRAME_WIDTH = 0
-   RS_PROP_FRAME_HEIGHT = 1
-   RS_PROP_FRAME_FPS = 2
+class myRealsense2:
+  RS_PROP_FRAME_WIDTH = 0
+  RS_PROP_FRAME_HEIGHT = 1
+  RS_PROP_FPS = 2
 
-   def __init__(self, width=1280, height=720, fps=30, bag=None):
-     conf = rs.config()
-     if bag is not None:
-       rs.config.enable_device_from_file(conf, bag, repeat_playback=False)
-     else:
-       conf.enable_stream(rs.stream.color, width, height, rs.format.bgr8, fps)
-     conf.enable_stream(rs.stream.depth, width, height, rs.format.z16, fps)
-     self._wt = width
-     self._ht = height
-     self._fps = fps
+  def __init__(self, width=1280, height=720, fps=30, bag=None):
+    conf = rs.config()
+    if bag is not None:
+      rs.config.enable_device_from_file(conf, bag, repeat_playback=False)
+    else:
+      conf.enable_stream(rs.stream.color, width, height, rs.format.bgr8, fps)
+    conf.enable_stream(rs.stream.depth, width, height, rs.format.z16, fps)
+    self._wt = width
+    self._ht = height
+    self._fps = fps
 
-     self.pipeline = rs.pipeline()
-     self.profile = self.pipeline.start(conf)
- 
-     align_to = rs.stream.color
-     self.align = rs.align(align_to)
+    self.pipeline = rs.pipeline()
+    self.profile = self.pipeline.start(conf)
 
-     #depth_sensor = profile.get_device().first_depth_sensor()
-     #depth_scale = depth_sensor.get_depth_scale()
+    align_to = rs.stream.color
+    self.align = rs.align(align_to)
 
-   def get(self, const_str):
-     if const_str == self.RS_PROP_FRAME_WIDTH:
-       return self._wt
-     elif const_str == self.RS_PROP_FRAME_HEIGHT:
-       return self._ht
-     elif const_str == self.RS_PROP_FRAME_FPS:
-       return self._fps
-     else:
-       sys.exit("Error: invalid configuration")
+    self.colorizer = rs.colorizer()
 
-   def read(self):
-     frames = self.pipeline.wait_for_frames()
-     aligned_frames = self.align.process(frames)
+    #depth_sensor = profile.get_device().first_depth_sensor()
+    #depth_scale = depth_sensor.get_depth_scale()
 
-     color_frame = aligned_frames.get_color_frame()
-     depth_frame = aligned_frames.get_depth_frame()
+  def get(self, const_str):
+    if const_str == self.RS_PROP_FRAME_WIDTH:
+      return self._wt
+    elif const_str == self.RS_PROP_FRAME_HEIGHT:
+      return self._ht
+    elif const_str == self.RS_PROP_FPS:
+      return self._fps
+    else:
+      sys.exit("Error: invalid configuration")
 
-     #if not depth_frame or not color_frame:
-     #    return False, []
+  def isOpened(self):
+    try:
+      # デバイス情報などが取得できるかチェック
+      dev = self.profile.get_device()
+      sensors = dev.query_sensors()
+      return len(sensors) > 0
+    except Exception as e:
+      print("Pipeline not properly initialized:", e)
+      return False
 
-     color_image = np.asanyarray(color_frame.get_data())
-     depth_image = np.asanyarray(depth_frame.get_data())
+  def read(self):
+    frames = self.pipeline.wait_for_frames()
+    aligned_frames = self.align.process(frames)
 
-     #array = np.concatenate((color_image, depth_image.reshape(depth_image.shape[0], depth_image.shape[1], 1)), axis=2)
+    color_frame = aligned_frames.get_color_frame()
+    depth_frame = aligned_frames.get_depth_frame()
 
-     return True, {'rgb': cv2.cvtColor(color_image, cv2.COLOR_RGB2BGR), 'depth': depth_image}#array
+    color_image = cv2.cvtColor(np.asanyarray(color_frame.get_data()), cv2.COLOR_RGB2BGR)
+    depth_image = np.asanyarray(depth_frame.get_data())
+    colormap = np.asanyarray(self.colorizer.colorize(depth_frame).get_data())
 
-   def convert2DepthColorMap(self, depth):
-     return rs.colorizer().colorize(depth)    
+    return True, {'rgb': cv2.cvtColor(color_image, cv2.COLOR_RGB2BGR), 'depth': depth_image, 'colormap': colormap}
 
-   def release(self):
-     self.pipeline.stop()
+  def release(self):
+    self.pipeline.stop()
+
  ```
+## クラスの利用サンプル
+ ```python
+import cv2
+from my_realsense2 import myRealsense2
+
+def main():
+    cap = myRealsense2(width=640, height=480, fps=30)
+    ht = int(cap.get(myRealsense2.RS_PROP_FRAME_HEIGHT))
+    wt = int(cap.get(myRealsense2.RS_PROP_FRAME_WIDTH))
+    fps = cap.get(myRealsense2.RS_PROP_FPS)
+
+    print('REALSENSE2')
+    print('Frame Height x Width: ', ht, " x ", wt)
+    print('FPS: ', fps)
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+
+        if ret==False:
+            break
+
+        image = frame['rgb']
+        depth = frame['depth'] #depth array
+        colormap = frame['colormap']
+
+        cv2.imshow("image", image)
+        cv2.imshow("depth", colormap)
+
+        if cv2.waitKey(1)==ord('q'):
+            break
+    
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__=='__main__':
+    main()
+ ```
+
 
 # PyQtGraphのクラス化サンプル
  Pythonでグラフを描くための代表的なものには，matplotlibを用いる方法とpyqtgraphを用いるものがあります．<br>
  MATLABという科学計算ソフトウェアの機能をPythonで実現しているmatplotlibを利用するとかなり様々なグラフを描くことができますが，リアルタイムな動的描画が少し難しいです．<br>
  pyqtgraphは，Qtと呼ばれれるC++によるUIデザインやソフトウェア開発を行うためのライブラリ／ソフトウェアを利用したグラフ描画機能に特化したライブラリです．ビジュアル性の高いグラフや動的グラフの描画が可能です．<br>
- ここでは，pyqtgraphを用いて時系列波形を動的/静的に描画するためのクラスを提供します．
+ ここでは，pyqtgraphを用いて時系列波形を動的/静的に描画するためのクラスを紹介します．
 
+## クラスのサンプル
  ```python
- import cv2
- import numpy as np
- import pyqtgraph as qtg
- import sys
- from PyQt5 import QtWidgets, QtCore
- from collections import deque
- 
- import random
- 
- class myGraph(qtg.GraphicsLayoutWidget):
-   __instance = None
-   canvas = None
-   curve  = None
-   cvmap = None
-   t1 = None
-   __xcap_list = {}
-   __ycap_list = {}
-   __xrange_list = {}
-   __yrange_list = {}
- 
-   @staticmethod
-   def getInstance():
-     if myGraph.__instance == None:
-       myGraph()
-     return myGraph.__instance
-   
-   def __init__(self):
-     if myGraph.__instance == None:
-       myGraph.__instance = self
-       self.SOLIDLINE = QtCore.Qt.SolidLine
-       self.DASHLINE  = QtCore.Qt.DashLine    # 破線
-       self.DOTLINE   = QtCore.Qt.DotLine     # 点線
-       self.DASHDOTLINE = QtCore.Qt.DashDotLine   # 1点破線
-       self.DATHDOTDOTLINE = QtCore.Qt.DashDotDotLine # 2点は線
-     
-       self.initialize()
-     
-   def initialize(self):
-     self.app = QtWidgets.QApplication(sys.argv)
-     qtg.setConfigOptions(antialias=True, foreground='k', background='w')
-     self.win = qtg.GraphicsLayoutWidget()
-     self.win.show()
-     
-     self.canvas = {}
-     self.curve = {}
-   
-   def setWindowSize(self, width, height):
-     self.win.resize(width, height)
-   
-   def setPlotCanvas(self, title=[], col=0, row=0):
-     tmp = self.win.addPlot(show=False, size=None, title=title, col=col, row=row)
-     self.canvas[id(tmp)] = tmp
-     #tmp.setLabel('left', '(a.u.)', units='')
-     #tmp.setLabel('bottom', 'time (sec)', units='')
-     return id(tmp)
-   
-   def setCanvas(self, id):
-     return self.canvas[id]
-   
-   def setCurve(self, canvasid=None, maxdatasize=300, pen=None):
-     if pen==None:
-       mypen = qtg.mkPen(color=(0, 255, 0), style=self.SOLIDLINE, width=3)
-     else:
-       mypen = pen
-     
-     if self.canvas[canvasid]==None:
-       print('Canvas does not exist')
-       return None
-     
-     tmp = self.canvas[canvasid].plot([], [], pen=mypen)
-     self.curve[id(tmp)] = [tmp, deque(maxlen=maxdatasize), deque(maxlen=maxdatasize)]
-     
-     return id(tmp)
-   
-   def makePen(self, color, style, width):
-     return qtg.mkPen(color=color, style=style, width=width)
-   
-   
-   def setCurveData(self, curveid, xlist, ylist):
-     #print(xlist)
-     
-     self.curve[curveid][1].extend(xlist)
-     self.curve[curveid][2].extend(ylist)
-   
-   def setStatus(self, canvasid=None, xrange=[], yrange=[], xcap=[], ycap=[]):
-     if len(xcap)>0:
-       self.__xcap_list[canvasid] = xcap
-       if len(xcap)==2:
-         unit = xcap[1]
-       else:
-         unit = ''
-       self.canvas[canvasid].setLabel('bottom', xcap[0], units=unit)
-     
-     if len(ycap)>0:
-       self.__ycap_list[canvasid] = ycap
-       if len(xcap)==2:
-         unit = xcap[1]
-       else:
-         unit = ''
-       self.canvas[canvasid].setLabel('left', ycap[0], units='')
-     
-     if len(xrange)==2:
-       self.__xrange_list[canvasid] = xrange
-     
-     if len(yrange)==2:
-       self.__yrange_list[canvasid] = yrange
-   
-   def show(self):
-     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-       QtWidgets.QApplication.instance().exec_()
-   
-   def startRefresh(self, interval=1000):
-     self.t1 = QtCore.QTimer()
-     self.t1.setInterval(interval)
-     self.t1.timeout.connect(lambda:self.refresh())
-     self.t1.start()
-   
-   def refresh(self):
-     xlist = []
-     for curveid, curvepack in self.curve.items():
-       curve = curvepack[0]
-       xlist = [x for x in curvepack[1]]
-       ylist = [y for y in curvepack[2]]
-       curve.setData(xlist, ylist)
-     
-     for id, values in self.__xrange_list.items():
-       #self.canvas[id].setXRange(xlist[0], xlist[-1], padding=0)
-       if len(values)==2:
-         self.canvas[id].setXRange(values[0], values[1])
-     
-     for id, values in self.__yrange_list.items():
-       if len(values)==2:
-         self.canvas[id].setYRange(values[0], values[1])
-   
-   def stopRefresh(self):
-     self.t1.stop()
-   
-   def destroyRefresh(self):
-     self.t1.deleteLater()
-   
-   def destroyWindow(self):
-     self.win.deleteLater()
+import sys
+import pyqtgraph as qtg
+from PyQt5 import QtWidgets, QtCore
+from collections import deque
+
+class myGraph(qtg.GraphicsLayoutWidget):
+	__instance = None
+	canvas = None
+	curve  = None
+	cvmap = None
+	t1 = None
+	__curve_to_canvas = {}
+	__point_to_canvas = {}
+	__xcap_list = {}
+	__ycap_list = {}
+	__xrange_list = {}
+	__yrange_list = {}
+
+	@staticmethod
+	def getInstance():
+		if myGraph.__instance == None:
+				myGraph()
+		return myGraph.__instance
+
+	def __init__(self):
+		if myGraph.__instance == None:
+			myGraph.__instance = self
+			self.SOLIDLINE = QtCore.Qt.SolidLine
+			self.DASHLINE  = QtCore.Qt.DashLine    # 破線
+			self.DOTLINE   = QtCore.Qt.DotLine     # 点線
+			self.DASHDOTLINE = QtCore.Qt.DashDotLine   # 1点破線
+			self.DATHDOTDOTLINE = QtCore.Qt.DashDotDotLine # 2点は線
+
+			self.initialize()
+
+	def initialize(self):
+		self.app = QtWidgets.QApplication(sys.argv)
+		qtg.setConfigOptions(antialias=True, foreground='k', background='w')
+		self.win = qtg.GraphicsLayoutWidget()
+		self.win.show()
+
+		self.canvas = {}
+		self.curve = {}
+		self.point = {}
+
+	def setWindowSize(self, width, height):
+		self.win.resize(width, height)
+
+	def setPlotCanvas(self, title=[], col=0, row=0):
+		tmp = self.win.addPlot(show=False, size=None, title=title, col=col, row=row)
+		self.canvas[id(tmp)] = tmp
+		return id(tmp)
+
+	def setCanvas(self, id):
+		return self.canvas[id]
+
+	def setCurve(self, canvasid=None, maxdatasize=300, pen=None):
+		if pen==None:
+			mypen = qtg.mkPen(color=(0, 255, 0), style=self.SOLIDLINE, width=3)
+		else:
+			mypen = pen
+
+		if self.canvas[canvasid]==None:
+			print('Canvas does not exist')
+			return None
+
+		tmp = self.canvas[canvasid].plot([], [], pen=mypen)
+		self.curve[id(tmp)] = [tmp, deque(maxlen=maxdatasize), deque(maxlen=maxdatasize)]
+		self.__curve_to_canvas[id(tmp)] = canvasid
+		return id(tmp)
+
+	def setCurveData(self, curveid, xlist, ylist):
+		self.curve[curveid][1].extend(xlist)
+		self.curve[curveid][2].extend(ylist)
+
+	def setPoint(self, canvasid=None, symbol="o", incolor='r', outcolor='r', size="5"):
+		tmp = self.canvas[canvasid].plot([], [], symbol, symbolPen=outcolor, symbolBrush=incolor, symbolSize=size, pen=None)
+		self.point[id(tmp)] = [tmp, deque(), deque()]
+		self.__point_to_canvas[id(tmp)] = canvasid
+		return id(tmp)
+	
+	def setPointData(self, pointid, xlist, ylist):
+		self.point[pointid][1].extend(xlist)
+		self.point[pointid][2].extend(ylist)
+
+	def makePen(self, color, style, width):
+		return qtg.mkPen(color=color, style=style, width=width)
+
+	def setStatus(self, canvasid=None, xrange=[], yrange=[], xcap=[], ycap=[]): #xcap = ["time", "s"]
+		if len(xcap)>0:
+			self.__xcap_list[canvasid] = xcap
+			if len(xcap)==2:
+				unit = xcap[1]
+			else:
+				unit = ''
+			self.canvas[canvasid].setLabel('bottom', xcap[0], units=unit)
+
+		if len(ycap)>0:
+			self.__ycap_list[canvasid] = ycap
+			if len(xcap)==2:
+				unit = xcap[1]
+			else:
+				unit = ''
+			self.canvas[canvasid].setLabel('left', ycap[0], units='')
+
+		if len(xrange)==2:
+			self.__xrange_list[canvasid] = xrange
+
+		if len(yrange)==2:
+			self.__yrange_list[canvasid] = yrange
+
+	def show(self):
+		if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+			QtWidgets.QApplication.instance().exec_()
+
+	def startRefresh(self, interval=1000):
+		self.t1 = QtCore.QTimer()
+		self.t1.setInterval(interval)
+		self.t1.timeout.connect(lambda:self.refresh())
+		self.t1.start()
+
+	def refresh(self):
+		xlist = []
+		xmin = None
+		xmax = None
+		for curveid, curvepack in self.curve.items():
+			canvasid = self.__curve_to_canvas[curveid]
+			if canvasid in self.__xrange_list:
+				values = self.__xrange_list[canvasid]
+				if len(values)==2:
+					xmin = values[0]
+					xmax = values[1]
+			curve = curvepack[0]
+			indices = [i for i, x in enumerate(curvepack[1]) if (xmin is None or x >= xmin) and (xmax is None or x <= xmax)]
+			xlist = [curvepack[1][i] for i in indices]
+			ylist = [curvepack[2][i] for i in indices]
+			curve.setData(xlist, ylist)
+			if xmin!=None or xmax!=None:
+				self.canvas[canvasid].setXRange(xmin, xmax)
+
+		for pointid, pointpack in self.point.items():
+			canvasid = self.__point_to_canvas[pointid]
+			if canvasid in self.__xrange_list:
+				values = self.__xrange_list[canvasid]
+				if len(values)==2:
+					xmin = values[0]
+					xmax = values[1]
+			point = pointpack[0]
+			indices = [i for i, x in enumerate(pointpack[1]) if (xmin is None or x >= xmin) and (xmax is None or x <= xmax)]
+			xlist = [pointpack[1][i] for i in indices]
+			ylist = [pointpack[2][i] for i in indices]
+			point.setData(xlist, ylist)
+
+		for id, values in self.__yrange_list.items():
+			if len(values)==2:
+				self.canvas[id].setYRange(values[0], values[1])
+
+	def stopRefresh(self):
+		self.t1.stop()
+
+	def destroyRefresh(self):
+		self.t1.deleteLater()
+
+	def destroyWindow(self):
+		self.win.deleteLater()
  ```
 
-このクラスの使い方(1.静的グラフ, 2.動的グラフ)は次の通り．描画ウィンドウを右クリックすると，グラフの一部や全部を.pngや.jpgなど種々の画像ファイルに保存することができます．
+## クラス利用のサンプル
+このクラスの使い方(1.静的グラフ, 2.動的グラフ)は次の通り．描画ウィンドウを右クリックすると，グラフの一部や全部を.pngや.jpgなど種々の画像ファイルに保存することができます．<br>
+<span style="color: red;">※なお，動的グラフ作成時にmain関数でcv2.waitKey()やQTimer以外の時間制御（timeの関数やthreadingの関数の利用）を行った場合，グラフ描画クラスのスレッド（更新）も同時に停止するので注意（GIL）．</span>
+
+### 静的グラフのサンプル
  ```python
- import cv2
- import numpy as np
- import time
- from collections import deque
+import cv2
+import numpy as np
+from collections import deque
  
- from myQtGraph import myGraph
+from my_qt_graph import myGraph
  
- def main():
+def main():
    graphWindow = myGraph.getInstance() #ウィンドウは1つしか生成できない
    graphWindow.setWindowSize(800,400)
  
@@ -271,19 +344,18 @@ RGBのカメラと距離（Depth）センサは別々のため，alignment（位
  
    graphWindow.show() #ウインドウの描画
  
- if __name__=='__main__':
+if __name__=='__main__':
    main()
  ```
 
-
+### 動的グラフのサンプル
  ```python
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 
 import cv2
 import numpy as np
-import time
-from myQtGraph import myGraph
+from my_qt_graph import myGraph
 
 def main():
   graphWindow = myGraph.getInstance() #ウィンドウは1つしか生成できない
