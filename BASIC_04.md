@@ -19,7 +19,7 @@
 RGB-DカメラはRGB画像と同時に深度（距離）の計測が可能なカメラです．その一つである[Intel Realsense](https://www.intelrealsense.com/)はpyrealsense2ライブラリを追加すると利用可能となります．<br>
 RGBのカメラと距離（Depth）センサは別々のため，alignment（位置合わせ）が必要です．
 
-## クラスのサンプル
+## クラスのサンプル(my_realsense2.py)
  ```python
 import sys
 import cv2
@@ -135,7 +135,7 @@ if __name__=='__main__':
  pyqtgraphは，Qtと呼ばれれるC++によるUIデザインやソフトウェア開発を行うためのライブラリ／ソフトウェアを利用したグラフ描画機能に特化したライブラリです．ビジュアル性の高いグラフや動的グラフの描画が可能です．<br>
  ここでは，pyqtgraphを用いて時系列波形を動的/静的に描画するためのクラスを紹介します．
 
-## クラスのサンプル
+## クラスのサンプル(my_qt_graph.py)
  ```python
 import sys
 import pyqtgraph as qtg
@@ -395,7 +395,7 @@ if __name__=='__main__':
   - 検出の処理速度は旧バージョンの利用法の方が上です
   - 新バージョンの利用法と旧バージョンの利用法を混在させるとうまく動作しないことがあります
 
-## クラス化サンプル
+## クラス化サンプル(my_mediapipe.py)
  ```python
 import cv2
 import numpy as np
@@ -573,7 +573,7 @@ import numpy as np
 import time 
 from my_mediapipe import MyMediaPipe
 
-dev = 1
+dev = 0
 
 def main():
 
@@ -772,7 +772,7 @@ if __name__=='__main__':
     main()
  ```
 
- # キーボード入力のクラス化サンプル
+ # キーボード入力のクラス化サンプル(my_key_press_release.py)
 
  w/a/s/dを押す（TRUE），離す（FALSE）関数と， キーコードを送るとキー入力を行う関数を実装したクラス．
 
