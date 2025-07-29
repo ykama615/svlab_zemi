@@ -15,7 +15,7 @@
 <hr>
 
 # REALSENSE（pyrealsense2）のクラス化サンプル
-※7/28UPDATEよりPython 3.12.9にも対応
+※7/28UPDATEよりPython 3.12.9にも対応<br>
 RGB-DカメラはRGB画像と同時に深度（距離）の計測が可能なカメラです．その一つである[Intel Realsense](https://www.intelrealsense.com/)はpyrealsense2ライブラリを追加すると利用可能となります．<br>
 RGBのカメラと距離（Depth）センサは別々のため，alignment（位置合わせ）が必要です．
 
