@@ -8,7 +8,7 @@
 6. 各種クラス・応用
    - [REALSENSE（pyrealsense2）のクラス化サンプル](#realsensepyrealsense2のクラス化サンプル)
    - [PyQtGraphのクラス化サンプル](#pyqtgraphのクラス化サンプル)
-   - [MediaPipeのクラス化サンプル](#MediaPipe（Legacy Version／旧バージョン）のクラス化サンプル)
+   - [MediaPipeのクラス化サンプル](#MediaPipe（LegacyVersion／旧バージョン）のクラス化サンプル)
    - [キーボード入力のクラス化サンプル](#キーボード入力のクラス化サンプルmy_key_press_releasepy)
    - [Minecraftをジェスチャで動かすサンプル（2023年以降未整備）](#Minecraftをジェスチャで動かすサンプル2023年以降未整備)
 
