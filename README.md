@@ -103,141 +103,21 @@
    3. 以下の実行結果が得られれば成功です<br>
    <image src="./inst10.png"><br>
 
-### :o: Practice
-- Give it a try to run the ”hello_opencv.py”.
-  - It is the sample of reading and showing an image file with the cv2 library.
-  - The window is closed if any button is pressed.
-- Give it a try to run the "show_video.py"
-  - Create a new file" named "show_video.py"<br>
-    <image src="../image/create_newfile.png" width="50%" height="50%"><br>
-  - The following code is the sample of capturing from the camera and showing frames with the cv2 library.
-    - Please copy & paste this code to "show_video.py".
-    - The window is closed if \'q\' button is pressed.
-    ```
+# OpenCVライブラリのサンプルの実行
+  - 新規ファイルとして[sample_cv2.py]を作成し，以下のコードを入力して実行してみましょう．
+    ```python
+    # sample_cv2.py
     import cv2
-    
-    dev = 0
-    
-    def main():
-        cap = cv2.VideoCapture(dev)
-        ht = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        wt = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-        print(ht," x ", wt)
-    
-        while cap.isOpened():
-            ret, frame = cap.read()
-    
-            if ret==False or cv2.waitKey(1) == ord('q'):
-                break
-    
-            cv2.imshow("video", frame)
-        
-        cap.release()
-        cv2.destroyAllWindows()
-    
-    if __name__=='__main__':
-        main()
+    img = cv2.imread('./img/standard/Mandrill.bmp') # read image file
+    if img is None: # maybe Path is wrong
+        print("image file is not opened.")
+        exit(1)
+    bimg = cv2.GaussianBlur(img, (51,51), 5) # gaussian filter (size=(51,51),sigma=5)
+    cv2.imshow('img',img)
+    cv2.imshow('blur img',bimg)
+    cv2.waitKey(0) # pause until press any key
+    cv2.destroyAllWindows # close all cv2's windows
     ```
-  
-  > **Note** The latest usage of the Mediapipe is able to be learned in another section.
 
-  <br>
-
-
-
-1. exeファイルを展開します
-    - C:\oit\py25\以下に，python，VS Codeが，<!-- C:\oit\home\以下にpy24フォルダ（ソースコード用フォルダ）-->が展開されます．
- 
- 
-2. 環境の起動
-    - デスクトップにあるpy25_startのショートカットまたは C:\oit\py25\py25_start.bat をダブルクリックして起動します．
- 
- 
-3. ソースコードディレクトリ構造
-    - C:\oit\py25\source\以下のディレクトリ構造は次の通りです．新しい.pyファイルはsourceフォルダに追加します．
-      ```
-      +[source]           <== ワーキングディレクトリ ("C:\oit\py25")
-      |
-      |-+[img]            <== 画像用フォルダ
-      | |-+[standard]     <== 標準画像用フォルダ
-      |   |-+[mono]       <== グレースケール画像用フォルダ
-      |   | |-(files)
-      |   |-(files)
-      |-+[learned_models] <== 学習済み物体・人検出ファイル格納フォルダ
-      | |-+[haarcascades]
-      | | |-(files)
-      | |-+[mediapipe]
-      | | |-(files)
-      | |-(files)
-      |-sample1.py
-      |-sample2.py
-      |-sample3.py
-      |-sample4.py
-      |-sample5.py
-      |-sample6.py
-      |-sample7.py
-      |-sample8.py
-      |-(files)
-      ```
-
-4. 実行ファイルの作り方とターミナルの起動
-    - VS Codeの[エクスプローラー]メニューの[SOURCE]フォルダの右に示される，新規ファイルの追加，新規フォルダの追加でファイルやフォルダの追加を行います．＊画像中の[SOURCECODE]を[SOURCE]に読み替えてください<br>
-        ![fig001](./fig001.png)
-    - ターミナルが開いていない場合，[ターミナル]メニューから[新しいターミナル]を選択してターミナルを起動します．<br>
-        ![fig002](./fig002.png)
-
-5. サンプルプログラムの実行
-    - 新規ファイルとして[sample_basic.py]を作成し，以下のコードを入力してみましょう．
-      ```python
-      # sample_basic.py
-      sum = 0
-      for i in range(10):
-        sum = sum + i
-        print(str(i) + ":" + str(sum))
-      if sum <= 30 :
-        print("sum is under 30")
-      elif sum <= 50 :
-        print("sum is between 30 and 50")
-      else:
-        print("sum is over 50")
-      ```
-    - [実行] 以下のコマンドを入力するか，VS Code右上の再生ボタンを押してプログラムを実行します．<br>
-      ※カレントディレクトリに注意
-      ```sh
-      python sample_basic.py
-      ```
-      
-    - 以下の実行結果が出力されれば成功です．
-      ```sh
-      C:\oit\py25\source> python sample_basic.py
-      0:0
-      1:1
-      2:3
-      3:6
-      4:10
-      5:15
-      6:21
-      7:28
-      8:36
-      9:45
-      sum is between 30 and 50
-      ```
-
-6. OpenCVライブラリのサンプルの実行
-    - 新規ファイルとして[sample_cv2.py]を作成し，以下のコードを入力して実行してみましょう．
-      ```python
-      # sample_cv2.py
-      import cv2
-      img = cv2.imread('./img/standard/Mandrill.bmp') # read image file
-      if img is None: # maybe Path is wrong
-          print("image file is not opened.")
-          exit(1)
-      bimg = cv2.GaussianBlur(img, (51,51), 5) # gaussian filter (size=(51,51),sigma=5)
-      cv2.imshow('img',img)
-      cv2.imshow('blur img',bimg)
-      cv2.waitKey(0) # pause until press any key
-      cv2.destroyAllWindows # close all cv2's windows
-      ```
-
-    - 実行結果は以下の通りで， 2つ目のウィンドウは[Mandrill.bmp]をブラー（平滑化）した結果となります．<br>
-        ![fig003](./fig003.png)
+  - 実行結果は以下の通りで， 2つ目のウィンドウは[Mandrill.bmp]をブラー（平滑化）した結果となります．<br>
+      ![fig003](./fig003.png)
