@@ -1,5 +1,3 @@
-<hr>
-
 1. 環境の設定（↓）
 2. [基本概要](BASIC_00.md)
 3. [カメラへのアクセスと動画処理](BASIC_01.md)
@@ -13,81 +11,98 @@
 
  - 以下は配布環境のインストール方法です
 
-0. 指定されたリンクから `pyXX.exe` をダウンロードします．
-    > **Note**
-    > - パスワードが必要な場合，大学のアカウントでのアクセスが必要な場合があるので注意しましょう
-1. `py25.exe` ファイルを実行します.
-    > **Note**
-    > - 以下のような警告画面が表示された場合, `詳細情報` をクリックした後，`実行` をクリックしてください. <br>
-    > <image src="./inst00.png" width="40%" height="40%"><br>
-    > <image src="./inst01.png" width="40%" height="40%"><br>
-2. `次へ(N)` をクリックします.<br>
+  0. 指定されたリンクから `pyXX.exe` をダウンロードします．
+  > **Note** パスワードが必要な場合，大学のアカウントでのアクセスが必要な場合があるので注意しましょう
+  1. `pyXX.exe` ファイルを実行します.
+  > **Note** 以下のような警告画面が表示された場合, `詳細情報` をクリックした後，`実行` をクリックしてください. <br>
+  > <image src="./inst00.png" width="40%" height="40%"><br>
+  > <image src="./inst01.png" width="40%" height="40%"><br>
+  2. `次へ(N)` をクリックします.<br>
   <image src="./inst02.png" width="40%" height="40%"><br>
   > インストール過程(1)...<br>
   > <image src="./inst03.png" width="40%" height="40%"><br>
   > インストール過程(2)...<br>
   > <image src="./inst04.png" width="40%" height="40%"><br>
-
-3. このインストーラでは， `C:\oit\py25` に python実行環境（Python3.X + VSCode) をインストールし，ソースファイル ディレクトリとして `C:\oit\py25\source` と，デスクトップ上に実行のためのショートカット（下図）を設定します．.<br>
+  
+  3. このインストーラでは， `C:\oit\pyXX` に python実行環境（Python3.X + VSCode) がインストールされ，ソースファイル ディレクトリとして `C:\oit\pyXX\source` と，デスクトップ上に実行のためのショートカット（下図）が設定されます．<br>
   <image src="./icon.png" width="10%" height="10%">
 
-> **Note**
-> Creating a link on the Desktop often fails. In that case, please run "C:\oit\py25en\py25en_start.bat" directly. It is possible to create the link manually, but DO NOT move anything in the `py25en` folder!)
+  > **Note** デスクトップへのショートカットの設定は，計算機の状況により失敗することがあります. その場合，`C:\oit\pyXX\pyXX_start.bat` をクリックして直接起動します．<br>
+  > ショートカットを手動で作成することもできますが，`py25` フォルダ内のファイル（の一部）を **移動させない** ように注意しましょう．
 
-#### Installed folder structure
-- This environment is installed to "C:\oit\py25en\" and its inside is included the following.
-  - **C:\oit\py25en\source**: the working directory for saving the source code (Directory "py25en" NEED NOT touch)
-  - **C:\oit\py25en\\_tmp_**: NEED NOT touch
-  - **C:\oit\py25en\VSCode**: NEED NOT touch, Visual Studio Code
-  - **C:\oit\py24\WPy64-312101**: NEED NOT touch, Python3.12.10amd64 (WPy64-312101)
-  - **C:\oit\py24\py25en_start.bat**: bat file to start this environment up 
 
-### :o:Checkpoint(Start the environment 1)
-- Start the environment from "py25en_start" icon on the Desktop (or C:\oit\py25en\py25en_start.bat).
-- **If the following warning pops up...**
-  - **CHECK** the "Trust the authors..." box out
-  - CLICK the **"YES"** button <br>
-    <image src="../image/trust_vsws.png" width="50%" height="50%">
+# 環境の起動
 
-### :o:Checkpoint(Start the environment 2)
-- **If the location of the EXPLORER does not be the `souce` folder(SOURCE), you have to open the `C:\oit\py25en\sorce\` from the [File]-[Open Folder] menu.** <br>
-  <image src="../image/vsws_explorer.png" width="50%" height="50%">
-- **If the terminal window has not shown, please open it from the [Terminal]-[New Terminal] menu.** <br>
-  <image src="../image/vsws_tmenu.png" width="50%" height="50%">
-- Please confirm Python modules by inputting the `pip list` command in the terminal window.<br>
-  <image src="../image/vsws_piplist.png" width="50%" height="50%">
+  - デスクトップにあるpyXX_startのショートカットまたは C:\oit\pyXX\pyXX_start.bat をダブルクリックして起動します．
 
-### :o:Checkpoint(Start the environment 3)
-- **When you select the `.py` file in the Explorer window, if the status bar shows `Select Python Interpreter` ...** <br>
-  <image src="../image/vs_setting01.png" width="50%" height="50%">
-- **you need to set the path to `python.exe` (`C:\oit\py25en\WPy64-312101\python\python.exe`) as shown below.** <br>
-  <image src="../image/vs_setting02.png" width="50%" height="50%"><br>
-  <image src="../image/vs_setting03.png" width="50%" height="50%">
-- **To check whether the interpreter is set correctly, use the status bar or the command palette (Select Interpreter).**
-  <image src="../image/vs_setting04.png" width="50%" height="50%"><br>
-  <image src="../image/vs_setting05.png" width="50%" height="50%">
+  - ソースコードディレクトリ構造
+    - C:\oit\py25\source\以下のディレクトリ構造は次の通りです(2025/08)．新しい.pyファイルはsourceフォルダに追加します．
+      ```
+      +[source]           <== ワーキングディレクトリ ("C:\oit\py25")
+      |
+      |-+[img]            <== 画像用フォルダ
+      | |-+[standard]     <== 標準画像用フォルダ
+      |   |-+[mono]       <== グレースケール画像用フォルダ
+      |   | |-(files)
+      |   |-(files)
+      |-+[learned_models] <== 学習済み物体・人検出ファイル格納フォルダ
+      | |-+[haarcascades]
+      | | |-(files)
+      | |-+[mediapipe]
+      | | |-(files)
+      | |-(files)
+      |-sample1.py
+      |-sample2.py
+      |-sample3.py
+      |-sample4.py
+      |-sample5.py
+      |-sample6.py
+      |-sample7.py
+      |-sample8.py
+      |-(files)
+      ```
 
-### :o:Checkpoint(Run python code with VSCode)
-- Please confirm how to execute the sample Python code with VSCode.
-  - Open the "sample1.py" file with Double Click in [source] folder of the explorer menu.<br>
-    <image src="../image/vs_sample1.png" width="100%" height="100%">
-  - Open the terminal window if it has not appeared.<br>
-    <br>
-    > **Note** The current Working directory shown in the terminal window has to be the same as the file's location to execute. <br>
-    > **Note** You have to change the directory using the 'cd' command, in case the current directory shown in the terminal window is different from the source code directory. <br>
-    <br>
-  - Please confirm that the Python code can execute in the terminal window.
-    ```sh
-    C:\oit\py25en\source> python sample1.py
-    ```
-    <br>
-    
-    > **Note** The program is executable with the run button, but **we suggest executing with the command line**. <br>
-    > <image src="../image/vs_sample2.png"><br>
-    <br>
-
-  - The following are running results successfully.<br>
-    <image src="../image/vs_sample3.png"><br>
+  ### :o:チェックポイント1
+  - `py25en_start`の初回実行時に以下のポップアップが表示された場合
+    - `はい、作成者を信頼します` を選択します
+      <image src="./inst05.png" width="50%" height="50%">
+  
+  ### :o:チェックポイント2
+  - VSCode起動時に `SOURCE`（`C:\oit\py25en\sorce\`）が開いていない場合，[ファイル]-[フォルダーを開く] メニューから開きます <br>
+    <image src="./inst06.png" width="50%" height="50%">
+  - VSCode起動時にターミナルウィンドウが開いていない場合,[…]-[ターミナル]-[新しいターミナル]メニューから開きます <br>
+    <image src="./inst07.png" width="50%" height="50%">
+  
+  ### :o:チェックポイント3
+  - VSCodeで `.py` ファイルを開いたときに, ステータスバー（右下）に `インタープリターを選択する`（`Select Python Interpreter`）と表示される場合 ...<br>
+  - `インタープリターを選択する` をクリックし，コマンドパレットに `python.exe` (`C:\oit\py25en\WPy64-312101\python\python.exe`) までのパスを設定します<br>
+    直接入力またはdefault Interpreterの設定が候補にあればそれを選択します
+    <image src="./inst08.png" width="50%" height="50%">
+  - 正しく設定されたかは，ステータスバー（右下）に `python 3.12.10` と表示されているかを確認します
+  
+  ### :o:チェックポイント4
+   - pythonの実行方法を確認しましょう
+  
+   1. [source] フォルダから `sample1.py` を開きます<br>
+ 
+   > **Note** ターミナルウィンドウが開いていない場合は開くようにします（ [チェックポイント2](###チェックポイント2) を確認）<br> 
+   > **Note** ターミナルウィンドウに表示されている現在の作業ディレクトリは実行するファイルの場所と同じである必要があります<br>
+   > **Note** もしターミナルに表示されている現在のディレクトリがソースコードのディレクトリと異なる場合は `cd` コマンドを使ってディレクトリを変更する必要があります<br>
+   <br>
+   
+   2. ターミナルウィンドウに下記のコマンドを入力して実行します
+   
+   ```sh
+   C:\oit\py25\source> python sample1.py
+   ```
+   <br>
+   
+   > **Note** メニューにある `実行ボタン` からも実行は可能です <br>
+   > <image src="./inst09.png"><br>
+   <br>
+   
+   3. 以下の実行結果が得られれば成功です<br>
+   <image src="./inst10.png"><br>
 
 ### :o: Practice
 - Give it a try to run the ”hello_opencv.py”.
