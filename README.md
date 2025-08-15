@@ -19,17 +19,17 @@
 1. `py25.exe` ファイルを実行します.
     > **Note**
     > - 以下のような警告画面が表示された場合, `詳細情報` をクリックした後，`実行` をクリックしてください. <br>
-    > <image src="../image/inst00.png" width="40%" height="40%"><br>
-    > <image src="../image/inst01.png" width="40%" height="40%"><br>
+    > <image src="./inst00.png" width="40%" height="40%"><br>
+    > <image src="./inst01.png" width="40%" height="40%"><br>
 2. `次へ(N)` をクリックします.<br>
-  <image src="../image/inst02.png" width="40%" height="40%"><br>
+  <image src="./inst02.png" width="40%" height="40%"><br>
   > インストール過程(1)...<br>
-  > <image src="../image/inst03.png" width="40%" height="40%"><br>
+  > <image src="./inst03.png" width="40%" height="40%"><br>
   > インストール過程(2)...<br>
-  > <image src="../image/inst04.png" width="40%" height="40%"><br>
+  > <image src="./inst04.png" width="40%" height="40%"><br>
 
 3. このインストーラでは， `C:\oit\py25` に python実行環境（Python3.X + VSCode) をインストールし，ソースファイル ディレクトリとして `C:\oit\py25\source` と，デスクトップ上に実行のためのショートカット（下図）を設定します．.<br>
-  <image src="../image/icon.png" width="10%" height="10%">
+  <image src="./icon.png" width="10%" height="10%">
 
 > **Note**
 > Creating a link on the Desktop often fails. In that case, please run "C:\oit\py25en\py25en_start.bat" directly. It is possible to create the link manually, but DO NOT move anything in the `py25en` folder!)
