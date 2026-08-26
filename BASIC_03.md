@@ -9,511 +9,427 @@
 
 <hr>
 
-# MediaPipe（Legacy Solution / 旧バージョン用）
- MediaPipeで提供されている機能のうちPythonでサポートされているものは，2025.07現在，以下の通りとなります．
- 
-| ソリューション名       | 説明                                         |
-|------------------------|----------------------------------------------|
-| Face Detection         | 顔の位置を検出するモデル                     |
-| Face Mesh              | 顔の468点のランドマークを検出                |
-| Hands                  | 手の21点のランドマーク検出                   |
-| Pose                   | 姿勢（全身33点）のランドマーク検出           |
-| Holistic               | 顔・手・姿勢を統合して同時に検出するモデル   |
-| Selfie Segmentation    | セルフィー画像の背景分離                     |
-| Objectron              | 3D物体検出とトラッキング（例：靴、椅子など） |
+# MediaPipe
+MediaPipe の新 API（**Tasks API** / `mediapipe.tasks`）では、タスクごとに学習済みモデル（`.task` または `.tflite` ファイル）を読み込み、専用の検出器（Detector / Landmarker / Recognizer / Segmenter）を構成して処理を行います。
 
-  ※なお，2023.4版，mediapipe0.10.0以降に採用されたMediaPipe Tasks（新バージョン）では，以下のようなソリューションがあります．
-   - Vision Tasks（画像処理系）
+---
 
-| タスク名                   | 説明                                     |
-|---------------------------|------------------------------------------|
-| Object Detection          | 物体検出（EfficientDetなど）             |
-| Image Classification      | 画像分類                                 |
-| Image Segmentation        | セルフィーや背景の分離                   |
-| Interactive Segmentation  | インタラクティブな領域分割               |
-| Image Embedding           | 画像の特徴ベクトル抽出                   |
-| Face Detection            | 顔検出                                   |
-| Face Landmark Detection   | 顔のランドマーク検出（478点など）       |
-| Face Stylization          | 顔画像のスタイル変換（アニメ風など）     |
-| Hand Landmark Detection   | 手のランドマーク検出                     |
-| Gesture Recognition       | 手のジェスチャー分類                     |
-| Pose Landmark Detection   | 姿勢のランドマーク検出                   |
-| Image Generation          | 画像生成（例：テキストから画像）         |
+## モデルファイルの配置場所
 
-   - Audio Tasks（音声処理系）
+本環境における MediaPipe の学習済みモデルは、すべて以下の相対パス配下に配置して読み込みます。
 
-| タスク名            | 説明                          |
-|---------------------|-------------------------------|
-| Audio Classification | 音声分類（例：YAMNet）        |
+**プロジェクト内のモデル配置構造**
 
-   - Text Tasks（自然言語処理系）
+```text
+project_root/
+│
+├── learned_models/
+│   └── mediapipe/                          ← モデルファイルの配置フォルダ
+│       ├── hand_landmarker.task            (手の検出用)
+│       ├── pose_landmarker_lite.task       (姿勢推定用)
+│       ├── face_landmarker.task            (顔メッシュ・BlendShapes用)
+│       ├── blaze_face_short_range.tflite   (顔検出用)
+│       ├── gesture_recognizer.task         (ジェスチャ認識用)
+│       └── selfie_segmentation.tflite      (背景分離用)
+│
+└── main.py                                 ← 実行用スクリプト
 
-| タスク名            | 説明                                                 |
-|---------------------|------------------------------------------------------|
-| Text Classification | テキストの感情やカテゴリ分類                         |
-| Text Embedding      | 文のベクトル化（例：Universal Sentence Encoder）    |
-| Language Detection  | 言語の自動判定                                       |
+```
 
-  ## Selfie Segmentationを例とした基本的な使い方
-  以下は，MediaPipe の Selfie Segmentation 機能を利用した例です．他の機能を利用する場合も基本手順は同じとなります．
-  1. mp.solutionsパッケージから使いたい機能を呼び出す
-  2. processメソッドを用いて検出を行う
-  3. processの戻り値（results）を分解して必要な情報を抽出する
+---
 
-  ```python
-  import cv2
-  import numpy as np
-  import mediapipe as mp
+## MediaPipe Tasks API の機能一覧
 
-  device = 0
+`mediapipe.tasks.vision` モジュールで提供されている主要な検出器と、対応するモデルファイルは以下の通りです。
 
-  def main():
-    cap = cv2.VideoCapture(device)
-    fps = cap.get(cv2.CAP_PROP_FPS)
+| 機能 | タスク名 (`mediapipe.tasks.vision`) | 使用モデルファイルパス | 概要 |
+| --- | --- | --- | --- |
+| **Hands** | `HandLandmarker` | `./learned_models/mediapipe/hand_landmarker.task`[cite: 5] | 手の21箇所ランドマークと左右判定[cite: 5] |
+| **Pose** | `PoseLandmarker` | `./learned_models/mediapipe/pose_landmarker_lite.task`[cite: 5] | 身体33箇所のランドマークを取得[cite: 5] |
+| **Face Mesh** | `FaceLandmarker` | `./learned_models/mediapipe/face_landmarker.task`[cite: 5] | 顔のメッシュおよび表情スコア（BlendShapes）取得[cite: 5] |
+| **Face** | `FaceDetector` | `./learned_models/mediapipe/blaze_face_short_range.tflite`[cite: 5] | 顔のバウンディングボックスとキーポイント検出[cite: 5] |
+| **Gesture** | `GestureRecognizer` | `./learned_models/mediapipe/gesture_recognizer.task`[cite: 5] | グー・チョキ・パー等のハンドジェスチャ認識[cite: 5] |
+| **Segment** | `ImageSegmenter` | `./learned_models/mediapipe/selfie_segmentation.tflite`[cite: 5] | 人物領域を抽出する背景分離マスク処理[cite: 5] |
 
-    # SelfieSegmentationを利用する準備
-    segment = mp.solutions.selfie_segmentation.SelfieSegmentation(model_selection=0)
-                           #↑この部分を変更すると検出されるものが変わる
+---
 
-    while cap.isOpened() :
-      ret, frame = cap.read()
+## 標準 Tasks API による処理の基本の流れ
 
-      # frameへのmediapipe(SelfieSegmentation)の適用
-      results = segment.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+いずれのタスクも、標準的な実装手順は以下の 5 ステップで共通しています。
 
-      # 検出結果(results)が存在した場合
-      if results.segmentation_mask is not None:
-        condition = np.stack((results.segmentation_mask, )*3, axis=-1)>0.5 #↑前景と背景の境界（0.5※適当）でマスクを作成
+1. **`BaseOptions` の設定**: `./learned_models/mediapipe/` 配下のモデルパスを指定[cite: 5]
+2. **`Options` の構築**: 動作モード（`RunningMode.IMAGE` 等）や各種パラメータを設定[cite: 5]
+3. **検出器の生成**: 各クラスの `create_from_options()` を呼び出してインスタンス化[cite: 5]
+4. **`mp.Image` への変換**: OpenCV の BGR 画像を `mp.Image` オブジェクトへ変換[cite: 5]
+5. **推論と結果取得**: `detect()` や `recognize()`, `segment()` を呼び出して処理を実行[cite: 5]
 
-        bg = np.ones(frame.shape, dtype=np.uint8)*255 #magentaの背景を
-        bg[:,:,1] = 0                                 #作っています
+---
 
-        #conditionの切り分けに従って，frameのままとbgへの置き換えを行う
-        frame = np.where(condition, frame, bg)
+## Selfie Segmentation（背景置き換え）
 
-      if cv2.waitKey(1) & 0xFF == ord('q') or ret == False:
-        break
+`ImageSegmenter` と `selfie_segmentation.tflite` を使用し、人物領域のマスクを取得して背景をマゼンタ色に置換します[cite: 5]。
 
-      cv2.imshow("video", frame)
+```python
+import cv2
+import numpy as np
+import mediapipe as mp
 
+# 1. オプション設定とモデル指定
+BaseOptions = mp.tasks.BaseOptions
+ImageSegmenter = mp.tasks.vision.ImageSegmenter
+ImageSegmenterOptions = mp.tasks.vision.ImageSegmenterOptions
+VisionRunningMode = mp.tasks.vision.RunningMode
+
+segment_options = ImageSegmenterOptions(
+    base_options=BaseOptions(model_asset_path="./learned_models/mediapipe/selfie_segmentation.tflite"),
+    running_mode=VisionRunningMode.IMAGE,
+    output_category_mask=True
+)
+
+def main():
+    cap = cv2.VideoCapture(0)
+
+    # 2. Segmenter インスタンスの生成
+    with ImageSegmenter.create_from_options(segment_options) as segmenter:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            # 3. mp.Image への変換（BGR -> RGB）
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+
+            # 4. 推論実行とマスク取得
+            segmentation_result = segmenter.segment(mp_image)
+            
+            if segmentation_result.category_mask is not None:
+                mask = segmentation_result.category_mask.numpy_view()
+                # しきい値適用（人物領域の判別）
+                condition = np.stack((mask.squeeze() <= 0.5,) * 3, axis=2)
+
+                # 背景画像（マゼンタ色）の作成
+                bg_image = np.zeros(frame.shape, dtype=np.uint8)
+                bg_image[:] = (255, 0, 255)
+
+                # 合成処理
+                frame = np.where(condition, frame, bg_image)
+
+            cv2.imshow('Selfie Segmentation', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    cap.release()
     cv2.destroyAllWindows()
-    cap.release()
 
-  if __name__ == '__main__':
+if __name__ == '__main__':
     main()
-  ```
 
-  ## どの手が挙がっているかを評価するサンプル
-  - MediaPipeのPoseを使って左右どちらの手を挙げているか（または両方）を画面上に表示します
-  - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
-  - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
-   - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
-  ```python
-  import math
-  import cv2
-  import mediapipe as mp
-  import numpy as np
-  mp_drawing = mp.solutions.drawing_utils
-  mp_pose = mp.solutions.pose
+```
 
-  device = 0 # cameera device number
+---
 
-  def main():
-    # For webcam input:
-    cap = cv2.VideoCapture(device)
-    pose = mp_pose.Pose( min_detection_confidence=0.5, min_tracking_confidence=0.5 )
+## 挙手判定サンプル（Pose Landmarker）
 
-    while cap.isOpened():
-      ret, frame = cap.read()
-      if not ret:
-        print("Ignoring empty camera frame.")
-        # If loading a video, use 'break' instead of 'continue'.
-        continue
+`PoseLandmarker` と `pose_landmarker_lite.task` を使用し、身体の 33 箇所キーポイントから挙手を判定します[cite: 5]。
 
-      # Flip the image horizontally for a later selfie-view display, and convert the BGR image to RGB.
-      image = cv2.cvtColor( cv2.flip(frame, 1), cv2.COLOR_BGR2RGB )
+```python
+import cv2
+import mediapipe as mp
 
-      # To improve performance, optionally mark the image as not writeable to pass by reference.
-      image.flags.writeable = False
-      results = pose.process( image )
+BaseOptions = mp.tasks.BaseOptions
+PoseLandmarker = mp.tasks.vision.PoseLandmarker
+PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
+VisionRunningMode = mp.tasks.vision.RunningMode
 
-      # Draw the pose annotation on the image.
-      image.flags.writeable = True
-      image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-      if results.pose_landmarks:
-        mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+pose_options = PoseLandmarkerOptions(
+    base_options=BaseOptions(model_asset_path="./learned_models/mediapipe/pose_landmarker_lite.task"),
+    running_mode=VisionRunningMode.IMAGE,
+    num_poses=1,
+    min_pose_detection_confidence=0.5,
+    min_pose_presence_confidence=0.5
+)
 
-        # judge
-        cv2.putText(image, judge_raise_hand(image, results.pose_landmarks), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+def judge_raise_hand(pose_landmarks):
+    # NormalizedLandmark: 0=Nose, 15=Left Wrist, 16=Right Wrist
+    nose_y = pose_landmarks[0].y
+    left_wrist_y = pose_landmarks[15].y
+    right_wrist_y = pose_landmarks[16].y
 
-      cv2.imshow('MediaPipe Pose', image)
-      if cv2.waitKey(1) & 0xFF == 27:
-        break
-    cap.release()
+    is_left_up = left_wrist_y < nose_y
+    is_right_up = right_wrist_y < nose_y
 
-  # Judgment of raising hand
-  def judge_raise_hand(image, landmarks):
-    image_width, image_height = image.shape[1], image.shape[0]
-    landmark_point = []
-
-    zt = math.sqrt(image_width*image_width + image_height*image_height)
-    for index, landmark in enumerate(landmarks.landmark):
-      if landmark.visibility < 0 or landmark.presence < 0:
-        continue
-
-      # Convert the obtained landmark values x, y, z to the coordinates on the image
-      landmark_x = min(int(landmark.x * image_width), image_width - 1)
-      landmark_y = min(int(landmark.y * image_height), image_height - 1)
-      landmark_z = int(landmark.z * zt)
-
-      landmark_point.append(np.array([landmark_x, landmark_y, landmark_z], dtype=int))
-
-    if len(landmark_point) != 0:
-      if landmark_point[0][1] > landmark_point[20][1] and landmark_point[0][1] > landmark_point[19][1]:
+    if is_left_up and is_right_up:
         return "both"
-      elif landmark_point[0][1] > landmark_point[20][1]:
+    elif is_left_up:
         return "left"
-      elif landmark_point[0][1] > landmark_point[19][1]:
+    elif is_right_up:
         return "right"
-      else:
-        return ""
+    return ""
 
-  if __name__ == '__main__':
+def main():
+    cap = cv2.VideoCapture(0)
+
+    with PoseLandmarker.create_from_options(pose_options) as landmarker:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            frame = cv2.flip(frame, 1)
+            ht, wt, _ = frame.shape
+
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+
+            result = landmarker.detect(mp_image)
+
+            if result.pose_landmarks:
+                pose_landmarks = result.pose_landmarks[0]
+
+                # 座標描画
+                for lm in pose_landmarks:
+                    cx, cy = int(lm.x * wt), int(lm.y * ht)
+                    cv2.circle(frame, (cx, cy), 3, (0, 255, 0), -1)
+
+                res_text = judge_raise_hand(pose_landmarks)
+                cv2.putText(frame, res_text, (30, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
+
+            cv2.imshow('MediaPipe Pose', frame)
+            if cv2.waitKey(1) & 0xFF == 27:
+                break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
     main()
-  ```
-  
-  ## 人差し指の座標を表示するサンプル
-  - MediaPipeのHandsを使って左右の人差し指の位置座標を表示します
-  - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
-  - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
-    - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
-  - 人差し指の先はLandmarkリスト（配列）の添字8に割り当てられています
-    - 他のLandmarkは，[マニュアル](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker?hl=ja) で確認してください 
-  ```python
- import math
- import cv2
- import mediapipe as mp
- import numpy as np
- import time
- mp_drawing = mp.solutions.drawing_utils
- mp_hands = mp.solutions.hands
 
- device = 0 # cameera device number
+```
 
- def getFrameNumber(start:float, fps:int):
-   now = time.perf_counter() - start
-   frame_now = int(now * 1000 / fps)
+---
 
-   return frame_now
+## 人差し指の座標表示（Hand Landmarker）
 
- # Draw a circle on index finger
- def drawFingertip(image, landmarks):
-   image_width, image_height = image.shape[1], image.shape[0]
-   landmark_point = []
+`HandLandmarker` と `hand_landmarker.task` を使用し、手の 21 箇所ランドマークおよび左右判定（Handedness）を取得します[cite: 5]。
 
-   zt = math.sqrt(image_width*image_width + image_height*image_height)
-   for index, landmark in enumerate(landmarks.landmark):
-     if landmark.visibility < 0 or landmark.presence < 0:
-         continue
+```python
+import cv2
+import mediapipe as mp
 
-     # Convert the obtained landmark values x, y, z to the coordinates on the image
-     landmark_x = min(int(landmark.x * image_width), image_width - 1)
-     landmark_y = min(int(landmark.y * image_height), image_height - 1)
-     landmark_z = int(landmark.z * zt)
+BaseOptions = mp.tasks.BaseOptions
+HandLandmarker = mp.tasks.vision.HandLandmarker
+HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
+VisionRunningMode = mp.tasks.vision.RunningMode
 
-     landmark_point.append(np.array([landmark_x, landmark_y, landmark_z], dtype=int))
+hands_options = HandLandmarkerOptions(
+    base_options=BaseOptions(model_asset_path="./learned_models/mediapipe/hand_landmarker.task"),
+    running_mode=VisionRunningMode.IMAGE,
+    num_hands=2,
+    min_hand_detection_confidence=0.5,
+    min_hand_presence_confidence=0.5
+)
 
-   # Draw a circle on index finger and display the coordinate value
-   cv2.circle(image, (landmark_point[8][0], landmark_point[8][1]), 7, (0, 0, 255), 3)
-   cv2.putText(image, "(" + str(landmark_point[8][0]) + ", " + str(landmark_point[8][1]) + ")", 
-     (landmark_point[8][0] - 20, landmark_point[8][1] - 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+def main():
+    cap = cv2.VideoCapture(0)
 
+    with HandLandmarker.create_from_options(hands_options) as landmarker:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
- def main():
-   # For webcam input:
-   global device
+            frame = cv2.flip(frame, 1)
+            ht, wt, _ = frame.shape
 
-   cap = cv2.VideoCapture(device)
-   fps = cap.get(cv2.CAP_PROP_FPS)
-   wt  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-   ht  = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
-   print("Size:", ht, "x", wt, "/Fps: ", fps)
+            results = landmarker.detect(mp_image)
 
-   start = time.perf_counter()
-   frame_prv = -1
+            if results.hand_landmarks:
+                for idx, hand_landmarks in enumerate(results.hand_landmarks):
+                    # 左右判別
+                    handedness = results.handedness[idx][0].category_name
+                    
+                    # Index 8: 人差し指先端
+                    pt8 = hand_landmarks[8]
+                    cx, cy = int(pt8.x * wt), int(pt8.y * ht)
 
-   cv2.namedWindow('MediaPipe Hands', cv2.WINDOW_NORMAL)
+                    cv2.circle(frame, (cx, cy), 7, (0, 0, 255), -1)
+                    cv2.putText(frame, f"{handedness} ({cx}, {cy})", (cx - 20, cy - 20),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-   hands = mp_hands.Hands(
-   min_detection_confidence=0.5,
-   min_tracking_confidence=0.5)
+            cv2.imshow('MediaPipe Hands', frame)
+            if cv2.waitKey(1) & 0xFF == 27:
+                break
 
-   while cap.isOpened():
-     frame_now=getFrameNumber(start, fps)
-     if frame_now == frame_prv:
-         continue
-     frame_prv = frame_now
+    cap.release()
+    cv2.destroyAllWindows()
 
-     ret, frame = cap.read()
-     if not ret:
-       print("Ignoring empty camera frame.")
-       # If loading a video, use 'break' instead of 'continue'.
-       continue
+if __name__ == '__main__':
+    main()
 
-     # Flip the image horizontally for a later selfie-view display, and convert
-     # the BGR image to RGB.
-     frame = cv2.cvtColor(cv2.flip(frame, 1), cv2.COLOR_BGR2RGB)
+```
 
-     # To improve performance, optionally mark the image as not writeable to
-     # pass by reference.
-     frame.flags.writeable = False
-     results = hands.process(frame)
+---
 
-     # Draw the index finger annotation on the image.
-     frame.flags.writeable = True
-     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-     if results.multi_hand_landmarks:
-         for hand_landmarks in results.multi_hand_landmarks:
-             drawFingertip(frame, hand_landmarks)
-     cv2.imshow('MediaPipe Hands', frame)
-     if cv2.waitKey(1) & 0xFF == 27:
-           break
-   cap.release()
+## 顔メッシュと BlendShapes（Face Landmarker）
 
- if __name__ == '__main__':
-   main()
- ```
- 
- ## FaceMeshを表示するサンプル
- - MediaPipeのFaceMeshを使って468点の顔の3D特徴点を表示します
- - innerカメラは左右が反転している（鏡状になっている）ので，cv2.flip関数を使って反転しています
- - MediaPipeはRGBカラー，VideoCapture（OpenCV）はBGRカラーなのでcv2.cvtColor関数で順序の入れ替えを行っています
-   - cv2.imshowの前にもう一度cv2.cvtColor関数を使ってBGRカラーに戻しています
- - Landmarkの詳しい情報は，[マニュアル](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker?hl=ja) で確認してください 
+`FaceLandmarker` と `face_landmarker.task` を使用します[cite: 5]。`output_face_blendshapes=True` を指定することで、表情のスコア（笑顔や目の開き具合等）を取得可能です[cite: 5]。
 
- ```python
- import math
- import cv2
- import mediapipe as mp
- import time
- import numpy as np
- mp_drawing = mp.solutions.drawing_utils
- mp_face_mesh = mp.solutions.face_mesh
+```python
+import cv2
+import mediapipe as mp
 
- device = 0 # cameera device number
+BaseOptions = mp.tasks.BaseOptions
+FaceLandmarker = mp.tasks.vision.FaceLandmarker
+FaceLandmarkerOptions = mp.tasks.vision.FaceLandmarkerOptions
+VisionRunningMode = mp.tasks.vision.RunningMode
 
- def getFrameNumber(start:float, fps:int):
-   now = time.perf_counter() - start
-   frame_now = int(now * 1000 / fps)
+fmesh_options = FaceLandmarkerOptions(
+    base_options=BaseOptions(model_asset_path="./learned_models/mediapipe/face_landmarker.task"),
+    running_mode=VisionRunningMode.IMAGE,
+    min_face_detection_confidence=0.5,
+    min_face_presence_confidence=0.5,
+    output_face_blendshapes=True  # 表情スコアの出力を有効化
+)
 
-   return frame_now
+def main():
+    cap = cv2.VideoCapture(0)
 
- def main():
-   # For webcam input:
-   global device
+    with FaceLandmarker.create_from_options(fmesh_options) as landmarker:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-   cap = cv2.VideoCapture(device)
-   fps = cap.get(cv2.CAP_PROP_FPS)
-   wt  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-   ht  = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            frame = cv2.flip(frame, 1)
+            ht, wt, _ = frame.shape
 
-   print("Size:", ht, "x", wt, "/Fps: ", fps)
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
-   start = time.perf_counter()
-   frame_prv = -1
+            detection_result = landmarker.detect(mp_image)
 
-   drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+            # メッシュ（座標）の描画
+            if detection_result.face_landmarks:
+                for face_landmarks in detection_result.face_landmarks:
+                    for lm in face_landmarks:
+                        cx, cy = int(lm.x * wt), int(lm.y * ht)
+                        cv2.circle(frame, (cx, cy), 1, (0, 255, 0), -1)
 
-   face_mesh = mp_face_mesh.FaceMesh(
-   min_detection_confidence=0.5,
-   min_tracking_confidence=0.5)
+            # BlendShapes（表情データ）の取得
+            if detection_result.face_blendshapes:
+                first_face_shapes = {cat.category_name: cat.score for cat in detection_result.face_blendshapes[0]}
+                smile_score = first_face_shapes.get("mouthSmileLeft", 0.0)
+                cv2.putText(frame, f"Smile Score: {smile_score:.2f}", (30, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
 
-   while cap.isOpened():
-     frame_now=getFrameNumber(start, fps)
-     if frame_now == frame_prv:
-       continue
-     frame_prv = frame_now
+            cv2.imshow('MediaPipe Face Mesh', frame)
+            if cv2.waitKey(1) & 0xFF == 27:
+                break
 
-     ret, frame = cap.read()
-     if not ret:
-       print("Ignoring empty camera frame.")
-       # If loading a video, use 'break' instead of 'continue'.
-       continue
+    cap.release()
+    cv2.destroyAllWindows()
 
-     # Flip the image horizontally for a later selfie-view display, and convert
-     # the BGR image to RGB.
-     frame = cv2.cvtColor(cv2.flip(frame, 1), cv2.COLOR_BGR2RGB)
-     # To improve performance, optionally mark the image as not writeable to
-     # pass by reference.
-     frame.flags.writeable = False
-     results = face_mesh.process(frame)
+if __name__ == '__main__':
+    main()
 
-     # Draw the face mesh annotations on the image.
-     frame.flags.writeable = True
-     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-     if results.multi_face_landmarks:
-       for face_landmarks in results.multi_face_landmarks:
-         #mp_drawing.draw_landmarks(image, face_landmarks, mp_face_mesh.FACE_CONNECTIONS)
-         my_draw_face(frame, face_landmarks)
-     cv2.imshow('MediaPipe FaceMesh', frame)
-     if cv2.waitKey(1) & 0xFF == 27:
-       break
-   cap.release()
+```
 
- def my_draw_face(image, landmarks):
-   image_width, image_height = image.shape[1], image.shape[0]
-   landmark_point = []
+---
 
-   zt = math.sqrt(image_width*image_width + image_height*image_height)
-   for index, landmark in enumerate(landmarks.landmark):
-     if landmark.visibility < 0 or landmark.presence < 0:
-       continue
+## チョキの判定サンプル（Hand Landmarker）
 
-     # Convert the obtained landmark values x, y, z to the coordinates on the image
-     landmark_x = min(int(landmark.x * image_width), image_width - 1)
-     landmark_y = min(int(landmark.y * image_height), image_height - 1)
-     landmark_z = int(landmark.z * zt)
+`HandLandmarker` から取得した 3D 座標を元にベクトル内積計算を行い、指の開き・曲がり具合を計算して「チョキ」を判定します[cite: 5]。
 
-     landmark_point.append(np.array([landmark_x, landmark_y, landmark_z], dtype=int))
+```python
+import cv2
+import math
+import numpy as np
+import mediapipe as mp
 
-   if len(landmark_point) != 0:
-     for i in range(0, len(landmark_point)):
-       cv2.circle(image, (int(landmark_point[i][0]),int(landmark_point[i][1])), 1, (0, 255, 0), 1)
+BaseOptions = mp.tasks.BaseOptions
+HandLandmarker = mp.tasks.vision.HandLandmarker
+HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
+VisionRunningMode = mp.tasks.vision.RunningMode
 
- if __name__ == '__main__':
-   main()
- ```
-<!--
-## [エクストラ] 配布環境の自作ライブラリの利用
+hands_options = HandLandmarkerOptions(
+    base_options=BaseOptions(model_asset_path="./learned_models/mediapipe/hand_landmarker.task"),
+    running_mode=VisionRunningMode.IMAGE,
+    num_hands=2,
+    min_hand_detection_confidence=0.5,
+    min_hand_presence_confidence=0.5
+)
 
-配布環境には，mediapipeのうち，フレーム画像を渡すと，Face Detection，Hands，Poseの結果の座標リスト，Selfie Segmentationの結果画像を返却する補助するライブラリ（パッケージ）が用意してあります．
- - 準備
-   - パッケージをimportし，インスタンスを生成しておきます 
-   - フレーム画像は反転，色変換（RGBにする）をしておきます
-    - imshowする際に，色を再変換（BGRに戻す）する必要があります 
-   ```python
-   import myPhysiology as mp
-   mpd = mp.MpDetector()
-   frame = cv2.flip(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 1)
-   ```
-   
- - getFace(frame, bool=ランドマーク座標返却の要・不要) -> 検出した顔の領域の座標とランドマーク座標
-   ```python
-   detections = mpd.getFace(frame, True)
-   for [box, keys] in detections:
-     if box!=[]:
-       cv2.rectangle(frame, (box[0], box[1]), (box[0]+box[2], box[1]+box[3]), [0,255,0], 1)
-     if keys!=[]:
-       for points in keys:
-         cv2.circle(frame, points, 3, [255,0,0], -1)
-   ```
-
- - getHand(frame) -> 左右の指の座標リストのリスト
-   ```python
-   hands = mpd.getHand(frame)
-   for hand in hands:
-     left = hand[0]
-     right = hand[1]
-     for point in left:
-       x, y, z = point
-       cv2.circle(frame, [x, y], 3, [255,0,255], -1)
-     for point in right:
-       x, y, z = point
-       cv2.circle(frame, [x, y], 3, [0,255,0], -1)
-   ```
- 
- - getPose(frame) -> ポーズの座標リスト
-   ```python
-   poses = mpd.getPose(frame)
-   for point in poses:
-     x, y, z, ret = point
-     if ret:
-       scale = abs(int(5 * (z/cap.wt-1.0)))
-       cv2.circle(frame, [x, y], scale, [0,0,255], -1)
-   ```
-
-  ## チョキを判定するサンプル
-  - カメラの呼び出しには [配布環境のパッケージの関数](BASIC_0.md) を利用しています（VideoCaptureに置き換え可能です）
-  - MediaPipe Handには 配布環境のパッケージの関数（前節）を使っています（標準関数に置き換え可能です）
-  - ベクトルの長さ，角度の算出方法（calcAngle関数）については [こちら](BASIC_FP01.md#2つのベクトルのなす角) を確認してください
-
-  ```python
-  # -*- coding: utf-8 -*-
-  import cv2
-  import numpy as np
-  import myCapture as mycap
-  import myPhysiology as mp
-  import time
-
-  dev = 0
-
-  def main():
-      cap = mycap.CameraSelector(dnum=dev, size=[640, 480])
-      mpd = mp.MpDetector()
-
-      while cap.isOpened():
-          ret, fnum, frame = cap.read()
-          start = time.perf_counter()
-          frame = cv2.flip(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),1)
-
-          if ret:
-            hands = mpd.getHand(frame)
-            for hand in hands:
-              right = hand[1]
-
-              if len(right)>0: 
-                for point in right:
-                  x, y, _ = point
-                  cv2.circle(frame, [x, y], 3, [0,255,0], -1)
-
-                # 手の付け根と指の先端，第2関節までの長さを算出（指を閉じているかどうかの判定）
-                third_m = np.linalg.norm(np.array(right[0])-np.array(right[14])) # 手の付根-薬指第２関節
-                pinky_m = np.linalg.norm(np.array(right[0])-np.array(right[18])) # 手の付根-子指第２関節
-                third_t = np.linalg.norm(np.array(right[0])-np.array(right[16])) # 手の付根-薬指先端
-                pinky_t = np.linalg.norm(np.array(right[0])-np.array(right[20])) # 手の付根-薬指先端
-
-                # 手のひらの幅，手のひらの外側から親指の先端までの長さを算出（親指を折り曲げているかどうかの判定）
-                thumb_l = np.linalg.norm(np.array(right[17])-np.array(right[4]))
-                hand_wt = np.linalg.norm(np.array(right[17])-np.array(right[5]))
-
-                # 第2関節-第3関節と第2関節-先端のなす角を算出（指を伸ばしているかどうかの判定）
-                first_d = calcAngle(np.array(right[7])-np.array(right[6]),np.array(right[5])-np.array(right[6]))
-                secnd_d = calcAngle(np.array(right[11])-np.array(right[10]),np.array(right[9])-np.array(right[10]))
-
-                if (third_t < third_m) and (pinky_t < pinky_m) and (thumb_l < hand_wt) and (first_d > 140) and (secnd_d > 140):
-                  print("choki")
-
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            cv2.imshow("video", frame)
-            if cv2.waitKey(1) == ord('q'):
-              break
-
-      cap.release()
-      cv2.destroyAllWindows()
-
-  def calcAngle(v1, v2):
+def calc_angle(v1, v2):
     v1_n = np.linalg.norm(v1)
     v2_n = np.linalg.norm(v2)
-
-    cos_theta = np.inner(v1, v2) / (v1_n * v2_n)
-
+    if v1_n == 0 or v2_n == 0:
+        return 0.0
+    cos_theta = np.clip(np.inner(v1, v2) / (v1_n * v2_n), -1.0, 1.0)
     return np.rad2deg(np.arccos(cos_theta))
 
-  if __name__=='__main__':
-      main()
-      
-  ```
+def main():
+    cap = cv2.VideoCapture(0)
 
-  ## [課題] じゃんけん判定
-  1. ぐー，ちょき，ぱーを判定できるように改良してみましょう
-  2. 適当なタイミングでコンピュータの手を決定し，カメラに映った人の手と比較して勝敗を判定しじゃんけんができるようにしてみましょう
+    with HandLandmarker.create_from_options(hands_options) as landmarker:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-  - 0以上3未満（0,1,2）の整数乱数を発生させるサンプルは以下のようになります
-    
-```python
-import random
+            frame = cv2.flip(frame, 1)
+            ht, wt, _ = frame.shape
+            zt = math.sqrt(wt * wt + ht * ht)
 
-cpu = random.randint(0,3)
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+
+            results = landmarker.detect(mp_image)
+
+            if results.hand_landmarks:
+                for idx, hand_landmarks in enumerate(results.hand_landmarks):
+                    # 座標の格納
+                    pts = [np.array([lm.x * wt, lm.y * ht, lm.z * zt]) for lm in hand_landmarks]
+
+                    for p in pts:
+                        cv2.circle(frame, (int(p[0]), int(p[1])), 3, (0, 255, 0), -1)
+
+                    # 距離と角度の算出
+                    third_m = np.linalg.norm(pts[0] - pts[14])
+                    pinky_m = np.linalg.norm(pts[0] - pts[18])
+                    third_t = np.linalg.norm(pts[0] - pts[16])
+                    pinky_t = np.linalg.norm(pts[0] - pts[20])
+
+                    thumb_l = np.linalg.norm(pts[17] - pts[4])
+                    hand_wt = np.linalg.norm(pts[17] - pts[5])
+
+                    first_d = calc_angle(pts[7] - pts[6], pts[5] - pts[6])
+                    secnd_d = calc_angle(pts[11] - pts[10], pts[9] - pts[10])
+
+                    # チョキ判定
+                    if (third_t < third_m) and (pinky_t < pinky_m) and (thumb_l < hand_wt) and (first_d > 140) and (secnd_d > 140):
+                        cv2.putText(frame, "choki", (50, 50),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+
+            cv2.imshow("Janken Check", frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
+
 ```
--->
+
+---
+
+## [課題] じゃんけん判定
+
+1. 上記のチョキ判定コードを拡張して、「グー」「チョキ」「パー」のすべての手を判定できるようにプログラムを改良してみましょう。
+2. ランダムにコンピュータの手（`0`:グー, `1`:チョキ, `2`:パー）を決定し、カメラに映ったプレイヤーの手と勝敗判定を行う「じゃんけんゲーム」を作成してみましょう。
