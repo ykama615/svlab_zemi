@@ -10,221 +10,274 @@
 <hr>
 
 # カメラへのアクセス
- もっとも簡単なカメラへのアクセスのサンプルプログラムは以下の通りです．<br>
- - グローバル変数のdevにカメラのデバイス番号や動画ファイル名を指定します
- - \'q\'ボタンを押すとプログラムが終了します
 
-  ```python
-  # script4.py
-  import cv2
+もっとも簡単なカメラアクセスのサンプルプログラムは以下の通りです。
+- グローバル変数 `dev` にカメラのデバイス番号（または動画ファイルパス）を指定します。
+- 'q' キーを押すとプログラムが終了します。
 
-  dev = 0
+```python
+# script4.py
+import cv2
 
-  def main():
+dev = 0
+
+def main():
     cap = cv2.VideoCapture(dev)
     ht  = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     wt  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     while cap.isOpened():
-      ret, frame = cap.read()
+        ret, frame = cap.read()
 
-      if ret == False:
-        break
+        if not ret:
+            break
 
-      cv2.imshow("video", frame)
+        cv2.imshow("video", frame)
 
-      if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
     cv2.destroyAllWindows()
     cap.release()
 
-  if __name__=='__main__':
+if __name__ == '__main__':
     main()
-  ```
 
-  #### 内蔵カメラ以外のWebカメラ等を利用する場合
-  1. MSMF(Microsoft Media Foundation)の設定
-  USB接続のカメラの場合，cv2.VideoCaptureによるカメラの起動が遅くなります．これを回避するためにメインプログラムの先頭（import cv2より前）に以下の2行を記述します．
-  ```python
-  # cv2のインポート前にカメラに関する設定を行う
-  import os
-  os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+```
 
-  import cv2
-  ```
+### 内蔵カメラ以外のWebカメラ等を利用する場合
 
-  2. DirectShow経由で利用する方法
-  1の他に，VideoCaptureに引数を指定する，以下の方法を使うこともできます
-  ```python
-  # DirectShow経由でカメラ映像を取得する
-  cap = cv2.VideoCapture(dev, cv2.CAP_DSHOW)
-  ```
-  
+#### 1. MSMF(Microsoft Media Foundation)の設定
 
-  ## [課題] Let's Selfy プログラム
-  キー\'s\'を押すと，そのときのフレームが表示・保存されるプログラムを作成してみましょう．
-  - ヒント
-  ```python
-  key = cv2.waitKey(1)
-  if key & 0xFF == ord('q'):
+USB接続カメラの場合、`cv2.VideoCapture` によるカメラの起動が遅くなる場合があります。これを回避するため、メインプログラムの先頭（`import cv2` より前）に以下の設定を記述します。
+
+```python
+# cv2のインポート前にカメラ環境変数の設定を行う
+import os
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
+import cv2
+
+```
+
+#### 2. DirectShow経由で利用する方法
+
+1 のほかに、`VideoCapture` の引数にバックエンドフラグを指定する方法も利用できます。
+
+```python
+# DirectShow経由でカメラ映像を取得する
+cap = cv2.VideoCapture(dev, cv2.CAP_DSHOW)
+
+```
+
+---
+
+# 課題・演習
+
+## 【課題】 Let's Selfy プログラム
+
+キー 's' を押すと、その瞬間のフレームを画面表示・保存するプログラムを作成してみましょう。
+
+* **ヒント**:
+
+```python
+key = cv2.waitKey(1)
+if key & 0xFF == ord('q'):
     break
-  elif key & 0xFF == ord('s'):
+elif key & 0xFF == ord('s'):
     cv2.imshow("image", frame)
     cv2.imwrite("photo.jpg", frame)
-  ```
 
-  ## [課題] グレースケール・ビデオ・プログラム
-  映像がグレースケールに変換されるようにするプログラムを作成してみましょう．
-  - ヒント
-  ```python
-  cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-  ```
+```
 
-  ## [課題] エッジ・ビデオ・プログラム
-  グレースケール・ビデオ・プログラムにエッジ検出処理を追加してみましょう．
-  - エッジとは画像中の色や明るさが極端に変化する（不連続の）部分のことで，写っているモノとモノの境界を示します
-  - ヒント
-  ```python
-  cv2.Canny(gray, 100, 200)
-  ```
-  
-  # タイムラプス
-  - 15フレームに1回（30FPSであれば0.5秒に1回）ずつ，フレームを deque に追加していくことでタイムラプス動画を作成してみましょう
-  - \'q\' ボタンを押すことでタイムラプスの収録を終了し，収録した内容が再生されます
-  - 色々なタイミングでフレームを収録していくプログラムに変更してみましょう
-  
-  ```python
-  import cv2
-  import numpy as np
-  from collections import deque # dequeの利用に必要
+## 【課題】 グレースケール・ビデオ・プログラム
 
-  dev = 0
+カメラ映像をリアルタイムでグレースケールに変換して表示するプログラムを作成してみましょう。
 
-  def main():
+* **ヒント**:
+
+```python
+gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+```
+
+## 【課題】 エッジ・ビデオ・プログラム
+
+グレースケール・ビデオ・プログラムに Canny 法によるエッジ検出処理を追加してみましょう。
+
+* **エッジとは**: 画像中の色や明るさが極端に変化する（不連続な）部分のことで、写っている物体の境界線を示します。
+* **ヒント**:
+
+```python
+edges = cv2.Canny(gray, 100, 200)
+
+```
+
+---
+
+# タイムラプス
+
+* 15フレームに1回（30 FPS であれば 0.5 秒に 1 回）ずつ、取得したフレームを `deque` に追加していくことでタイムラプス動画を作成してみましょう。
+* 'q' キーを押すとタイムラプスの収録を終了し、収録されたフレームが連続再生されます。
+* 収録タイミング（間隔）を変更して動作を確認してみましょう。
+
+```python
+import cv2
+import numpy as np
+from collections import deque
+
+dev = 0
+
+def main():
     cap = cv2.VideoCapture(dev)
     fps = cap.get(cv2.CAP_PROP_FPS)
+    # FPS取得失敗（0.0）時のゼロ除算対策
+    wait_msec = int(1000.0 / fps) if fps > 0 else 33
 
     timelapse = deque()
     fnum = 0
 
     while cap.isOpened():
-      ret, frame = cap.read()
+        ret, frame = cap.read()
 
-      if ret == False:
-        break
+        if not ret:
+            break
 
-      cv2.imshow("video", frame)
-      if fnum%15==0:
-        # (1)dequeの末尾にframeを追加する
-        timelapse.append(frame)
-      fnum = fnum + 1
+        cv2.imshow("video", frame)
+        
+        # 15フレームごとにdequeの末尾へ追加
+        if fnum % 15 == 0:
+            timelapse.append(frame)
+        fnum += 1
 
-      if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q'):
-        break
+        if cv2.waitKey(wait_msec) & 0xFF == ord('q'):
+            break
 
-    # dequeの内容を再生
+    # 収録したdequeの内容を再生
     for frame in timelapse:
-      cv2.imshow("timelapsex2", frame)
-      if cv2.waitKey(int(1000/30)) & 0xFF == ord('q'):
-        break
+        cv2.imshow("timelapse", frame)
+        if cv2.waitKey(int(1000 / 30)) & 0xFF == ord('q'):
+            break
 
-    cv2.waitKey(0)      
     cv2.destroyAllWindows()
     cap.release()
 
-  if __name__ == '__main__':
+if __name__ == '__main__':
     main()
-  ```
-  <!--
-  ## [エクストラ] 配布環境の自作ライブラリの利用
-  配布環境には，カメラ制御と画面キャプチャを補助するライブラリ（パッケージ）が用意してあります．
-   - mylibs\\myCapture パッケージ内の　camera_selector.py モジュール（CameraSelectorクラス）
-   - CameraSelectorのコンストラクタは次の通り
-      ```python
-      CameraSelector(dnum='デバイス番号', fps='FPS', size='描画画面サイズ', box='キャプチャエリア')
-      ```
-   - readメソッドの戻り値は次の通り
-     - カメラの起動時間とFPSから推定したフレーム番号が返却されます 
-      ```python
-      [フレーム取得の成否, フレーム番号, フレームデータ] = cap.read()
-      ```
-  - 次のサンプルは，プログラム引数でカメラやそのプロパティを指定できるようにしたものです
 
-  ```python
-  import cv2
-  import argparse
-  import myCapture as mycap
+```
 
-  def main(args):
+---
+
+# 【エクストラ】 配布環境の自作ライブラリの利用
+
+配布環境には、カメラ制御と画面キャプチャを補助するライブラリパッケージが用意されています。
+
+* `mylibs/myCapture` パッケージ内 `camera_selector.py` モジュール（`CameraSelector` クラス）
+* **コンストラクタ構造**:
+```python
+CameraSelector(dnum='デバイス番号', fps='FPS', size='描画画面サイズ', box='キャプチャエリア')
+
+```
+
+
+* **`read()` メソッドの戻り値**:
+```python
+ret, fnum, frame = cap.read()
+# [フレーム取得成否(bool), 推定フレーム番号(int), フレーム画像データ]
+
+```
+
+
+
+### コマンドライン引数対応サンプルコード
+
+```python
+import cv2
+import argparse
+import mylibs.myCapture as mycap
+
+def main(args):
     cap = mycap.CameraSelector(args.device, args.fps, args.size, args.box)
 
     while cap.isOpened():
-      ret, fnum, frame = cap.read()
+        ret, fnum, frame = cap.read()
 
-      if ret:
-        cv2.imshow("video", frame)
-      if cv2.waitKey(1) == ord('q'):
-          break
+        if ret:
+            cv2.imshow("video", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
     cap.release()
     cv2.destroyAllWindows()
 
-  if __name__=='__main__':
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-      description="--name \'window_name\' \n --device \'camera_num(99 is screen capture)\' \n--fps num")
-    parser.add_argument('--device', type=int,
-       help="--device \'camera_num(99 is screen capture)\'")
-    parser.add_argument('--fps', type=int)
-    def stype(ssize): return list(map(int, ssize.split(',')))
-    parser.add_argument('--size', type=stype, help="width,height")
-    parser.add_argument('--box', type=stype, help="x,y,width,height")
+        description="--device 'camera_num (99 is screen capture)'\n--fps num"
+    )
+    parser.add_argument('--device', type=int, default=0, help="カメラデバイス番号 (99: 画面キャプチャ)")
+    parser.add_argument('--fps', type=int, help="フレームレート")
+    
+    def stype(ssize):
+        return list(map(int, ssize.split(',')))
+        
+    parser.add_argument('--size', type=stype, help="幅,高さ (例: 1280,720)")
+    parser.add_argument('--box', type=stype, help="x,y,幅,高さ")
     args = parser.parse_args()
+    
     main(args)
-  ```
-  - 引数なしの場合， device 0 のカメラをデフォルト状態で起動します
-  ```sh
-  % python c_select.py 
-  -----------------------------------------
-  Camera( 0 )
-  480.0 x 640.0 @ 30.0
-  -----------------------------------------
-  ```
-  - 引数として \-\-dev オプションでデバイス番号，\-\-size オプションでカメラの画面サイズなどを指定して起動できます
-  - 指定するオプションの数，順番は任意です
-  - \-\-size や \-\-fpsに，デバイスに対応していない値が設定された場合，自動的にデフォルト値が読み込まれ，その結果が出力されます
-  ```sh
-  % python c_select.py --dev 1 --size 1280,720
-  -----------------------------------------
-  Camera( 1 )
-  720.0 x 1280.0 @ 30.0
-  -----------------------------------------
 
-  % python c_select.py --fps 90　　←対応していない値を指定➡30FPSで起動した
-  -----------------------------------------
-  Camera( 0 )
-  480.0 x 640.0 @ 30.0
-  CAUTION: fps cannot be set to the specified value
-  -----------------------------------------
-  ```
-  - \-\-dev オプションに 99 を指定するとデスクトップキャプチャモードで起動します
-  - 任意のウィンドウのバーを Ctrl+Click するとそのウィンドウの，任意の位置で Shift+Click すると画面全体がキャプチャされます
-  - オプションを追加することで，任意の位置から指定した幅と高さの領域のキャプチャも可能です
-  ```sh
-  % python c_select.py --dev 99
-  -----------------------------------------
-  ScreenCapture
-  Ctrl+Click: Window Select
-  Shift+Click: Area Select
-  -----------------------------------------
-  
-  % python c_select.py --dev 99 --fps 90 --box 100,400,500,500
-  -----------------------------------------
-  ScreenCapture
-  Ctrl+Click: Window Select
-  Shift+Click: Area Select
-  -----------------------------------------
-  [100, 400, 500, 500]
-  ```
-  -->
+```
+
+* **デフォルトでの実行（デバイス 0）**:
+```sh
+% python c_select.py 
+-----------------------------------------
+Camera( 0 )
+480.0 x 640.0 @ 30.0
+-----------------------------------------
+
+```
+
+
+* **オプション指定例**:
+```sh
+% python c_select.py --device 1 --size 1280,720
+-----------------------------------------
+Camera( 1 )
+720.0 x 1280.0 @ 30.0
+-----------------------------------------
+
+% python c_select.py --fps 90  # 未対応FPSを指定した場合、デフォルトに自動フォールバック
+-----------------------------------------
+Camera( 0 )
+480.0 x 640.0 @ 30.0
+CAUTION: fps cannot be set to the specified value
+-----------------------------------------
+
+```
+
+
+* **デスクトップキャプチャモード (`--device 99`)**:
+* 任意のウィンドウのバーを **Ctrl + Click** するとそのウィンドウをキャプチャ
+* 画面上を **Shift + Click** すると画面全体を選択キャプチャ
+
+
+```sh
+% python c_select.py --device 99
+-----------------------------------------
+ScreenCapture
+Ctrl+Click: Window Select
+Shift+Click: Area Select
+-----------------------------------------
+
+% python c_select.py --device 99 --fps 90 --box 100,400,500,500
+-----------------------------------------
+ScreenCapture
+Ctrl+Click: Window Select
+Shift+Click: Area Select
+-----------------------------------------
+[100, 400, 500, 500]
+
+```
