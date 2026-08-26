@@ -1,27 +1,13 @@
 <hr>
 
-1. 環境の設定（↓）
-2. [基本概要](BASIC_00.md)
-3. [カメラへのアクセスと動画処理](BASIC_01.md)
-4. [顔と顔パーツの検出](BASIC_02.md)
-5. [顔・手・ポーズ検出](BASIC_03.md)
-6. [2つのベクトルのなす角とベクトル演算](zsample01.md)
-7. [MediaPipe統合処理ライブラリ (`my_mediapipe_n.py`)](lecnote_dt01.md)
-8. [OpenMMLab 顔検出・キーポイント抽出ライブラリ (`my_mmface.py`)](lecnote_dt02.md)
-9. [OpenMMLab 統合姿勢推定ライブラリ (`my_mmpose.py`)](lecnote_dt03.md)
-10. [dlib 顔検出・68点ランドマーク抽出ライブラリ (`my_dlib.py`)](lecnote_dt04.md)
-11. [動画画像処理ライブラリ (`my_cap_av2.py`)](lecnote_cap01.md)
-12. [Intel RealSense 画像処理ライブラリ (`my_rs_cap.py`)](lecnote_cap02.md)
-13. [Orbbec Femto Bolt 画像処理ライブラリ (`my_bolt_cap.py`)](lecnote_cap03.md)
-14. [3D頭部姿勢・視線・顔正面化解析ライブラリ (`my_analysis_head.py`)](lecnote_an01.md)
-15. [3D身体姿勢・背骨・移動量解析ライブラリ (`my_analysis_body.py`)](lecnote_an02.md)
-16. [呼吸信号抽出ライブラリ (`my_analysis_respiration.py`)](lecnote_an03.md)
-17. [非接触脈波・rPPG信号抽出ライブラリ (`my_analysis_rppg.py`)](lecnote_an04.md)
-18. [PyQtGraph 高速グラフ描画ライブラリ (`my_qt_graph.py`)](lecnote_tl01.md)
-19. [CSV入出力・ファイルパス・日時操作 (`my_csv.py` / `my_util.py`)](lecnote_tl02.md)
-20. [デジタル信号処理ライブラリ (`my_digital_filter.py`)](lecnote_tl03.md)
+**目次・講義ノート**
+* **基礎**: 1. 環境設定（↓） / 2. [基本概要](BASIC_00.md) / 3. [カメラ・動画](BASIC_01.md) / 4. [顔検出](BASIC_02.md) / 5. [ポーズ検出](BASIC_03.md) / 6. [ベクトル演算](zsample01.md)
+* **検出・推定 (`dt`)**: 7. [MediaPipe](lecnote_dt01.md) / 8. [MMFace](lecnote_dt02.md) / 9. [MMPose](lecnote_dt03.md) / 10. [dlib](lecnote_dt04.md)
+* **キャプチャ (`cap`)**: 11. [動画処理](lecnote_cap01.md) / 12. [RealSense](lecnote_cap02.md) / 13. [Femto Bolt](lecnote_cap03.md)
+* **生体解析 (`an`)**: 14. [頭部姿勢・視線](lecnote_an01.md) / 15. [身体姿勢・移動量](lecnote_an02.md) / 16. [呼吸信号](lecnote_an03.md) / 17. [rPPG脈波](lecnote_an04.md)
+* **ツール・信号処理 (`tl`)**: 18. [PyQtGraph](lecnote_tl01.md) / 19. [CSV・ファイル操作](lecnote_tl02.md) / 20. [デジタルフィルタ](lecnote_tl03.md)
 
-<hr>
+<hr><hr>
 
 # 環境のインストール
 
