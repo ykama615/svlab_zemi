@@ -4,11 +4,11 @@
 
 <b>基礎編</b>
 1. 環境の設定（↓）
-2. [基本概要](BASIC_00.md)
-3. [カメラへのアクセスと動画処理](BASIC_01.md)
-4. [顔と顔パーツの検出](BASIC_02.md)
-5. [顔・手・ポーズ検出](BASIC_03.md)
-6. [2つのベクトルのなす角とベクトル演算](zsample01.md)
+2. [基本概要](articles/basic/BASIC_00.md)
+3. [カメラへのアクセスと動画処理](articles/basic/BASIC_01.md)
+4. [顔と顔パーツの検出](articles/basic/BASIC_02.md)
+5. [顔・手・ポーズ検出](articles/basic/BASIC_03.md)
+6. [2つのベクトルのなす角とベクトル演算](articles/basic/sample01.md)
 
 <details><summary><b>検出・推定（4項目）</b></summary>
 
