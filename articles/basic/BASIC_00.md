@@ -3,8 +3,8 @@
 **講義ノート・ライブラリ一覧**
 
 <b>基礎編</b>
-1. [環境の設定]（../../README.md）
-2. 基本概要(↓)
+1. [環境の設定](../../README.md)
+2. 基本概要（↓）
 3. [カメラへのアクセスと動画処理](articles/basic/BASIC_01.md)
 4. [顔と顔パーツの検出](articles/basic/BASIC_02.md)
 5. [顔・手・ポーズ検出](articles/basic/BASIC_03.md)
