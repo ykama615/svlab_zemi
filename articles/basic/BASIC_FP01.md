@@ -9,20 +9,20 @@
 4. [顔と顔パーツの検出](BASIC_02.md)
 5. [顔・手・ポーズ検出](BASIC_03.md)
 6. 2つのベクトルのなす角とベクトル演算（↓）
-   
-<details><summary><b>検出・推定（4項目）</b></summary>
-
-7. [MediaPipe統合処理 (`my_mediapipe_n.py`)](../lecnote/lecnote_dt01.md)
-8. [OpenMMLab 顔検出・キーポイント抽出 (`my_mmface.py`)](../lecnote/lecnote_dt02.md)
-9. [OpenMMLab 統合姿勢推定 (`my_mmpose.py`)](../lecnote/lecnote_dt03.md)
-10. [dlib 顔検出・68点ランドマーク抽出 (`my_dlib.py`)](../lecnote/lecnote_dt04.md)
-</details>
 
 <details><summary><b>キャプチャ（3項目）</b></summary>
 
-11. [動画画像処理 (`my_cap_av2.py`)](../lecnote/lecnote_cap01.md)
-12. [Intel RealSense 画像処理 (`my_rs_cap.py`)](../lecnote/lecnote_cap02.md)
-13. [Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)](../lecnote/lecnote_cap03.md)
+7. [動画画像処理 (`my_cap_av2.py`)](../lecnote/lecnote_cap01.md)
+8. [Intel RealSense 画像処理 (`my_rs_cap.py`)](../lecnote/lecnote_cap02.md)
+9. [Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)](../lecnote/lecnote_cap03.md)
+</details>
+
+<details><summary><b>検出・推定（4項目）</b></summary>
+
+10. [MediaPipe統合処理 (`my_mediapipe_n.py`)](../lecnote/lecnote_dt01.md)
+11. [OpenMMLab 顔検出・キーポイント抽出 (`my_mmface.py`)](../lecnote/lecnote_dt02.md)
+12. [OpenMMLab 統合姿勢推定 (`my_mmpose.py`)](../lecnote/lecnote_dt03.md)
+13. [dlib 顔検出・68点ランドマーク抽出 (`my_dlib.py`)](../lecnote/lecnote_dt04.md)
 </details>
 
 <details><summary><b>生体・動作解析（4項目）</b></summary>
