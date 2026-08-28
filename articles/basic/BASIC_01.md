@@ -47,7 +47,7 @@
 
 <hr>
 
-OpenCVを用いたWebカメラの制御手法から画像処理演習，独自ライブラリによる環境構築までを実例付きでまとめた解説ドキュメントです．
+OpenCVを用いたWebカメラの制御手法から画像処理演習による環境構築までを実例付きでまとめた解説ドキュメントです．
 
 <hr>
 
@@ -211,44 +211,3 @@ if __name__ == '__main__':
 ```
 
 ---
-
-# 【エクストラ】 配布環境の自作ライブラリの利用
-
-### コマンドライン引数対応サンプルコード
-
-```python
-import cv2
-import argparse
-import mylibs.myCapture as mycap
-
-def main(args):
-    cap = mycap.CameraSelector(args.device, args.fps, args.size, args.box)
-
-    while cap.isOpened():
-        ret, fnum, frame = cap.read()
-
-        if ret:
-            cv2.imshow("video", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description="--device 'camera_num (99 is screen capture)'\n--fps num"
-    )
-    parser.add_argument('--device', type=int, default=0, help="カメラデバイス番号 (99: 画面キャプチャ)")
-    parser.add_argument('--fps', type=int, help="フレームレート")
-    
-    def stype(ssize):
-        return list(map(int, ssize.split(',')))
-        
-    parser.add_argument('--size', type=stype, help="幅,高さ (例: 1280,720)")
-    parser.add_argument('--box', type=stype, help="x,y,幅,高さ")
-    args = parser.parse_args()
-    
-    main(args)
-
-```
