@@ -75,8 +75,6 @@
 
 ---
 
-```
-
 ## :red_square: my_rs_cap.py (RealSense VideoCapture) の概要と特徴
 
 提供された `VideoCapture` クラスは、OpenCV互換の操作感（`read()`, `get()`, `isOpened()`, `release()` など）を保ちながら、Intel RealSense の強力な RGB-D キャプチャ機能および `.bag` 再生機能を簡潔に扱えるように設計されています。
