@@ -1,34 +1,76 @@
+<hr>
+
+**講義ノート・ライブラリ一覧**
+
+<details><summary><b>基礎編（6項目）</b></summary>
+  
+1. [環境の設定](../../README.md)
+2. [基本概要](../basic/BASIC_00.md)
+3. [カメラへのアクセスと動画処理](../basic/BASIC_01.md)
+4. [顔と顔パーツの検出](../basic/BASIC_02.md)
+5. [顔・手・ポーズ検出](../basic/BASIC_03.md)
+6. [2つのベクトルのなす角とベクトル演算](../basic/BASIC_FP01.md)
+</details>
+
+<details><summary><b>キャプチャ（3項目）</b></summary>
+
+7. [動画画像処理 (`my_cap_av2.py`)](lecnote_cap01.md)
+8. [Intel RealSense 画像処理 (`my_rs_cap.py`)](lecnote_cap02.md)
+9. [Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)](lecnote_cap03.md)
+</details>
+   
+<b>➡検出・推定（4項目）</b>
+
+10. [MediaPipe統合処理 (`my_mediapipe_n.py`)](lecnote_dt01.md)
+11. [OpenMMLab 顔検出・キーポイント抽出 (`my_mmface.py`)](lecnote_dt02.md)
+12. OpenMMLab 統合姿勢推定 (`my_mmpose.py`)（↓）
+13. [dlib 顔検出・68点ランドマーク抽出 (`my_dlib.py`)](lecnote_dt04.md)
+
+<details><summary><b>生体・動作解析（4項目）</b></summary>
+
+14. [3D頭部姿勢・視線・顔正面化 (`my_analysis_head.py`)](lecnote_an01.md)
+15. [3D身体姿勢・背骨・移動量 (`my_analysis_body.py`)](lecnote_an02.md)
+16. [呼吸信号抽出 (`my_analysis_respiration.py`)](lecnote_an03.md)
+17. [非接触脈波・rPPG信号抽出 (`my_analysis_rppg.py`)](lecnote_an04.md)
+</details>
+
+<details><summary><b>ツール・信号処理（3項目）</b></summary>
+
+18. [PyQtGraph 高速グラフ描画 (`my_qt_graph.py`)](lecnote_tl01.md)
+19. [CSV入出力・ファイルパス操作 (`my_csv.py` / `my_util.py`)](lecnote_tl02.md)
+20. [デジタル信号処理 (`my_digital_filter.py`)](lecnote_tl03.md)
+</details>
+
+<details><summary><b>その他（1項目）</b></summary>
+
+21. [Minecraftコントロール(1)](../minecraft/mcbot_01.md)
+</details>
+
+<hr>
+
+自作ライブラリ `my_libs` 内の各クラス（映像キャプチャ `VideoCapture` および OpenMMLab 姿勢推定クラス `MyMMPose`）を活用し、全身・手・足・顔などの統合姿勢推定（Pose Estimation）を実装するための解説ドキュメントです。
+
+<hr>
+
 # OpenMMLab 統合姿勢推定ライブラリ (my_mmpose.py) の使い方
 
-[トップページへ戻る](https://www.google.com/search?q=../README.md)
+## 概要
+
+- `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+- `./my_libs/detector/my_mmpose.py` 内の `MyMMPose` クラスを使用し、OpenMMLab (RTMDet / RTMPose) による以下の姿勢推定機能を処理します。
+  - **身体 17 箇所キーポイントの標準検出（`coco` モード）**
+  - **全身・手・足・顔を含む全 133 箇所の一括検出（`whole` モード）**
+  - **人物検出器（RTMDet）と姿勢推定器（RTMPose）の分離制御**
+  - **関節存在確率ヒートマップの出力**
 
 ---
 
-## 目的
-
-* 本ドキュメントでは、`my_cap_av2.py` の `VideoCapture` クラスを用いて映像を取り込み、`my_mmpose.py`（`MyMMPose` クラス）を使用して OpenMMLab (RTMDet / RTMPose) による全身の姿勢推定を行う方法について解説します。
-
-
-* 標準的な身体 17 箇所キーポイント検出（`coco` モード）に加え、顔・手・足を含む 全 133 箇所の全身一括検出（`whole` モード）の利用手順を扱います。
-
-
-
 ## 前提条件
 
-* デスクトップ上の `ipbl26_start` を実行して VSCode を起動します。ターミナルウィンドウに表示されるカレントディレクトリが `C:\oit\home\ipbl` であることを確認してください。
-* **【重要】** `my_cap_av2.py` および `my_mmpose.py` が `C:\oit\home\ipbl\my_libs` フォルダー内に配置されていることを確認してください。
-
-
-* **【重要】** MMDetection / MMPose 用の設定ファイル（`.py`）および重みファイル（`.pth`）が `C:\oit\home\ipbl\learned_models\mmpose\` 内に配置されている必要があります。
-
-
-* ターミナルで以下のコマンドを実行してプログラムを動作させます。
-```sh
-C:\oit\home\ipbl> python XXX.py
-
-```
-
-
+- **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+  - `my_cap_av2.py`: `./my_libs/video_capture/`
+  - `my_mmpose.py`: `./my_libs/detector/`
+- **【重要】** MMDetection / MMPose 用の設定ファイル（`.py`）および重みファイル（`.pth`）が `./learned_models/mmpose/` 内に正しく配置されている必要があります。
 
 ---
 
@@ -153,49 +195,27 @@ if __name__ == '__main__':
 
 | メソッド | 引数 | 戻り値 | 説明 |
 | --- | --- | --- | --- |
-| `__init__(device, model, heatmap)` | `device='cpu'`, `model='coco'`, `heatmap=False` | なし | モデル読み込みと初期化 (`model='whole'` で 133 点モード)
-
- |
-| `get_RTMDet(frame)` | `frame`: BGR画像 | `(bbox, score)` | 最高スコアの人物 BBox `[x1, y1, x2, y2]` とスコアを返却
-
- |
-| `get_RTMPose(frame, bbox)` | `frame`: BGR画像, `bbox`: 人物BBox | `dict` | 姿勢データを保持する辞書 (`'pose'`, `'face'`, `'hands'`, `'feet'`, `'heatmap'`) を返却
-
- |
+| `__init__(device, model, heatmap)` | `device='cpu'`, `model='coco'`, `heatmap=False` | なし | モデル読み込みと初期化 (`model='whole'` で 133 点モード) |
+| `get_RTMDet(frame)` | `frame`: BGR画像 | `(bbox, score)` | 最高スコアの人物 BBox `[x1, y1, x2, y2]` とスコアを返却 |
+| `get_RTMPose(frame, bbox)` | `frame`: BGR画像, `bbox`: 人物BBox | `dict` | 姿勢データを保持する辞書 (`'pose'`, `'face'`, `'hands'`, `'feet'`, `'heatmap'`) を返却 |
 
 ### パーツ別データ取得ゲッター
 
 | メソッド | 戻り値 | 説明 |
 | --- | --- | --- |
-| `get_RTMFace()` | `(face_kpts, face_scores)` | `whole` モード時の顔 68 点座標とスコアを取得
-
- |
-| `get_RTMHands()` | `(hand_kpts, hand_scores)` | `whole` モード時の左右手（各21点）座標とスコアの辞書を取得
-
- |
-| `get_RTMFeet()` | `(foot_kpts, foot_scores)` | `whole` モード時の左右足（各3点）座標とスコアの辞書を取得
-
- |
+| `get_RTMFace()` | `(face_kpts, face_scores)` | `whole` モード時の顔 68 点座標とスコアを取得 |
+| `get_RTMHands()` | `(hand_kpts, hand_scores)` | `whole` モード時の左右手（各21点）座標とスコアの辞書を取得 |
+| `get_RTMFeet()` | `(foot_kpts, foot_scores)` | `whole` モード時の左右足（各3点）座標とスコアの辞書を取得 |
 
 ### 骨格接続取得・補助ユーティリティ
 
 | メソッド | 説明 |
 | --- | --- |
-| `get_pose_connections()` | 身体主要 17 関節の接続ペアリストを取得
-
- |
-| `get_hand_connections()` | 手（21点）の接続ペアリスト（左右別辞書）を取得
-
- |
-| `get_face_connections()` | 顔（68点）の輪郭・パーツ接続ペアリストを取得
-
- |
-| `get_foot_connections()` | 足裏（3点）の三角形接続ペアリストを取得
-
- |
-| `make_face_bbox(kpts, scores)` | 身体キーポイント（目・耳・鼻）から顔部分の拡大 BBox を算出
-
- |
+| `get_pose_connections()` | 身体主要 17 関節の接続ペアリストを取得 |
+| `get_hand_connections()` | 手（21点）の接続ペアリスト（左右別辞書）を取得 |
+| `get_face_connections()` | 顔（68点）の輪郭・パーツ接続ペアリストを取得 |
+| `get_foot_connections()` | 足裏（3点）の三角形接続ペアリストを取得 |
+| `make_face_bbox(kpts, scores)` | 身体キーポイント（目・耳・鼻）から顔部分の拡大 BBox を算出 |
 
 ---
 
@@ -216,8 +236,5 @@ if res is not None and res['heatmap'] is not None:
 
 ```
 
-
-
----
 
 [トップページへ戻る]()
