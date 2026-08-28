@@ -1,22 +1,64 @@
 <hr>
 
+**講義ノート・ライブラリ一覧**
+
+<b>基礎編</b>
 1. [環境の設定](../../README.md)
 2. [基本概要](BASIC_00.md)
 3. [カメラへのアクセスと動画処理](BASIC_01.md)
 4. [顔と顔パーツの検出](BASIC_02.md)
 5. 顔・手・ポーズ検出（↓）
-6. [各種クラス・応用](BASIC_04.md)
+6. [2つのベクトルのなす角とベクトル演算](BASIC_FP01.md)
+
+<details><summary><b>検出・推定（4項目）</b></summary>
+
+7. [MediaPipe統合処理 (`my_mediapipe_n.py`)](../lecnote/lecnote_dt01.md)
+8. [OpenMMLab 顔検出・キーポイント抽出 (`my_mmface.py`)](../lecnote/lecnote_dt02.md)
+9. [OpenMMLab 統合姿勢推定 (`my_mmpose.py`)](../lecnote/lecnote_dt03.md)
+10. [dlib 顔検出・68点ランドマーク抽出 (`my_dlib.py`)](../lecnote/lecnote_dt04.md)
+</details>
+
+<details><summary><b>キャプチャ（3項目）</b></summary>
+
+11. [動画画像処理 (`my_cap_av2.py`)](../lecnote/lecnote_cap01.md)
+12. [Intel RealSense 画像処理 (`my_rs_cap.py`)](../lecnote/lecnote_cap02.md)
+13. [Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)](../lecnote/lecnote_cap03.md)
+</details>
+
+<details><summary><b>生体・動作解析（4項目）</b></summary>
+
+14. [3D頭部姿勢・視線・顔正面化 (`my_analysis_head.py`)](../lecnote/lecnote_an01.md)
+15. [3D身体姿勢・背骨・移動量 (`my_analysis_body.py`)](../lecnote/lecnote_an02.md)
+16. [呼吸信号抽出 (`my_analysis_respiration.py`)](../lecnote/lecnote_an03.md)
+17. [非接触脈波・rPPG信号抽出 (`my_analysis_rppg.py`)](../lecnote/lecnote_an04.md)
+</details>
+
+<details><summary><b>ツール・信号処理（3項目）</b></summary>
+
+18. [PyQtGraph 高速グラフ描画 (`my_qt_graph.py`)](../lecnote/lecnote_tl01.md)
+19. [CSV入出力・ファイルパス操作 (`my_csv.py` / `my_util.py`)](../lecnote/lecnote_tl02.md)
+20. [デジタル信号処理 (`my_digital_filter.py`)](../lecnote/lecnote_tl03.md)
+</details>
+
+<details><summary><b>その他（1項目）</b></summary>
+
+21. [Minecraftコントロール(1)](../minecraft/mcbot_01.md)
+</details>
+
+<hr>
+
+MediaPipe Tasks API を用いた各種検出タスク（手・姿勢・顔・背景分離）の実装手順からジャンケン判定などの応用例・演習までをまとめた解説ドキュメントです．
 
 <hr>
 
 # MediaPipe
-MediaPipe の新 API（**Tasks API** / `mediapipe.tasks`）では、タスクごとに学習済みモデル（`.task` または `.tflite` ファイル）を読み込み、専用の検出器（Detector / Landmarker / Recognizer / Segmenter）を構成して処理を行います。
+MediaPipe の新 API（**Tasks API** / `mediapipe.tasks`）では，タスクごとに学習済みモデル（`.task` または `.tflite` ファイル）を読み込み，専用の検出器（Detector / Landmarker / Recognizer / Segmenter）を構成して処理を行います．
 
 ---
 
 ## モデルファイルの配置場所
 
-本環境における MediaPipe の学習済みモデルは、すべて以下の相対パス配下に配置して読み込みます。
+本環境における MediaPipe の学習済みモデルは，すべて以下の相対パス配下に配置して読み込みます．
 
 **プロジェクト内のモデル配置構造**
 
@@ -40,7 +82,7 @@ project_root/
 
 ## MediaPipe Tasks API の機能一覧
 
-`mediapipe.tasks.vision` モジュールで提供されている主要な検出器と、対応するモデルファイルは以下の通りです。
+`mediapipe.tasks.vision` モジュールで提供されている主要な検出器と，対応するモデルファイルは以下の通りです．
 
 | 機能 | タスク名 (`mediapipe.tasks.vision`) | 使用モデルファイルパス | 概要 |
 | --- | --- | --- | --- |
@@ -55,7 +97,7 @@ project_root/
 
 ## 標準 Tasks API による処理の基本の流れ
 
-いずれのタスクも、標準的な実装手順は以下の 5 ステップで共通しています。
+いずれのタスクも，標準的な実装手順は以下の 5 ステップで共通しています．
 
 1. **`BaseOptions` の設定**: `./learned_models/mediapipe/` 配下のモデルパスを指定[cite: 5]
 2. **`Options` の構築**: 動作モード（`RunningMode.IMAGE` 等）や各種パラメータを設定[cite: 5]
@@ -67,7 +109,7 @@ project_root/
 
 ## Selfie Segmentation（背景置き換え）
 
-`ImageSegmenter` と `selfie_segmentation.tflite` を使用し、人物領域のマスクを取得して背景をマゼンタ色に置換します[cite: 5]。
+`ImageSegmenter` と `selfie_segmentation.tflite` を使用し，人物領域のマスクを取得して背景をマゼンタ色に置換します[cite: 5]．
 
 ```python
 import cv2
@@ -131,7 +173,7 @@ if __name__ == '__main__':
 
 ## 挙手判定サンプル（Pose Landmarker）
 
-`PoseLandmarker` と `pose_landmarker_lite.task` を使用し、身体の 33 箇所キーポイントから挙手を判定します[cite: 5]。
+`PoseLandmarker` と `pose_landmarker_lite.task` を使用し，身体の 33 箇所キーポイントから挙手を判定します[cite: 5]．
 
 ```python
 import cv2
@@ -212,7 +254,7 @@ if __name__ == '__main__':
 
 ## 人差し指の座標表示（Hand Landmarker）
 
-`HandLandmarker` と `hand_landmarker.task` を使用し、手の 21 箇所ランドマークおよび左右判定（Handedness）を取得します[cite: 5]。
+`HandLandmarker` と `hand_landmarker.task` を使用し，手の 21 箇所ランドマークおよび左右判定（Handedness）を取得します[cite: 5]．
 
 ```python
 import cv2
@@ -277,7 +319,7 @@ if __name__ == '__main__':
 
 ## 顔メッシュと BlendShapes（Face Landmarker）
 
-`FaceLandmarker` と `face_landmarker.task` を使用します[cite: 5]。`output_face_blendshapes=True` を指定することで、表情のスコア（笑顔や目の開き具合等）を取得可能です[cite: 5]。
+`FaceLandmarker` と `face_landmarker.task` を使用します[cite: 5]．`output_face_blendshapes=True` を指定することで，表情のスコア（笑顔や目の開き具合等）を取得可能です[cite: 5]．
 
 ```python
 import cv2
@@ -343,7 +385,7 @@ if __name__ == '__main__':
 
 ## チョキの判定サンプル（Hand Landmarker）
 
-`HandLandmarker` から取得した 3D 座標を元にベクトル内積計算を行い、指の開き・曲がり具合を計算して「チョキ」を判定します[cite: 5]。
+`HandLandmarker` から取得した 3D 座標を元にベクトル内積計算を行い，指の開き・曲がり具合を計算して「チョキ」を判定します[cite: 5]．
 
 ```python
 import cv2
@@ -431,5 +473,5 @@ if __name__ == '__main__':
 
 ## [課題] じゃんけん判定
 
-1. 上記のチョキ判定コードを拡張して、「グー」「チョキ」「パー」のすべての手を判定できるようにプログラムを改良してみましょう。
-2. ランダムにコンピュータの手（`0`:グー, `1`:チョキ, `2`:パー）を決定し、カメラに映ったプレイヤーの手と勝敗判定を行う「じゃんけんゲーム」を作成してみましょう。
+1. 上記のチョキ判定コードを拡張して，「グー」「チョキ」「パー」のすべての手を判定できるようにプログラムを改良してみましょう．
+2. ランダムにコンピュータの手（`0`:グー, `1`:チョキ, `2`:パー）を決定し，カメラに映ったプレイヤーの手と勝敗判定を行う「じゃんけんゲーム」を作成してみましょう．
