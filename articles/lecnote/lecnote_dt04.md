@@ -1,34 +1,75 @@
+<hr>
+
+**講義ノート・ライブラリ一覧**
+
+<details><summary><b>基礎編（6項目）</b></summary>
+  
+1. [環境の設定](../../README.md)
+2. [基本概要](../basic/BASIC_00.md)
+3. [カメラへのアクセスと動画処理](../basic/BASIC_01.md)
+4. [顔と顔パーツの検出](../basic/BASIC_02.md)
+5. [顔・手・ポーズ検出](../basic/BASIC_03.md)
+6. [2つのベクトルのなす角とベクトル演算](../basic/BASIC_FP01.md)
+</details>
+
+<details><summary><b>キャプチャ（3項目）</b></summary>
+
+7. [動画画像処理 (`my_cap_av2.py`)](lecnote_cap01.md)
+8. [Intel RealSense 画像処理 (`my_rs_cap.py`)](lecnote_cap02.md)
+9. [Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)](lecnote_cap03.md)
+</details>
+   
+<b>➡検出・推定（4項目）</b>
+
+10. [MediaPipe統合処理 (`my_mediapipe_n.py`)](lecnote_dt01.md)
+11. [OpenMMLab 顔検出・キーポイント抽出 (`my_mmface.py`)](lecnote_dt02.md)
+12. [OpenMMLab 統合姿勢推定 (`my_mmpose.py`)](lecnote_dt03.md)
+13. dlib 顔検出・68点ランドマーク抽出 (`my_dlib.py`)（↓）
+
+<details><summary><b>生体・動作解析（4項目）</b></summary>
+
+14. [3D頭部姿勢・視線・顔正面化 (`my_analysis_head.py`)](lecnote_an01.md)
+15. [3D身体姿勢・背骨・移動量 (`my_analysis_body.py`)](lecnote_an02.md)
+16. [呼吸信号抽出 (`my_analysis_respiration.py`)](lecnote_an03.md)
+17. [非接触脈波・rPPG信号抽出 (`my_analysis_rppg.py`)](lecnote_an04.md)
+</details>
+
+<details><summary><b>ツール・信号処理（3項目）</b></summary>
+
+18. [PyQtGraph 高速グラフ描画 (`my_qt_graph.py`)](lecnote_tl01.md)
+19. [CSV入出力・ファイルパス操作 (`my_csv.py` / `my_util.py`)](lecnote_tl02.md)
+20. [デジタル信号処理 (`my_digital_filter.py`)](lecnote_tl03.md)
+</details>
+
+<details><summary><b>その他（1項目）</b></summary>
+
+21. [Minecraftコントロール(1)](../minecraft/mcbot_01.md)
+</details>
+
+<hr>
+
+自作ライブラリ `my_libs` 内の各クラス（映像キャプチャ `VideoCapture` および dlib 統合クラス `MyDlib`）を活用し、dlib による顔検出と 68 点顔ランドマーク抽出、高速トラッキングを実装するための解説ドキュメントです。
+
+<hr>
+
 # dlib 顔検出・68点ランドマーク抽出ライブラリ (my_dlib.py) の使い方
 
-[トップページへ戻る](https://www.google.com/search?q=../README.md)
+## 概要
+
+- `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+- `./my_libs/detector/my_dlib.py` 内の `MyDlib` クラスを使用し、dlib による以下の機能を処理します。
+  - **HOG ベースの複数顔検出**
+  - **68 点の顔ランドマーク抽出**
+  - **テンプレートマッチングを用いた高速単一顔トラッキング（`get_single_face_fast`）**
 
 ---
 
-## 目的
-
-* 本ドキュメントでは、`my_cap_av2.py` の `VideoCapture` クラスを用いて映像を取り込み、`my_dlib.py`（`MyDlib` クラス）を使用して dlib による顔検出および 68 点の顔ランドマーク抽出を行う方法について解説します。
-
-
-* テンプレートマッチングを用いた高速な単一顔トラッキング機能（`get_single_face_fast`）の活用方法についても説明します。
-
-
-
 ## 前提条件
 
-* デスクトップ上の `ipbl26_start` を実行して VSCode を起動します。ターミナルウィンドウに表示されるカレントディレクトリが `C:\oit\home\ipbl` であることを確認してください。
-* **【重要】** `my_cap_av2.py` および `my_dlib.py` が `C:\oit\home\ipbl\my_libs` フォルダー内に配置されていることを確認してください。
-
-
-* **【重要】** 68点ランドマーク予測用モデルファイル `shape_predictor_68_face_landmarks.dat` が `C:\oit\home\ipbl\learned_models\` 内に配置されている必要があります。
-
-
-* ターミナルで以下のコマンドを実行してプログラムを動作させます。
-```sh
-C:\oit\home\ipbl> python XXX.py
-
-```
-
-
+- **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+  - `my_cap_av2.py`: `./my_libs/video_capture/`
+  - `my_dlib.py`: `./my_libs/detector/`
+- **【重要】** 68点ランドマーク予測用モデルファイル `shape_predictor_68_face_landmarks.dat` が `./learned_models/dlib/` 内に正しく配置されている必要があります。
 
 ---
 
@@ -124,18 +165,10 @@ if __name__ == '__main__':
 
 | メソッド | 引数 | 戻り値 | 説明 |
 | --- | --- | --- | --- |
-| `__init__()` | なし | なし | HOG 顔検出器および 68 点ランドマーク予測器を初期化
-
- |
-| `get_multiple_face(frame)` | `frame`: BGR画像 | `(dets, scores, idx)` | 画面内の全顔領域 (`dlib.rectangle` リスト) と検出スコアを取得
-
- |
-| `get_single_face_fast(frame)` | `frame`: BGR画像 | `([dets], [scores], [idx])` | テンプレートマッチングを併用して単一の顔を高速追跡
-
- |
-| `get_facemark(frame, dface)` | `frame`: BGR画像, `dface`: `dlib.rectangle` | `parts`: `ndarray` | 指定された顔領域内の 68 箇所キーポイント座標 `[[x, y], ...]` を返却
-
- |
+| `__init__()` | なし | なし | HOG 顔検出器および 68 点ランドマーク予測器を初期化 |
+| `get_multiple_face(frame)` | `frame`: BGR画像 | `(dets, scores, idx)` | 画面内の全顔領域 (`dlib.rectangle` リスト) と検出スコアを取得 |
+| `get_single_face_fast(frame)` | `frame`: BGR画像 | `([dets], [scores], [idx])` | テンプレートマッチングを併用して単一の顔を高速追跡 |
+| `get_facemark(frame, dface)` | `frame`: BGR画像, `dface`: `dlib.rectangle` | `parts`: `ndarray` | 指定された顔領域内の 68 箇所キーポイント座標 `[[x, y], ...]` を返却 |
 
 ---
 
@@ -159,9 +192,3 @@ if len(dets) > 0 and len(dets[0]) > 0 if isinstance(dets, list) else True:
         cv2.circle(frame, (p[0], p[1]), 2, (255, 255, 0), -1)
 
 ```
-
-
-
----
-
-[トップページへ戻る]()
