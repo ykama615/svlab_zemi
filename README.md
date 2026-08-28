@@ -2,7 +2,7 @@
 
 **講義ノート・ライブラリ一覧**
 
-<b>基礎編</b>
+<b>➡基礎編</b>
 1. 環境の設定（↓）
 2. [基本概要](articles/basic/BASIC_00.md)
 3. [カメラへのアクセスと動画処理](articles/basic/BASIC_01.md)
