@@ -1,20 +1,70 @@
+<hr>
+
+**講義ノート・ライブラリ一覧**
+
+<details><summary><b>基礎編（6項目）</b></summary>
+  
+1. [環境の設定](../../README.md)
+2. [基本概要](../basic/BASIC_00.md)
+3. [カメラへのアクセスと動画処理](../basic/BASIC_01.md)
+4. [顔と顔パーツの検出](../basic/BASIC_02.md)
+5. [顔・手・ポーズ検出](../basic/BASIC_03.md)
+6. 2つのベクトルのなす角とベクトル演算（↓）
+</details>
+
+<details><summary><b>キャプチャ（3項目）</b></summary>
+
+7. 動画画像処理 (`my_cap_av2.py`)[lecnote_cap01.md]
+8. [Intel RealSense 画像処理 (`my_rs_cap.py`)](lecnote_cap02.md)
+9. [Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)](lecnote_cap03.md)
+</details>
+
+<details><summary><b>検出・推定（4項目）</b></summary>
+
+10. [MediaPipe統合処理 (`my_mediapipe_n.py`)](lecnote_dt01.md)
+11. [OpenMMLab 顔検出・キーポイント抽出 (`my_mmface.py`)](lecnote_dt02.md)
+12. [OpenMMLab 統合姿勢推定 (`my_mmpose.py`)](lecnote_dt03.md)
+13. [dlib 顔検出・68点ランドマーク抽出 (`my_dlib.py`)](lecnote_dt04.md)
+</details>
+
+<b>➡生体・動作解析（4項目）</b>
+
+14. 3D頭部姿勢・視線・顔正面化 (`my_analysis_head.py`)（↓）
+15. [3D身体姿勢・背骨・移動量 (`my_analysis_body.py`)](lecnote_an02.md)
+16. [呼吸信号抽出 (`my_analysis_respiration.py`)](lecnote_an03.md)
+17. [非接触脈波・rPPG信号抽出 (`my_analysis_rppg.py`)](lecnote_an04.md)
+
+<details><summary><b>ツール・信号処理（3項目）</b></summary>
+
+18. [PyQtGraph 高速グラフ描画 (`my_qt_graph.py`)](lecnote_tl01.md)
+19. [CSV入出力・ファイルパス操作 (`my_csv.py` / `my_util.py`)](lecnote_tl02.md)
+20. [デジタル信号処理 (`my_digital_filter.py`)](lecnote_tl03.md)
+</details>
+
+<details><summary><b>その他（1項目）</b></summary>
+
+21. [Minecraftコントロール(1)](../minecraft/mcbot_01.md)
+</details>
+
+<hr>
+
+自作ライブラリ my_libs.analysis 内の頭部解析クラス MyAnalysisHead を活用し、2D ランドマークから 3D 頭部姿勢角（Pitch/Yaw/Roll）の推定、瞳孔の 3D 空間マッピング、視線ベクトルの抽出、およびデバッグ用の顔正面化再構成描画を実装するための解説ドキュメントです。
+
+<hr>
+
 # 3D頭部姿勢・視線・顔正面化解析ライブラリ (my_analysis_head.py) の使い方
-
-[トップページへ戻る](../../README.md)
-
----
 
 ## 目的
 - 本ドキュメントでは、2D ランドマーク（dlib / MediaPipe）から 3D 頭部姿勢角（Pitch/Yaw/Roll）の推定、瞳孔の 3D 空間マッピング、視線ベクトルの抽出、およびデバッグ用の顔正面化再構成描画を行う `MyAnalysisHead` クラスの動作原理と利用方法について解説します。
 
 ## 前提条件
-- **【重要】** `my_analysis_head.py` がライブラリフォルダー（例: `my_libs/`）に配置されていることを確認してください。
+- **【重要】** `my_analysis_head.py` がライブラリフォルダー（例: `my_libs/analysis/`）に配置されていることを確認してください。
 - **【重要】** 内部処理に `opencv-python` (`cv2`) および `numpy` を使用します。
 - ターミナルで以下のコマンドを実行してプログラムを動作させます。
   ```sh
   C:\oit\home\ipbl> python XXX.py
 
-  ```
+```
 
 ---
 
@@ -24,14 +74,14 @@
 
 ```
 [ 2D ランドマーク (dlib 68点) ]
-       │
-       ├─► 1. 姿勢推定 (solvePnP) ─────► 回転行列 R / 平行移動 Vector t を算出
-       │                                      │
-       ├─► 2. 3D 瞳孔マッピング ◄──────────────┤ Z奥行き補正 ＆ 逆回転 R^T で顔ローカルへ変換
-       │                                      │
-       ├─► 3. 視線ベクトル抽出 ◄───────────────┤ 目の中心からの正規化オフセット計算
-       │                                      │
-       └─► 4. 正面顔再構成 (デバッグ) ◄─────────┘ 68点全域を 3D 復元して回転キャンセルの上描画
+        │
+        ├─► 1. 姿勢推定 (solvePnP) ─────► 回転行列 R / 平行移動 Vector t を算出
+        │                                 │
+        ├─► 2. 3D 瞳孔マッピング ◄──────────────┤ Z奥行き補正 ＆ 逆回転 R^T で顔ローカルへ変換
+        │                                 │
+        ├─► 3. 視線ベクトル抽出 ◄───────────────┤ 目の中心からの正規化オフセット計算
+        │                                 │
+        └─► 4. 正面顔再構成 (デバッグ) ◄─────────┘ 68点全域を 3D 復元して回転キャンセルの上描画
 
 ```
 
@@ -59,12 +109,12 @@
 
 ## :red_square: 基本的な使い方とサンプルコード
 
-### 1. 2D ランドマークからの頭部姿勢と視線の推定 (head_pose_sample.py)
+### 1. 2D ランドマークからの頭部姿勢と視線の推定 (`head_pose_sample.py`)
 
 ```python
 import cv2
 import numpy as np
-from my_libs.my_analysis_head import MyAnalysisHead
+from my_libs.analysis.my_analysis_head import MyAnalysisHead
 
 def main():
     img_w, img_h = 640, 480
@@ -112,15 +162,15 @@ if __name__ == '__main__':
 
 | メソッド | 主要引数 | 戻り値 | 説明 |
 | --- | --- | --- | --- |
-| `set_ears(ear_l, ear_r)` | `ear_l`: 左耳座標<br><br>`ear_r`: 右耳座標 | なし | 左右の耳座標から頭部中心座標 (`head_center`) を自動計算して保持。 |
+| `set_ears(ear_l, ear_r)` | `ear_l`: 左耳座標<br><br><br>`ear_r`: 右耳座標 | なし | 左右の耳座標から頭部中心座標 (`head_center`) を自動計算して保持。 |
 | `set_head_center(center_pt)` | `center_pt`: `[x, y]` | なし | 頭部中心座標を直接指定して保持。 |
 | `get_head_center()` | なし | `list` / `None` | 現在保持している頭部中心座標 (`[x, y]`) を取得。 |
 | `set_mp_matrix(matrix)` | `matrix`: 4x4 行列 | なし | MediaPipe の 4x4 姿勢変換行列をセット（セット時は PnP より優先使用）。 |
-| `get_head_pose(dlib_landmark, img_w, img_h, head_center=None)` | `dlib_landmark`: 68点座標<br><br>`img_w`, `img_h`: 解像度 | `dict` | 頭部姿勢（`pitch`, `yaw`, `roll`, `rmat`, `tvec`, `cam_mtx` 等）を解く。 |
-| `get_iris_3d_positions(lpoint_list, rpoint_list, pose_res)` | `lpoint_list`, `rpoint_list`: 2D 瞳孔座標<br><br>`pose_res`: 姿勢結果 | `dict` | 瞳孔の 3D カメラ空間座標（`left`, `right`）および顔ローカル復元座標（`re_left`, `re_right`）を計算。 |
-| `get_gaze_vector(iris_3d_points, pose_res, side="left")` | `iris_3d_points`: 3D 瞳孔座標<br><br>`pose_res`: 姿勢結果<br><br>`side`: `'left'` / `'right'` | `dict` | 3D 視線ベクトルおよび水平・垂直の視線度数（`horizontal`, `vertical`）を取得。 |
-| `get_eye_aspect_ratio(dlib_landmark, pose_res, side="left")` | `dlib_landmark`: 68点座標<br><br>`pose_res`: 姿勢結果<br><br>`side`: `'left'` / `'right'` | `float` | 姿勢回転の影響を取り除いた正確な EAR（目の開き具合）を算出。 |
-| `draw_front_face_with_iris(face_landmarks, pose_res, iris_res, head_center)` | `face_landmarks`: 顔座標<br><br>`pose_res`: 姿勢結果<br><br>`iris_res`: 瞳孔3D結果<br><br>`head_center`: 頭部中心 | なし | **【デバッグ用】** 傾いた顔と正面化した 3D 再構成顔を OpenCV ウィンドウ（"Normalized Front Face"）で比較描画。 |
+| `get_head_pose(dlib_landmark, img_w, img_h, head_center=None)` | `dlib_landmark`: 68点座標<br><br><br>`img_w`, `img_h`: 解像度 | `dict` | 頭部姿勢（`pitch`, `yaw`, `roll`, `rmat`, `tvec`, `cam_mtx` 等）を解く。 |
+| `get_iris_3d_positions(lpoint_list, rpoint_list, pose_res)` | `lpoint_list`, `rpoint_list`: 2D 瞳孔座標<br><br><br>`pose_res`: 姿勢結果 | `dict` | 瞳孔の 3D カメラ空間座標（`left`, `right`）および顔ローカル復元座標（`re_left`, `re_right`）を計算。 |
+| `get_gaze_vector(iris_3d_points, pose_res, side="left")` | `iris_3d_points`: 3D 瞳孔座標<br><br><br>`pose_res`: 姿勢結果<br><br><br>`side`: `'left'` / `'right'` | `dict` | 3D 視線ベクトルおよび水平・垂直の視線度数（`horizontal`, `vertical`）を取得。 |
+| `get_eye_aspect_ratio(dlib_landmark, pose_res, side="left")` | `dlib_landmark`: 68点座標<br><br><br>`pose_res`: 姿勢結果<br><br><br>`side`: `'left'` / `'right'` | `float` | 姿勢回転の影響を取り除いた正確な EAR（目の開き具合）を算出。 |
+| `draw_front_face_with_iris(face_landmarks, pose_res, iris_res, head_center)` | `face_landmarks`: 顔座標<br><br><br>`pose_res`: 姿勢結果<br><br><br>`iris_res`: 瞳孔3D結果<br><br><br>`head_center`: 頭部中心 | なし | **【デバッグ用】** 傾いた顔と正面化した 3D 再構成顔を OpenCV ウィンドウ（"Normalized Front Face"）で比較描画。 |
 
 ---
 
@@ -128,7 +178,3 @@ if __name__ == '__main__':
 
 1. カメラ画像から取得した顔データに対し、`get_head_pose` を呼び出して `yaw`（首の横振り角度）を取得してください。
 2. `yaw` の値が `+15` 度以上または `-15` 度以下になった場合に、「脇見注意」とターミナルに表示する警告ロジックを作成してください。
-
----
-
-[トップページへ戻る]()
