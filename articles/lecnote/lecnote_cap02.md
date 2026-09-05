@@ -53,25 +53,36 @@
 
 <hr>
 
+申し訳ありません。シークバー機能（`init_seekbar`, ラップ版 `imshow`）の解説とそのサンプルコードがドキュメントに反映されていませんでした。
+
+`.bag` ファイル再生時におけるシークバーの設置と自動連動の解説を追記した完成版のドキュメントです。
+
+---
+
 # Intel RealSense 画像処理ライブラリ (my_rs_cap.py) の使い方
 
 ## 概要
 
-- `./my_libs/video_capture/my_rs_cap.py` 内の `VideoCapture` クラスを用いて Intel RealSense（D400シリーズ等）または `.bag` ファイルから映像ストリームを取得します。
-- `pyrealsense2` をベースに、以下の RGB-D キャプチャ機能を統合的に処理します。
-  - **カラー画像（BGR）、生深度値（Depth）、可視化用カラーマップ（Colormap）の一括取得**
-  - **3つの接続モード（標準カメラ / シリアル番号指定 / `.bag` ファイル再生）**
-  - **リアルタイム深度フィルタリング（ノイズ低減・穴埋め処理）**
-  - **`.bag` 再生時の高精度タイムスタンプ管理と任意位置へのシーク（`seek`）**
+* `./my_libs/video_capture/my_rs_cap.py` 内の `VideoCapture` クラスを用いて Intel RealSense（D400シリーズ等）または `.bag` ファイルから映像ストリームを取得します。
+* `pyrealsense2` をベースに、以下の RGB-D キャプチャ機能を統合的に処理します。
+* **カラー画像（BGR）、生深度値（Depth）、可視化用カラーマップ（Colormap）の一括取得**
+* **3つの接続モード（標準カメラ / シリアル番号指定 / `.bag` ファイル再生）**
+* **リアルタイム深度フィルタリング（ノイズ低減・穴埋め処理）**
+* **`.bag` 再生時の高精度タイムスタンプ管理と任意位置へのシーク（`seek`）**
+* **シークバーによる `.bag` 再生位置の任意移動・連動機能**
+
+
 
 ---
 
 ## 前提条件
 
-- **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
-  - `my_rs_cap.py`: `./my_libs/video_capture/`
-- **【重要】** 動作には `pyrealsense2` がインストールされた環境が必要です。
-- **【重要】** 再生テストに使用する `.bag` ファイルや保存画像は `./img/` 内に配置されている必要があります。
+* **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+* `my_rs_cap.py`: `./my_libs/video_capture/`
+
+
+* **【重要】** 動作には `pyrealsense2` がインストールされた環境が必要です。
+* **【重要】** 再生テストに使用する `.bag` ファイルや保存画像は `./img/` 内に配置されている必要があります。
 
 ---
 
@@ -82,27 +93,30 @@
 ### 主な特徴
 
 1. **RGB + 深度（Depth）データの一括取得**:
+
 * `cap.read()` を呼び出すだけで、カラー画像（`bgr`）、生の深度値（`depth`）、および可視化用のカラーマップ（`colormap`）の 3 つのデータを辞書形式で同時に取得できます。
 
-
 2. **3つの接続モード（ライブカメラ・シリアル指定・bag再生）**:
+
 * **標準カメラ接続**: `source=0`（デフォルト）等で接続された RealSense を使用します。
 * **シリアル番号指定**: デバイスのシリアル番号（文字列）を指定して特定のカメラをオープンします。
 * **`.bag` ファイル再生**: 拡張子が `.bag` のファイルパスを指定すると、過去に録画した RealSense データを再生できます。
 
-
 3. **高精度タイムスタンプと相対時間化**:
+
 * RealSense 固有のエポックタイムスタンプ（大きな数値）をキャプチャ開始時からの相対ミリ秒（`0.0 ms` 起点）に自動変換し、`cap.get(cv2.CAP_PROP_POS_MSEC)` で取得できます。
 
-
 4. **リアルタイム深度フィルタリング内蔵**:
+
 * 内部で `temporal_filter`（時系列フィルタ）および `hole_filling_filter`（穴埋めフィルタ）を適用し、ノイズの少ない高品質な深度マップを生成します。
 
-
 5. **.bag 再生時の時間制御とシーク機能**:
+
 * `.bag` ファイル再生時には非リアルタイム（コマ落ちなし）モードで動作させることができ、`seek(timestamp_ms)` メソッドによる任意のタイムスタンプ（ミリ秒）への移動や `get_total_duration()` による総再生時間の取得が可能です。
 
+6. **シークバーによる再生位置コントロール**:
 
+* `.bag` ファイル再生時に OpenCV ウィンドウへシークバーを設置し、現在の再生フレームと連動させながら自由に早送りや巻き戻しが行えます。
 
 ---
 
@@ -185,14 +199,14 @@ if __name__ == '__main__':
 
 ### :o: 練習
 
-* 上記の [`rs_viewer1.py`](https://www.google.com/search?q=%23rs_viewer1py) のソースコードを VS Code にコピー＆ペーストし、`C:\oit\home\ipbl\rs_viewer1.py` として保存します。
+* 上記の `rs_viewer1.py` のソースコードを VS Code にコピー＆ペーストし、作業ディレクトリに保存します。
 * RealSense カメラを PC に接続し、プログラムを実行してカラー画面と深度カラーマップ画面の両方が表示されることを確認してください。
 
 ---
 
 ## :red_square: 演習 (`rs_selfie.py`)
 
-* [`rs_viewer1.py`](https://www.google.com/search?q=%23rs_viewer1py) を元にして、特定のキーを押した際にカラー画像と深度カラーマップ画像の両方を保存する `rs_selfie.py` を作成してください。
+* `rs_viewer1.py` を元にして、特定のキーを押した際にカラー画像と深度カラーマップ画像の両方を保存する `rs_selfie.py` を作成してください。
 
 | キー | 動作内容 |
 | --- | --- |
@@ -200,6 +214,7 @@ if __name__ == '__main__':
 | **s** | カラー画像を `./img/rs_color.jpg`、深度カラーマップを `./img/rs_depth.jpg` として保存 |
 
 * **ヒントコード**:
+
 ```python
 key = cv2.waitKey(1) & 0xFF
 if key == ord('q'):
@@ -211,15 +226,13 @@ elif key == ord('s'):
 
 ```
 
-
-
 ---
 
-## :red_square: `.bag` ファイル再生とシーク機能の使い方
+## :red_square: `.bag` ファイル再生とシークバー機能 (`seek`, `init_seekbar`)
 
-RealSense Viewer等で録画した `.bag` ファイルを読み込んで解析・再生する場合の例です。
+RealSense Viewer等で録画した `.bag` ファイルを読み込んで解析・再生する場合の例です。シークバー（トラックバー）を設置して、再生位置の自由な移動や現在位置への連動を行うことができます。
 
-### .bag 再生と任意位置へのシークサンプル
+### .bag 再生とシークバー連動サンプル
 
 ```python
 import cv2
@@ -235,31 +248,27 @@ def main():
         print(".bag ファイルが見つかりません。")
         return
 
-    # 総再生時間の取得
-    total_ms = cap.get_total_duration()
-    print(f"Total Duration: {total_ms / 1000.0:.2f} seconds")
-
-    # 5秒 (5000ms) の位置へシーク
-    cap.seek(5000.0)
+    winname = "BAG Playback with Seekbar"
+    cv2.namedWindow(winname)
+    
+    # ウィンドウにシークバー（トラックバー）を設置
+    cap.init_seekbar(winname)
 
     while cap.isOpened():
         ret, frames = cap.read()
         if not ret:
+            print(".bag ファイルの終端に達しました。")
             break
 
-        current_ms = cap.get(cv2.CAP_PROP_POS_MSEC)
-        cv2.putText(frames['bgr'], f"Time: {current_ms/1000.0:.2f} s", (20, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+        # ラップされた imshow を使って表示とシークバーの位置連動を行う
+        cap.imshow(winname, frames)
 
-        cv2.imshow("BAG Playback", frames['bgr'])
-        cv2.imshow("BAG Depth", frames['colormap'])
-
-        key = cv2.waitKey(30) & 0xFF
-        if key == ord('q'):
+        # 'q' キーで終了
+        if cv2.waitKey(30) & 0xFF == ord('q'):
             break
 
-    cap.release()
     cv2.destroyAllWindows()
+    cap.release()
 
 if __name__ == '__main__':
     main()
