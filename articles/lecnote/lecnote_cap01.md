@@ -49,28 +49,29 @@
 
 <hr>
 
-自作ライブラリ `my_libs` 内の映像キャプチャクラス `VideoCapture` および `VideoWriter` を活用し、Webカメラ・動画ファイル・ドローンからの映像取り込みやタイムスタンプ管理、ログ付き録画を実装するための解説ドキュメントです。
-
-<hr>
-
 # 動画画像処理ライブラリ (my_cap_av2.py) の使い方
 
 ## 概要
 
-- `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いて各種ソースから映像ストリームを取得します。
-- OpenCV互換の操作感で、以下のキャプチャ・録画機能を処理します。
-  - **3つの入力ソース（Webカメラ / 動画ファイル / Hulaドローン）の自動判別機能**
-  - **PTSに基づく高精度タイムスタンプ取得とジャストシーク（`seek`）**
-  - **指定秒数範囲の読み出し（`set_range`）**
-  - **処理遅延ログ（`.log.csv`）を自動生成する H.264 対応 `VideoWriter`**
+* `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いて各種ソースから映像ストリームを取得します。
+* OpenCV互換の操作感で、以下のキャプチャ・録画機能を処理します。
+* **3つの入力ソース（Webカメラ / 動画ファイル / Hulaドローン）の自動判別機能**
+* **PTSに基づく高精度タイムスタンプ取得とジャストシーク（`seek`）**
+* **指定秒数範囲の読み出し（`set_range`）**
+* **シークバーによる動画の任意位置への移動・再生連動**
+* **処理遅延ログ（`.log.csv`）を自動生成する H.264 対応 `VideoWriter**`
+
+
 
 ---
 
 ## 前提条件
 
-- **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
-  - `my_cap_av2.py`: `./my_libs/video_capture/`
-- **【重要】** 読み込み・保存に使用するテスト用画像や動画ファイルは `./img/` 内に配置されている必要があります。
+* **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+* `my_cap_av2.py`: `./my_libs/video_capture/`
+
+
+* **【重要】** 読み込み・保存に使用するテスト用画像や動画ファイルは `./img/` 内に配置されている必要があります。
 
 ---
 
@@ -81,27 +82,32 @@
 ### 主な特徴
 
 1. **OpenCV互換のインターフェース**:
+
 * `cap = VideoCapture(...)` や `cap.read()`, `cap.get(...)`, `cap.release()` などの OpenCV 標準と同等のメソッドを提供します。
 
-
 2. **3つの入力モードを自動判別**:
+
 * **Webカメラモード (`int`)**: 数値（`0` など）を渡すと標準Webカメラを使用します。
 * **動画ファイルモード (`str`)**: 動画ファイルのパス文字列を渡すと PyAV (`av`) を使用してデコードし、PTS (Presentation Time Stamp) に基づく正確なタイムスタンプ管理を行います。
 * **Hulaドローンモード (`object`)**: `get_image_array` メソッドを持つ SDK オブジェクトを渡すと、RTPストリーム制御や重複フレームのドロップ処理を行います。
 
-
 3. **高精度なシーク機能と範囲読み出し**:
+
 * ファイルモードにおいて、キーフレームシークと空読み（ロールフォワード）を組み合わせた正確な位置合わせ (`seek`) や、指定した秒数範囲のみを切り出す (`set_range`) 機能を提供します。
 
+4. **シークバーによる再生位置コントロール**:
 
-4. **CSVログ出力対応の VideoWriter**:
+* 動画ファイル再生時にOpenCVウィンドウへシークバーを設置し、現在の再生フレームと連動させながら自由に早送りや巻き戻しが行えます。
+
+5. **CSVログ出力対応の VideoWriter**:
+
 * PyAV を使用した H.264 エンコードに対応し、録画時の理論時間・実経過時間・処理遅延を記録する `.log.csv` を自動生成します。
-
-
 
 ---
 
-## :red_square: 高精度動画画像処理のサンプル
+## :red_square: 通常のWebカメラモードと基本サンプル (`video_viewer1.py`)
+
+`VideoCapture` に整数（`0` や `1` などのデバイスID）を渡すと、標準Webカメラモードとして動作します。このモードでは PyAV などの複雑なデコード処理を行わず、OpenCV標準の `cv2.VideoCapture` をラップして直接フレームを取得します。通常の `cv2.imshow` を使ってリアルタイムに画面描画を行います。
 
 ### video_viewer1.py
 
@@ -122,6 +128,10 @@ def main():
     # OpenCVの cv2.VideoCapture の代わりに my_cap_av2 の VideoCapture を使用
     cap = VideoCapture(device)
     
+    if not cap.isOpened():
+        print("カメラを開けませんでした。")
+        return
+
     # プロパティの取得
     fps = cap.get(cv2.CAP_PROP_FPS)
     wt  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -137,11 +147,12 @@ def main():
         # 現在のタイムスタンプ位置（ミリ秒）を取得
         current_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
 
+        # 通常の OpenCV の imshow で画面に表示
+        cv2.imshow("video", frame)
+
         # 'q' キーで終了
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
-        cv2.imshow("video", frame)
 
     cv2.destroyAllWindows()
     cap.release()
@@ -159,8 +170,6 @@ if __name__ == '__main__':
 * **文字列（例: `"./img/movie.mp4"`）**: 動画ファイル
 * **Hula SDKインスタンス**: Hulaドローンのカメラ入力
 
-
-
 | コード | 内容・説明 |
 | --- | --- |
 | `VideoCapture(source)` | 入力ソースに応じて内部モード（`camera`, `file`, `hula`）を初期化してストリームを開く |
@@ -173,14 +182,14 @@ if __name__ == '__main__':
 
 ### :o: 練習
 
-* [`video_viewer1.py`](https://www.google.com/search?q=%23video_viewer1py) のソースコードを VS Code にコピー＆ペーストし、`C:\oit\home\ipbl\video_viewer1.py` として保存します。
+* `video_viewer1.py` のソースコードを VS Code にコピー＆ペーストし、作業ディレクトリに保存します。
 * プログラムを実行し、カメラ映像が問題なく表示され、`q` キーで終了することを確認してください。
 
 ---
 
 ## :red_square: 演習 (`selfie.py`)
 
-* [`video_viewer1.py`](https://www.google.com/search?q=%23video_viewer1py) を元にして、特定のキーを押した際に静止画を保存する `selfie.py` を作成してください。
+* `video_viewer1.py` を元にして、特定のキーを押した際に静止画を保存する `selfie.py` を作成してください。
 
 | キー | 動作内容 |
 | --- | --- |
@@ -188,6 +197,7 @@ if __name__ == '__main__':
 | **s** | 現在の表示フレームを `./img/selfie.jpg` として保存 |
 
 * **ヒントコード**:
+
 ```python
 key = cv2.waitKey(1)
 if key & 0xFF == ord('q'):
@@ -198,13 +208,11 @@ elif key & 0xFF == ord('s'):
 
 ```
 
-
-
 ---
 
-## :red_square: 動画ファイルモード専用機能 (`seek`, `set_range`)
+## :red_square: 動画ファイルモード専用機能 (`seek`, `set_range`, シークバー)
 
-動画ファイル入力時（`mode == "file"`）に利用できる追加機能です。
+動画ファイル入力時（`mode == "file"`）に利用できる強力な追加機能です。
 
 ### 1. 指定秒数へのジャストシーク (`seek`)
 
@@ -223,6 +231,45 @@ cap.seek(15.5)
 ```python
 # 10.0秒の位置から 5.0秒間 のみ読み出し対象とする
 cap.set_range(start_sec=10.0, duration_sec=5.0)
+
+```
+
+### 3. シークバーによる操作と画面表示 (`init_seekbar`, `imshow`)
+
+動画ファイル再生時にマウスで任意の位置へ移動できるシークバーを設置できます。専用のラップメソッドを使用することで、再生中のフレーム位置とシークバーのつまみを自動連動させることができます。
+
+```python
+import os
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+import cv2
+from my_libs.my_cap_av2 import VideoCapture
+
+def main():
+    video_path = "./img/record.mp4"
+    cap = VideoCapture(video_path)
+    
+    winname = "video with seekbar"
+    cv2.namedWindow(winname)
+    
+    # ウィンドウにシークバー（トラックバー）を設置
+    cap.init_seekbar(winname)
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # ラップされた imshow を使って表示とシークバーの位置連動を行う
+        cap.imshow(winname, frame)
+
+        if cv2.waitKey(30) & 0xFF == ord('q'):
+            break
+
+    cv2.destroyAllWindows()
+    cap.release()
+
+if __name__ == '__main__':
+    main()
 
 ```
 
@@ -278,10 +325,9 @@ def main():
     cv2.destroyAllWindows()
     cap.release()
 
-if __name__ == '__main__':
+if __name__ =='.__main__':
     main()
 
 ```
 
 * `writer.release()` が呼び出されると、保存した動画（例: `record.mp4`）と同じディレクトリにログファイル（例: `record.log.csv`）が作成されます。
-
