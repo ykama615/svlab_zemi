@@ -51,30 +51,33 @@
 自作ライブラリ `my_libs` 内の各クラス（映像キャプチャ `VideoCapture` および MediaPipe 統合処理クラス `MyMediaPipeN`）を活用し、顔・手・姿勢・セグメンテーションなどの各種認識機能を実装するための解説ドキュメントです。
 
 <hr>
-
 # MediaPipe統合処理ライブラリ (my_mediapipe_n.py) の使い方
 
 ## 概要
 
-- `my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
-- `my_libs/detector/my_mediapipe_n.py` 内の `MyMediaPipeN` クラスを使用し、以下の認知機能を統合的に処理します。
-  - **顔検出 / 顔メッシュ**
-  - **手検出 / ジェスチャ認識**
-  - **姿勢推定（Pose）**
-  - **セルフィーセグメンテーション（背景切り抜き）**
+* `my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+* `my_libs/detector/my_mediapipe_n.py` 内の `MyMediaPipeN` クラスを使用し、以下の認知機能を統合的に処理します。
+* **顔検出 / 顔メッシュ**
+* **手検出 / ジェスチャ認識**
+* **姿勢推定（Pose）**
+* **セルフィーセグメンテーション（背景切り抜き）**
+
+
 
 ---
 
 ## 前提条件
 
-- **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
-  - `my_cap_av2.py`: `./my_libs/video_capture/`
-  - `my_mediapipe_n.py`: `./my_libs/detector/`
-- **【重要】** 学習済みモデルファイル群（`.task`, `.tflite`）が `./learned_models/mediapipe/` 内に正しく配置されている必要があります。
+* **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+* `my_cap_av2.py`: `./my_libs/video_capture/`
+* `my_mediapipe_n.py`: `./my_libs/detector/`
+
+
+* **【重要】** 学習済みモデルファイル群（`.task`, `.tflite`）が `./learned_models/mediapipe/` 内に正しく配置されている必要があります。
 
 ---
 
-## :red_square: my_mediapipe_n.py の概要と特徴
+## **my_mediapipe_n.py の概要と特徴**
 
 `MyMediaPipeN` は、MediaPipe Tasks API (Python) をラップし、OpenCV形式の画像フレームに対して多様な認識（顔・手・姿勢・ジェスチャ・顔メッシュ・表情スコア・背景セグメンテーション等）を簡潔なメソッド呼び出しで実現するカスタムクラスです。
 
@@ -99,9 +102,9 @@
 
 ---
 
-## :red_square: my_cap_av2 と連携した基本サンプルコード
+## **my_cap_av2 と連携した基本サンプルコード**
 
-`my_cap_av2.py` の `VideoCapture` で映像を入力し、`MyMediaPipeN` で手のランドマークを検出・描画する基本プログラムです。
+`my_libs/video_capture/my_cap_av2.py` の `VideoCapture` で映像を入力し、`MyMediaPipeN` で手のランドマークを検出・描画する基本プログラムです。
 
 ### mp_hand_viewer.py
 
@@ -110,9 +113,9 @@ import os
 # OpenCVのキャプチャ遅延を防ぐ設定
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2
-# ライブラリのインポート
-from my_libs.my_cap_av2 import VideoCapture
-from my_libs.my_mediapipe_n import MyMediaPipeN
+# ライブラリのインポート（正しいディレクトリ構造に準拠）
+from my_libs.video_capture.my_cap_av2 import VideoCapture
+from my_libs.detector.my_mediapipe_n import MyMediaPipeN
 
 device = 0 # 0: Webカメラ, または動画ファイルパス指定
 
@@ -159,7 +162,7 @@ if __name__ == '__main__':
 
 ---
 
-## :red_square: MyMediaPipeN の主なメソッド一覧
+## **MyMediaPipeN の主なメソッド一覧**
 
 ### 画像変換・基本操作
 
@@ -190,7 +193,7 @@ if __name__ == '__main__':
 
 ---
 
-## :red_square: 応用サンプル: 表情（BlendShapes）と姿勢推定の表示
+## **応用サンプル: 表情（BlendShapes）と姿勢推定の表示**
 
 `get_pose()` と `get_blendshapes()` を組み合わせた応用例です。
 
@@ -200,8 +203,8 @@ if __name__ == '__main__':
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2
-from my_libs.my_cap_av2 import VideoCapture
-from my_libs.my_mediapipe_n import MyMediaPipeN
+from my_libs.video_capture.my_cap_av2 import VideoCapture
+from my_libs.detector.my_mediapipe_n import MyMediaPipeN
 
 def main():
     cap = VideoCapture(0)
@@ -247,10 +250,11 @@ if __name__ == '__main__':
 
 ---
 
-## :red_square: 演習 (`mp_selfie_segmentation.py`)
+## **演習 (`mp_selfie_segmentation.py`)**
 
-* [`mp_hand_viewer.py`](https://www.google.com/search?q=%23mp_hand_viewerpy) を参考にして、`get_segment_image()` を使用して人物の背景を特定の色（例: 青色）に置き換える `mp_selfie_segmentation.py` を作成してください。
+* `mp_hand_viewer.py` を参考にして、`get_segment_image()` を使用して人物の背景を特定の色（例: 青色）に置き換える `mp_selfie_segmentation.py` を作成してください。
 * **ヒントコード**:
+
 ```python
 # セグメンテーションマスクの取得 (True: 人物, False: 背景)
 condition = mp_nn.get_segment_image(mp_image, dep=0.5)
@@ -263,4 +267,3 @@ output_frame = np.where(condition, frame, bg_image)
 cv2.imshow("Background Replacement", output_frame)
 
 ```
-
