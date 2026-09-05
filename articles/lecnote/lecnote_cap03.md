@@ -57,21 +57,26 @@
 
 ## 概要
 
-- `./my_libs/video_capture/my_bolt_cap.py` 内の `VideoCapture` クラスを用いて Orbbec Femto Bolt などの 3D カメラまたは `.mkv` ファイルから映像ストリームを取得します。
-- `pyorbbecsdk` をベースに、以下の RGB-D キャプチャ機能を統合的に処理します。
-  - **カラー画像（BGR）、生深度値（Depth）、可視化用カラーマップ（Colormap）の一括取得**
-  - **ライブキャプチャ時のバッファ自動フラッシュ（処理遅延・タイムラグ防止）**
-  - **解像度補正ロジックおよびプリセット指定（`HD`, `FHD` など）**
-  - **`.mkv` 再生時の高精度タイムスタンプ管理と任意位置へのシーク（`seek`）**
+* `./my_libs/video_capture/my_bolt_cap.py` 内の `VideoCapture` クラスを用いて Orbbec Femto Bolt などの 3D カメラまたは `.mkv` ファイルから映像ストリームを取得します。
+* `pyorbbecsdk` をベースに、以下の RGB-D キャプチャ機能を統合的に処理します。
+* **カラー画像（BGR）、生深度値（Depth）、可視化用カラーマップ（Colormap）の一括取得**
+* **ライブキャプチャ時のバッファ自動フラッシュ（処理遅延・タイムラグ防止）**
+* **解像度補正ロジックおよびプリセット指定（`HD`, `FHD` など）**
+* **`.mkv` 再生時の高精度タイムスタンプ管理と任意位置へのシーク（`seek`）**
+* **シークバーによる `.mkv` 再生位置の任意移動・連動機能**
+
+
 
 ---
 
 ## 前提条件
 
-- **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
-  - `my_bolt_cap.py`: `./my_libs/video_capture/`
-- **【重要】** 動作には `pyorbbecsdk` がインストールされた環境が必要です。
-- **【重要】** 再生テストに使用する `.mkv` ファイルや保存画像は `./img/` 内に配置されている必要があります。
+* **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+* `my_bolt_cap.py`: `./my_libs/video_capture/`
+
+
+* **【重要】** 動作には `pyorbbecsdk` がインストールされた環境が必要です。
+* **【重要】** 再生テストに使用する `.mkv` ファイルや保存画像は `./img/` 内に配置されている必要があります。
 
 ---
 
@@ -82,21 +87,24 @@
 ### 主な特徴
 
 1. **RGB + 深度（Depth）データの一括取得**:
+
 * `cap.read()` を呼び出すだけで、解像度が合わせ込まれたカラー画像（`bgr`）、生の深度値（`depth`）、および可視化用のカラーマップ（`colormap`）の 3 種類のデータを辞書形式で同時に取得できます。
 
-
 2. **リアルタイムキャプチャ時のバッファフラッシュ（遅延防止）**:
+
 * ライブカメラモード実行時、処理遅延によって内部バッファに溜まった古いフレームを自動的に掃き出し（ドロップし）、常に最新のフレームを優先して返却することでリアルタイム性を確保します。
 
-
 3. **.mkv ファイル再生・シーク機能**:
+
 * `source` に `.mkv` ファイルのパスを指定すると録画データの再生モードとなり、`seek(timestamp_ms)` による任意のタイムスタンプ（ミリ秒）へのシークや `get_total_duration()` による総再生時間の取得が可能です。
 
-
 4. **柔軟な初期化引数と解像度補正**:
+
 * `mode` や `width`, `height` 引数のさまざまな指定パターン（タプル、解像度定数 `HD`, `FHD` など）に対応する引数補正ロジックを内蔵しています。
 
+5. **シークバーによる再生位置コントロール**:
 
+* `.mkv` ファイル再生時に OpenCV ウィンドウへシークバーを設置し、現在の再生フレームと連動させながら自由に早送りや巻き戻しが行えます。
 
 ---
 
@@ -182,14 +190,14 @@ if __name__ == '__main__':
 
 ### :o: 練習
 
-* 上記の [`bolt_viewer1.py`](https://www.google.com/search?q=%23bolt_viewer1py) のソースコードを VS Code にコピー＆ペーストし、`C:\oit\home\ipbl\bolt_viewer1.py` として保存します。
+* 上記の `bolt_viewer1.py` のソースコードを VS Code にコピー＆ペーストし、作業ディレクトリに保存します。
 * Femto Bolt カメラを PC に接続し、プログラムを実行してカラー画面と深度カラーマップ画面の両方が表示されることを確認してください。
 
 ---
 
 ## :red_square: 演習 (`bolt_selfie.py`)
 
-* [`bolt_viewer1.py`](https://www.google.com/search?q=%23bolt_viewer1py) を元にして、特定のキーを押した際にカラー画像と深度カラーマップ画像の両方を保存する `bolt_selfie.py` を作成してください。
+* `bolt_viewer1.py` を元にして、特定のキーを押した際にカラー画像と深度カラーマップ画像の両方を保存する `bolt_selfie.py` を作成してください。
 
 | キー | 動作内容 |
 | --- | --- |
@@ -197,6 +205,7 @@ if __name__ == '__main__':
 | **s** | カラー画像を `./img/bolt_color.jpg`、深度カラーマップを `./img/bolt_depth.jpg` として保存 |
 
 * **ヒントコード**:
+
 ```python
 key = cv2.waitKey(1) & 0xFF
 if key == ord('q'):
@@ -209,15 +218,13 @@ elif key == ord('s'):
 
 ```
 
-
-
 ---
 
-## :red_square: `.mkv` ファイル再生とシーク機能の使い方
+## :red_square: `.mkv` ファイル再生とシークバー機能 (`seek`, `init_seekbar`)
 
-Orbbec SDK や Orbbec Viewer 等で録画した `.mkv` ファイルを読み込んで再生・解析する場合の例です。
+Orbbec SDK や Orbbec Viewer 等で録画した `.mkv` ファイルを読み込んで再生・解析する場合の例です。シークバー（トラックバー）を設置して、再生位置の自由な移動や現在位置への連動を行うことができます。
 
-### .mkv 再生と任意位置へのシークサンプル
+### .mkv 再生とシークバー連動サンプル
 
 ```python
 import cv2
@@ -233,30 +240,26 @@ def main():
         print(".mkv ファイルが見つかりません。")
         return
 
-    # 総再生時間の取得
-    total_ms = cap.get_total_duration()
-    print(f"Total Duration: {total_ms / 1000.0:.2f} seconds")
-
-    # 3秒 (3000ms) の位置へシーク
-    cap.seek(3000.0)
+    winname = "MKV Playback with Seekbar"
+    cv2.namedWindow(winname)
+    
+    # ウィンドウにシークバー（トラックバー）を設置
+    cap.init_seekbar(winname)
 
     while cap.isOpened():
         ret, frames = cap.read()
         if not ret:
+            print(".mkv ファイルの終端に達しました。")
             break
 
         if frames is None:
             continue
 
-        current_ms = cap.get(cv2.CAP_PROP_POS_MSEC)
-        cv2.putText(frames['bgr'], f"Time: {current_ms/1000.0:.2f} s", (20, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+        # ラップされた imshow を使って表示とシークバーの位置連動を行う
+        cap.imshow(winname, frames)
 
-        cv2.imshow("MKV Playback Color", frames['bgr'])
-        cv2.imshow("MKV Playback Depth", frames['colormap'])
-
-        key = cv2.waitKey(30) & 0xFF
-        if key == ord('q'):
+        # 'q' キーで終了
+        if cv2.waitKey(30) & 0xFF == ord('q'):
             break
 
     cap.release()
