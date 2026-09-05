@@ -55,51 +55,52 @@
 # OpenMMLab 顔検出・キーポイント抽出ライブラリ (my_mmface.py) の使い方
 
 ## 概要
-- 本ドキュメントでは、`my_cap_av2.py` の `VideoCapture` クラスを用いて映像を取り込み、`my_mmface.py`（`MyMMFace` クラス）を使用して OpenMMLab (MMDetection / MMPose) による高精度な顔検出および顔キーポイント（68点ランドマーク相当）の抽出を行う方法について解説します。
+
+* 本ドキュメントでは、`my_cap_av2.py` の `VideoCapture` クラスを用いて映像を取り込み、`my_mmface.py`（`MyMMFace` クラス）を使用して OpenMMLab (MMDetection / MMPose) による高精度な顔検出および顔キーポイント抽出を行う方法について解説します。
+* **専用の顔検出・キーポイントモデル（Face）**のほか、**DWPose**や**RTMW**といった**全身モデル（WholeBody系）からの顔パーツ抽出**もサポートしています。
 
 ## 前提条件
-- `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
-- `./my_libs/detector/my_mmface.py` 内の `MyMMFace` クラスを使用し、 `OpenMMLab (MMDetection / MMPose)` による以下の機能を処理します。
-  - **RTMDet-Face による高速・高精度な顔領域（BBox）検出**
-  - **RTMPose-Face による顔キーポイント（68点ランドマーク相当）抽出**
-  - **輪郭描画用の骨格接続データ自動生成**
-  
+
+* `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+* `./my_libs/detector/my_mmface.py` 内の `MyMMFace` クラスを使用し、OpenMMLab (MMDetection / MMPose) による以下の機能を処理します。
+* **RTMDet等による高速・高精度な検出処理**
+* **選択したモデルに応じた顔キーポイント（68点ランドマーク相当等）の抽出**
+* **輪郭描画用の骨格接続データ自動生成**
+
+
+
 ---
 
-## :red_square: my_mmface.py の概要と特徴
+## 🟥 my_mmface.py の概要と特徴
 
-`MyMMFace` は、OpenMMLab の物体検出ライブラリ（MMDetection）と姿勢推定ライブラリ（MMPose）を組み合わせ、Top-down 方式で高精度な顔バウンディングボックス検出とキーポイント検出を実行するカスタムクラスです。
+`MyMMFace` は、OpenMMLab の物体検出ライブラリ（MMDetection）と姿勢推定ライブラリ（MMPose）を組み合わせ、Top-down 方式で高精度な顔領域検出とキーポイント検出を実行するカスタムクラスです。
 
 ### 主な特徴
 
-1. **RTMDet-Face による顔検出 (`getFaceDet`)**:
-* 超軽量・高速な RTMDet-Nano モデルを利用して画像中の顔領域（BBox）とその信頼度スコアを取得します。
+1. **柔軟なモデル切り替え (`model` 引数)**:
+* 初期化時の `model` 引数（`'face'`, `'dwpose'`, `'rtmw'`）に応じて、専用の顔モデルを使用するか、全身モデルから顔領域を抽出するかを自動で切り替えます。
 
 
+2. **顔検出 (`getFaceDet`)**:
+* 検出器（RTMDet-Face または RTMDet）を利用して画像中の顔（または人物）のバウンディングボックス（BBox）とその信頼度スコアを取得します。
 
 
-2. **RTMPose-Face によるキーポイント抽出 (`getFacePose`)**:
-* 検出された顔領域を入力として、高精度な 68 点相当の顔キーポイント（目・眉・鼻・口・輪郭）と各点の信頼度スコアを抽出します。
+3. **顔キーポイント抽出 (`getFacePose`)**:
+* 検出された領域を入力として、モデルの仕様に応じたインデックススライスで顔パーツのキーポイント座標および各点の信頼度スコアを抽出します。
 
 
-
-
-3. **描画用の接続データ生成 (`get_connection`)**:
+4. **描画用の接続データ生成 (`get_connection`)**:
 * 抽出されたキーポイント間を結ぶ骨格ライン（顎線、眉、鼻、目、唇）のインデックスペアリストを自動生成し、輪郭描画を容易にします。
 
 
-
-
-4. **計算デバイス（CPU/GPU）の切り替え**:
+5. **計算デバイス（CPU/GPU）の切り替え**:
 * 初期化時の `device` 引数（例: `'cpu'` や `'cuda:0'`）により、実行環境に応じた推論デバイスを選択可能です。
 
 
 
-
-
 ---
 
-## :red_square: my_cap_av2 と連携した基本サンプルコード
+## 🟥 my_cap_av2 と連携した基本サンプルコード
 
 `my_cap_av2.py` の `VideoCapture` で映像を入力し、`MyMMFace` で顔とキーポイントをリアルタイム検出し描画する基本プログラムです。
 
@@ -120,9 +121,9 @@ device_input = 0 # 0: Webカメラ, または動画ファイルパス指定
 def main():
     global device_input
 
-    # 1. キャプチャと MMFace の初期化 (GPUを使用する場合は device='cuda:0' に変更)
+    # 1. キャプチャと MMFace の初期化 (model='face', 'dwpose', 'rtmw' を選択可能)
     cap = VideoCapture(device_input)
-    mm_face = MyMMFace(device='cpu')
+    mm_face = MyMMFace(device='cpu', model='face')
 
     # キーポイント接続線のインデックスリストを取得
     connections = mm_face.get_connection()
@@ -176,29 +177,24 @@ if __name__ == '__main__':
 
 ---
 
-## :red_square: MyMMFace の主なメソッド一覧
+## 🟥 MyMMFace の主なメソッド一覧
 
 | メソッド | 引数 | 戻り値 | 説明 |
 | --- | --- | --- | --- |
-| `__init__(device='cpu')` | `device`: 計算デバイス | なし | RTMDet-Face および RTMPose-Face の設定・モデルを初期化
+| `__init__(device='cpu', model='face')` | `device`: 計算デバイス<br>
 
- |
-| `getFaceDet(frame)` | `frame`: BGR画像 (`ndarray`) | `(bbox, score)` | 最高スコアの顔枠 `[x1, y1, x2, y2]` と信頼度スコアを返却。未検出時は `(None, None)`<br> |
-| `getFacePose(frame, bbox)` | `frame`: BGR画像, `bbox`: 顔枠 | `(kpts, scores)` | 顔の 68 点キーポイント座標配列と各点のスコアを返却
-
- |
-| `get_connection()` | なし | `connections` | 輪郭・目・口・鼻を結ぶインデックスペアリスト `[(0, 1), ...]` を取得
-
- |
+<br>`model`: モデル種別 (`'face'`, `'dwpose'`, `'rtmw'`) | なし | 検出器および姿勢推定モデルの構成ファイル・重みを初期化 |
+| `getFaceDet(frame)` | `frame`: BGR画像 (`ndarray`) | `(bbox, score)` | 最高スコアの顔（または人物）枠 `[x1, y1, x2, y2]` と信頼度スコアを返却。未検出時は `(None, None)` |
+| `getFacePose(frame, bbox)` | `frame`: BGR画像, `bbox`: 検出枠 | `(kpts, scores)` | モデル仕様（専用モデルまたは全身モデルのインデックススライス）に応じた顔キーポイント座標配列と各点のスコアを返却 |
+| `get_connection()` | なし | `connections` | 輪郭・目・口・鼻を結ぶインデックスペアリスト `[(0, 1), ...]` を取得 |
 
 ---
 
-## :red_square: 演習 (`mm_face_crop.py`)
+## 🟥 演習 (`mm_face_crop.py`)
 
-* [`mm_face_viewer.py`](https://www.google.com/search?q=%23mm_face_viewerpy) を参考にして、検出された顔領域（BBox）をトリミングし、別ウィンドウ `"Cropped Face"` に拡大表示する `mm_face_crop.py` を作成してください。
-
-
+* `mm_face_viewer.py` を参考にして、検出された顔領域（BBox）をトリミングし、別ウィンドウ `"Cropped Face"` に拡大表示する `mm_face_crop.py` を作成してください。
 * **ヒントコード**:
+
 ```python
 bbox, score = mm_face.getFaceDet(frame)
 
@@ -216,5 +212,4 @@ if bbox is not None and score > 0.5:
         cv2.imshow("Cropped Face", face_crop)
 
 ```
-
 
