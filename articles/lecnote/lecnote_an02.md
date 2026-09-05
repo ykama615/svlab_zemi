@@ -80,9 +80,9 @@ C:\oit\home\ipbl> python XXX.py
 [ 2D 姿勢 ランドマーク (肩・腰) ]
         │
         ├─► 1. 重心計算 (get_body_centroid) ───► 全体重心・上半身重心・下半身重心・法線ベクトルを算出
-        │                                        │
-        ├─► 2. 背骨算出 (get_backbone) ◄─────────────┴ 最小二乗法により Neck点 / 身体中心 / Hip点を特定
-        │                                        │
+        │                                           │
+        ├─► 2. 背骨算出 (get_backbone) ◄────────────＋ 最小二乗法により Neck点 / 身体中心 / Hip点を特定
+        │                                           │
         ├─► 3. 姿勢角計算 (get_posture_angles) ◄─────┘ 基準角からの Lower / Upper / Neck 屈曲角を算出
         │
         └─► 4. 移動量検知 (get_body_landmark_moving) ──► deque 履歴を用いたフレーム間のユークリッド移動量算出
