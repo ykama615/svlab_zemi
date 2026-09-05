@@ -47,120 +47,147 @@
 
 <hr>
 
-# 環境のインストール
+# Python・VSCode 画像処理環境 セットアップガイド
 
- - 以下は配布環境のインストール方法です
+## 概要
 
-  0. 指定されたリンクから `pyXX.exe` をダウンロードします．
-  > **Note** パスワードが必要な場合，大学のアカウントでのアクセスが必要な場合があるので注意しましょう
-  1. `pyXX.exe` ファイルを実行します.
-  > **Note** 以下のような警告画面が表示された場合, `詳細情報` をクリックした後，`実行` をクリックしてください. <br>
-  > <image src="./inst00.png" width="40%" height="40%"><br>
-  > <image src="./inst01.png" width="40%" height="40%"><br>
-  2. `次へ(N)` をクリックします.<br>
-  <image src="./inst02.png" width="40%" height="40%"><br>
-  > インストール過程(1)...<br>
-  > <image src="./inst03.png" width="40%" height="40%"><br>
-  > インストール過程(2)...<br>
-  > <image src="./inst04.png" width="40%" height="40%"><br>
-  
-  3. このインストーラでは， `C:\oit\pyXX` に python実行環境（Python3.X + VSCode) がインストールされ，ソースファイル ディレクトリとして `C:\oit\pyXX\source` と，デスクトップ上に実行のためのショートカット（下図）が設定されます．<br>
-  <image src="./icon.png" width="10%" height="10%">
+* このページでは、画像処理実習に向けた Python および VSCode の環境構築手順を説明します。
+* ポータブル版を使用するため、PCのレジストリなど環境を汚すことはありません。
 
-  > **Note** デスクトップへのショートカットの設定は，計算機の状況により失敗することがあります. その場合，`C:\oit\pyXX\pyXX_start.bat` をクリックして直接起動します．<br>
-  > ショートカットを手動で作成することもできますが，`py25` フォルダ内のファイル（の一部）を **移動させない** ように注意しましょう．
+> **メモ** 環境が不要になった場合は、フォルダごと削除するだけで完全にアンインストールできます。
 
-<br>
+### :green_square: インストールされる環境の詳細
 
-# 環境の起動
+* Python 3.12.10 (WinPython)
+* 含まれるパッケージ
+* numpy == 1.26.4
+* mediapipe == 0.10.33
+* opencv-python == 3.4.18.65
 
-  - デスクトップにあるpyXX_startのショートカットまたは C:\oit\pyXX\pyXX_start.bat をダブルクリックして起動します．
 
-  - ソースコードディレクトリ構造
-    - C:\oit\py25\source\以下のディレクトリ構造は次の通りです(2025/08)．新しい.pyファイルはsourceフォルダに追加します．
-      ```
-      +[source]           <== ワーキングディレクトリ ("C:\oit\py25")
-      |
-      |-+[img]            <== 画像用フォルダ
-      | |-+[standard]     <== 標準画像用フォルダ
-      |   |-+[mono]       <== グレースケール画像用フォルダ
-      |   | |-(files)
-      |   |-(files)
-      |-+[learned_models] <== 学習済み物体・人検出ファイル格納フォルダ
-      | |-+[haarcascades]
-      | | |-(files)
-      | |-+[mediapipe]
-      | | |-(files)
-      | |-(files)
-      |-sample1.py
-      |-sample2.py
-      |-sample3.py
-      |-sample4.py
-      |-sample5.py
-      |-sample6.py
-      |-sample7.py
-      |-sample8.py
-      |-(files)
-      ```
+* ※用意されたポータブル環境を使用しない場合は、上記の要件を満たす仮想環境をご自身で構築してください。
 
-  ### :o:チェックポイント1
-  - `py25en_start`の初回実行時に以下のポップアップが表示された場合， `親フォルダー'****'内のすべてのファイルの作成者を信頼します` をチェックし， `はい、作成者を信頼します` を選択します<br>
-      <image src="./inst05.png" width="50%" height="50%">
-  
-  ### :o:チェックポイント2
-  - VSCode起動時に `SOURCE`（`C:\oit\py25en\sorce\`）が開いていない場合，[ファイル]-[フォルダーを開く] メニューから開きます <br>
-    <image src="./inst06.png" width="50%" height="50%">
-  - VSCode起動時にターミナルウィンドウが開いていない場合,[…]-[ターミナル]-[新しいターミナル]メニューから開きます <br>
-    <image src="./inst07.png" width="50%" height="50%">
-  
-  ### :o:チェックポイント3
-  - VSCodeで `.py` ファイルを開いたときに, ステータスバー（右下）に `インタープリターを選択する`（`Select Python Interpreter`）と表示される場合 ...<br>
-  - `インタープリターを選択する` をクリックし，コマンドパレットに `python.exe` (`C:\oit\py25en\WPy64-312101\python\python.exe`) までのパスを設定します<br>
-    直接入力または `python.defaultInterpreterPath` の設定が候補にあればそれを選択します
-    <image src="./inst08.png" width="50%" height="50%">
-  - 正しく設定されたかは，ステータスバー（右下）に `python 3.12.10` と表示されているかを確認します
-  
-  ### :o:チェックポイント4
-   - pythonの実行方法を確認しましょう
-  
-   1. [source] フォルダから `sample1.py` を開きます<br>
- 
-   > **Note** ターミナルウィンドウが開いていない場合は開くようにします（ [チェックポイント2](#oチェックポイント2) を確認）<br> 
-   > **Note** ターミナルウィンドウに表示されている現在の作業ディレクトリは実行するファイルの場所と同じである必要があります<br>
-   > **Note** もしターミナルに表示されている現在のディレクトリがソースコードのディレクトリと異なる場合は `cd` コマンドを使ってディレクトリを変更する必要があります<br>
-   <br>
-   
-   2. ターミナルウィンドウに下記のコマンドを入力して実行します
-   
-   ```sh
-   C:\oit\py25\source> python sample1.py
-   ```
-   <br>
-   
-   > **Note** メニューにある `実行ボタン` からも実行は可能です <br>
-   > <image src="./inst09.png"><br>
-   <br>
-   
-   3. 以下の実行結果が得られれば成功です<br>
-   <image src="./inst10.png"><br>
 
-<br>
+* Visual Studio Code 1.113.0 (ポータブル版)
 
-# OpenCVライブラリのサンプルの実行
-  - 新規ファイルとして[sample_cv2.py]を作成し，以下のコードを入力して実行してみましょう．
-    ```python
-    # sample_cv2.py
-    import cv2
-    img = cv2.imread('./img/standard/Mandrill.bmp') # read image file
-    if img is None: # maybe Path is wrong
-        print("image file is not opened.")
-        exit(1)
-    bimg = cv2.GaussianBlur(img, (51,51), 5) # gaussian filter (size=(51,51),sigma=5)
-    cv2.imshow('img',img)
-    cv2.imshow('blur img',bimg)
-    cv2.waitKey(0) # pause until press any key
-    cv2.destroyAllWindows # close all cv2's windows
-    ```
+## 前提条件
 
-  - 実行結果は以下の通りで， 2つ目のウィンドウは[Mandrill.bmp]をブラー（平滑化）した結果となります．<br>
-      ![fig003](./fig003.png)
+* Windows 10 または 11
+* 内蔵カメラまたはUSBカメラ
+* アンチウイルスソフトの無効化（またはアンインストール）、および Windows セキュリティの「スマート アプリ コントロール」をオフにする
+* セキュリティソフト等によって、インストーラーやバッチファイルが削除されてしまう場合があります。
+
+## インストーラーを使用した Python・VSCode のセットアップ
+
+### :green_square: 環境のインストール手順
+
+* 指定されたフォルダにアクセスし、フォルダ内にある `README_py26.pdf` などの指示に従って環境をインストールしてください。
+* [フォルダへのリンク](https://oskit-my.sharepoint.com/:f:/g/personal/yoshiyuki_kamakura_oit_ac_jp/IgCmGGWyRvidTIrSIwzoav-gAWJziWVS6J4E8Qa3WLxZ6wE?e=Xbl8Cj)
+
+> **メモ**
+> * フォルダへのアクセスにはパスワードが必要です（パスワードは別途通知されます）。
+> * アンチウイルスソフトが有効な場合、実行ファイルやバッチファイルが正常に動作しないことがあります。
+> 
+> 
+
+### :green_square: インストール後のフォルダ構造
+
+* フォルダ構造は以下の通りです。
+* **C:\oit\home\python**: ソースコードを保存する作業ディレクトリ
+* **C:\oit\py26\**: **※このフォルダ内を変更・編集しないでください**
+* **C:\oit\py26\py26_start.bat**: 環境を起動するためのバッチファイル
+
+
+> **メモ**
+> * デスクトップにショートカットが作成されています。
+> * ショートカットが見つからない場合は、バッチファイル（**py26_start.bat**）から直接起動してください。
+> 
+> 
+
+
+
+### :o: チェックポイント（環境の起動 1）
+
+* デスクトップ上のアイコン（または `C:\oit\py26\py26_start.bat`）から環境を起動します。
+* **次のような警告画面が表示された場合：**
+* 「信頼する...」のチェックボックスに **チェックを入れます**
+* **「はい (YES)」** ボタンをクリックします 
+
+
+
+
+
+
+### :o: チェックポイント（環境の起動 2）
+
+* **VSCode のエクスプローラーに `python` フォルダが開いていない場合は、[ファイル (File)] - [フォルダーを開く (Open Folder)] から `C:\oit\home\python\` を開いてください。** 
+
+
+
+* **ターミナル画面が表示されていない場合は、[ターミナル (Terminal)] - [新しいターミナル (New Terminal)] メニューから開いてください。** 
+
+
+
+
+### :o: チェックポイント（環境の起動 3）
+
+* **エクスプローラーで `.py` ファイルを選択したとき：**
+* **設定が正しい場合：** ステータスバーにPythonのバージョンが正しく表示されます。
+
+* **設定が正しくない（または未設定の）場合：** ステータスバーのPythonバージョン（または `Python インタープリターの選択`）をクリックし、**「インタープリターを選択」** -> **「参照... (Browse...)」** の順にクリックして、以下の `python.exe` を選択してください。
+> **パス:** `"C:\oit\py26\WPy64-312101\python\python.exe"`
+> 
+
+
+
+
+
+## :red_square: 動作確認（実践）
+
+* カメラ映像を表示するサンプルプログラム `show_video.py` を動かしてみましょう。
+* 「`show_video.py`」という名前の新しいファイルを作成します。
+
+
+
+
+
+
+* 以下のコードは、カメラから映像をキャプチャし、OpenCV ライブラリを使用してフレームを表示するサンプルです。
+* コードをコピーして `show_video.py` に貼り付けてください。
+* キーボードの `q` キーを押すとウィンドウが閉じます。
+
+
+```python
+import cv2
+
+dev = 0
+
+def main():
+    cap = cv2.VideoCapture(dev)
+    ht = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    wt = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    print(ht, " x ", wt)
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+
+        if ret == False or cv2.waitKey(1) == ord('q'):
+            break
+
+        imshow_name = "video"
+        cv2.imshow(imshow_name, frame)
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
+
+```
+
+
+* ターミナルウィンドウで Python コードが実行できることを確認します。
+```sh
+C:\oit\home\python> python show_video.py
+
+```
