@@ -3,13 +3,13 @@
 **講義ノート・ライブラリ一覧**
 
 <details><summary><b>基礎編（6項目）</b></summary>
-
+  
 1. [環境の設定](../../README.md)
 2. [基本概要](../basic/BASIC_00.md)
 3. [カメラへのアクセスと動画処理](../basic/BASIC_01.md)
 4. [顔と顔パーツの検出](../basic/BASIC_02.md)
 5. [顔・手・ポーズ検出](../basic/BASIC_03.md)
-6. 2つのベクトルのなす角とベクトル演算（↓）
+6. [2つのベクトルのなす角とベクトル演算](../basic/BASIC_FP01.md)
 </details>
 
 <b>➡キャプチャ（3項目）</b>
@@ -17,7 +17,6 @@
 7. [動画画像処理 (`my_cap_av2.py`)](lecnote_cap01.md)
 8. [Intel RealSense 画像処理 (`my_rs_cap.py`)](lecnote_cap02.md)
 9. Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)（↓）
-</details>
 
 <details><summary><b>検出・推定（4項目）</b></summary>
 
