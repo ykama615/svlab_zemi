@@ -14,7 +14,7 @@
 
 <details><summary><b>キャプチャ（3項目）</b></summary>
 
-7. 動画画像処理 (`my_cap_av2.py`)
+7. 動画画像処理 (`my_cap_av2.py`)[lecnote_cap01.md]
 8. [Intel RealSense 画像処理 (`my_rs_cap.py`)](lecnote_cap02.md)
 9. [Orbbec Femto Bolt 画像処理 (`my_bolt_cap.py`)](lecnote_cap03.md)
 </details>
