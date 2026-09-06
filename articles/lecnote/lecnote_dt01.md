@@ -51,6 +51,7 @@
 <hr>
 
 自作ライブラリ `my_libs` 内の各クラス（映像キャプチャ `VideoCapture` および MediaPipe 統合処理クラス `MyMediaPipeN`）を活用し、顔・手・姿勢・セグメンテーションなどの各種認識機能を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
 
 <hr>
 
