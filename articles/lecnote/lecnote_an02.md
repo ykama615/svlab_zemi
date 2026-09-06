@@ -62,13 +62,6 @@
 
 * **【重要】** `my_analysis_body.py` がライブラリフォルダー（例: `my_libs/analysis/`）に配置されていることを確認してください。
 * **【重要】** 内部処理に `numpy` および Python 標準ライブラリの `math`, `collections.deque` を使用します。
-* ターミナルで以下のコマンドを実行してプログラムを動作させます。
-```sh
-C:\oit\home\ipbl> python XXX.py
-
-```
-
-
 
 ---
 
