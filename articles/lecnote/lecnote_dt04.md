@@ -57,12 +57,13 @@
 ## 概要
 
 * `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+* **【標準との違い】** OpenCV標準の `cv2.VideoCapture` でも同様のメソッドは存在しますが、環境や入力ソースによって経過時間の取得が不安定になったり正確性を欠く場合があります。本自作クラスでは `time.perf_counter()` や PTS を用いて一貫した正確なミリ秒タイムスタンプを担保し、実験ログの出力等に活用します。
+
+
 * `./my_libs/detector/my_dlib.py` 内の `MyDlib` クラスを使用し、dlib による以下の機能を処理します。
 * **HOG ベースの複数顔検出**
 * **68 点の顔ランドマーク抽出**
 * **テンプレートマッチングを用いた高速単一顔トラッキング（`get_single_face_fast`）**
-
-
 
 ---
 
@@ -79,27 +80,28 @@
 
 ## :red_square: my_dlib.py の概要と特徴
 
-`MyDlib` は、機械学習ライブラリ `dlib` の HOG (Histogram of Oriented Gradients) ベースの顔検出器および 68 点ランドマーク推論モデル（`shape_predictor`）を Python から手軽に利用するためのラップクラスです。
+`MyDlib` は、機械学習ライブラリ `dlib` の HOG ベース顔検出器および 68 点ランドマーク推論モデル（`shape_predictor`）を Python から手軽に利用するためのラップクラスです。
 
 ### 主な特徴
 
 1. **標準 HOG 顔検出 (`get_multiple_face`)**:
-
 * `dlib.get_frontal_face_detector()` を利用し、画像内の複数の顔領域（`dlib.rectangle`）と信頼度スコアを一括取得します。
 
-2. **テンプレートマッチングによる高速トラッキング (`get_single_face_fast`)**:
 
-* 毎フレーム重い HOG 検出を実行する代わりに、前フレームで検出した顔画像をテンプレートとして `cv2.matchTemplate` で追跡します。スコアが閾値（0.7）を下回った場合のみ再検出を行うことで処理を大幅に高速化します。
+2. **テンプレートマッチングによる高速トラッキング (`get_single_face_fast`)**:
+* 毎フレームの HOG 検出の代わりに、前フレームの顔画像をテンプレートとして `cv2.matchTemplate` で追跡します。スコアが閾値（0.7）を下回った場合のみ再検出を行います。
+
 
 3. **68 点ランドマークの NumPy 配列変換 (`get_facemark`)**:
+* `imutils.face_utils.shape_to_np` を用いて、抽出したランドマーク座標を `(68, 2)` の NumPy 配列（`int32`）として返却します。
 
-* `imutils.face_utils.shape_to_np` を内部で使用し、抽出したランドマーク座標を OpenCV 等で扱いやすい `(68, 2)` の NumPy 配列（`int32`）として返却します。
+
 
 ---
 
 ## :red_square: my_cap_av2 と連携した基本サンプルコード
 
-`my_cap_av2.py` の `VideoCapture` で映像を入力し、複数人の顔検出と 68 点のランドマーク描画を行う基本プログラムです。
+`my_cap_av2.py` の `VideoCapture` を用いて、正確な経過時間を取得しながら顔検出と 68 点ランドマークを描画するプログラムです。
 
 ### dlib_face_viewer.py
 
@@ -128,6 +130,9 @@ def main():
         if not ret:
             break
 
+        # 経過時間（ミリ秒）の取得
+        current_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
+
         # 2. 複数顔の検出
         dets, scores, idx = mydlib.get_multiple_face(frame)
 
@@ -141,6 +146,10 @@ def main():
                 parts = mydlib.get_facemark(frame, dface)
                 for p in parts:
                     cv2.circle(frame, (p[0], p[1]), 2, (0, 255, 0), -1)
+
+        # タイムスタンプの画面表示
+        cv2.putText(frame, f"Time: {current_msec:.1f} ms", (20, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
         # 4. 画面表示
         cv2.imshow("dlib Face Landmarks (my_cap_av2)", frame)
@@ -176,7 +185,7 @@ if __name__ == '__main__':
 * **ヒントコード**:
 
 ```python
-# 毎フレーム重い検出を行わず、テンプレートマッチングで高速追跡
+# テンプレートマッチングによる高速追跡
 dets, scores, idx = mydlib.get_single_face_fast(frame)
 
 if len(dets) > 0:
