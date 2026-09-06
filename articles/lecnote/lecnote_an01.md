@@ -9,7 +9,7 @@
 3. [カメラへのアクセスと動画処理](../basic/BASIC_01.md)
 4. [顔と顔パーツの検出](../basic/BASIC_02.md)
 5. [顔・手・ポーズ検出](../basic/BASIC_03.md)
-6. 2つのベクトルのなす角とベクトル演算（↓）
+6. [2つのベクトルのなす角とベクトル演算](../basic/BASIC_FP01.md)
 </details>
 
 <details><summary><b>キャプチャ（3項目）</b></summary>
