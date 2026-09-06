@@ -52,6 +52,7 @@
 <hr>
 
 自作ライブラリ `my_libs.tools` 内のデジタル信号処理クラス `myDigitalFilter` (`my_digital_filter.py`) を活用し、波形データの周波数フィルタリング、3次スプライン補間、移動平均・指数移動平均の算出、ピーク検出、およびトレンド除去を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
 
 <hr>
 
