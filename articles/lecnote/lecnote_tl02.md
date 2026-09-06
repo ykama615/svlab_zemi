@@ -50,7 +50,7 @@
 
 <hr>
 
-自作ライブラリ my_libs 内のファイルパス・日時操作クラス myUtil および CSV入出力クラス MyCSVWriter / MyCSVReader (my_csv.py / my_util.py) を活用し、パス・日時文字列の取得、重複を回避する自動連番付きCSV書き込み、およびデータ型変換を伴うCSV読み込みを実装するための解説ドキュメントです。
+自作ライブラリ `my_libs` 内のファイルパス・日時操作クラス `myUtil` および CSV入出力クラス `MyCSVWriter / MyCSVReader (my_csv.py / my_util.py)` を活用し、パス・日時文字列の取得、重複を回避する自動連番付きCSV書き込み、およびデータ型変換を伴うCSV読み込みを実装するための解説ドキュメントです。
 
 <hr>
 
