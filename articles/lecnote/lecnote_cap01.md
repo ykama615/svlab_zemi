@@ -51,7 +51,7 @@
 <hr>
 
 自作ライブラリ `my_libs.capture` 内の `my_cap_av2.py` の標準Webカメラおよび動画ファイル用キャプチャクラス `VideoCapture` を活用し、入力ソースの自動判別、PTSに基づく高精度タイムスタンプ取得、シーク・範囲読み出し、および H.264 録画・ログ出力を実装するための解説ドキュメントです。
-<br>**`mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
 
 <hr>
 
