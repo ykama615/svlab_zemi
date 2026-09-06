@@ -50,8 +50,9 @@
 
 <hr>
 
-自作ライブラリ `my_libs` 内の Intel RealSense 用キャプチャクラス `VideoCapture` を活用し、カラー画像・深度（Depth）画像の一括取得、フィルタリング処理、および `.bag` ファイルの再生・シーク機能を実装するための解説ドキュメントです。<br>
-**Intel RealSense（D400シリーズ等）またはその録画ファイル（`.bag`）ファイルが必要です。**
+自作ライブラリ `my_libs` 内の Intel RealSense 用キャプチャクラス `VideoCapture` を活用し、カラー画像・深度（Depth）画像の一括取得、フィルタリング処理、および `.bag` ファイルの再生・シーク機能を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
+<br>**Intel RealSense（D400シリーズ等）またはその録画ファイル（`.bag`）ファイルが必要です。**
 
 <hr>
 
