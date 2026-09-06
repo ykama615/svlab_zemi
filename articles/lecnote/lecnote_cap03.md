@@ -50,8 +50,9 @@
 
 <hr>
 
-自作ライブラリ `my_libs` 内の Orbbec 用キャプチャクラス `VideoCapture` を活用し、カラー画像・深度（Depth）画像の一括取得、バッファ遅延防止処理、および `.mkv` ファイルの再生・シーク機能を実装するための解説ドキュメントです。<br>
-**Orbbec Femto Bolt またはその録画ファイル（`.mkv`）が必要です。**
+自作ライブラリ `my_libs` 内の Orbbec 用キャプチャクラス `VideoCapture` を活用し、カラー画像・深度（Depth）画像の一括取得、バッファ遅延防止処理、および `.mkv` ファイルの再生・シーク機能を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
+<br>**Orbbec Femto Bolt またはその録画ファイル（`.mkv`）が必要です。**
 
 <hr>
 
