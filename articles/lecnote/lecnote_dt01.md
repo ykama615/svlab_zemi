@@ -51,11 +51,15 @@
 自作ライブラリ `my_libs` 内の各クラス（映像キャプチャ `VideoCapture` および MediaPipe 統合処理クラス `MyMediaPipeN`）を活用し、顔・手・姿勢・セグメンテーションなどの各種認識機能を実装するための解説ドキュメントです。
 
 <hr>
+
 # MediaPipe統合処理ライブラリ (my_mediapipe_n.py) の使い方
 
 ## 概要
 
-* `my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+* `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+* **【標準との違い】** OpenCV標準の `cv2.VideoCapture` でも同様のメソッドは存在しますが、環境や入力ソースによって経過時間の取得が不安定になったり正確性を欠く場合があります。本自作クラスでは `time.perf_counter()` や PTS を用いて一貫した正確なミリ秒タイムスタンプを担保し、実験ログの出力やイベント同期に活用します。
+
+
 * `my_libs/detector/my_mediapipe_n.py` 内の `MyMediaPipeN` クラスを使用し、以下の認知機能を統合的に処理します。
 * **顔検出 / 顔メッシュ**
 * **手検出 / ジェスチャ認識**
@@ -63,8 +67,6 @@
 * **セルフィーセグメンテーション（背景切り抜き）**
 
 
-
----
 
 ## 前提条件
 
@@ -79,12 +81,12 @@
 
 ## **my_mediapipe_n.py の概要と特徴**
 
-`MyMediaPipeN` は、MediaPipe Tasks API (Python) をラップし、OpenCV形式の画像フレームに対して多様な認識（顔・手・姿勢・ジェスチャ・顔メッシュ・表情スコア・背景セグメンテーション等）を簡潔なメソッド呼び出しで実現するカスタムクラスです。
+`MyMediaPipeN` は、MediaPipe Tasks API (Python) をラップし、OpenCV形式の画像フレームに対して多様な認識を簡潔なメソッド呼び出しで実現するカスタムクラスです。
 
 ### 主な特徴
 
 1. **統合された認識タスク**:
-* 顔検出（Face）、顔メッシュ（Face Mesh）、手検出（Hands）、姿勢推定（Pose）、ジェスチャ認識（Gesture）、セルフィーセグメンテーション（Selfie Segmentation）を一括管理します。
+* 顔検出、顔メッシュ、手検出、姿勢推定、ジェスチャ認識、セルフィーセグメンテーションを一括管理します。
 
 
 2. **OpenCV との親和性**:
@@ -92,11 +94,11 @@
 
 
 3. **表情解析（BlendShapes）とアライメント制御**:
-* 顔メッシュ検出時に内部で BlendShapes（52種類の表情パラメータ）や 4x4 変換行列のキャッシュを自動更新し、ゲッター経由で取得可能です。
+* 顔メッシュ検出時に内部で BlendShapes（52種類の表情パラメータ）や 4x4 変換行列のキャッシュを自動更新します。
 
 
 4. **描画支援ユーティリティ**:
-* 目蓋の開き具合の計測（`get_vertical_eyelid`）や、検出部位間の接続情報（`get_connections`）の参照機能を備えています。
+* 目蓋の開き具合の計測（ズーム計測等）や接続情報の参照機能を備えています。
 
 
 
@@ -104,16 +106,15 @@
 
 ## **my_cap_av2 と連携した基本サンプルコード**
 
-`my_libs/video_capture/my_cap_av2.py` の `VideoCapture` で映像を入力し、`MyMediaPipeN` で手のランドマークを検出・描画する基本プログラムです。
+`my_cap_av2.py` の `VideoCapture` で正確な経過時間を取得しながら、`MyMediaPipeN` で手のランドマークを検出・描画するプログラムです。
 
 ### mp_hand_viewer.py
 
 ```python
 import os
-# OpenCVのキャプチャ遅延を防ぐ設定
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2
-# ライブラリのインポート（正しいディレクトリ構造に準拠）
+
 from my_libs.video_capture.my_cap_av2 import VideoCapture
 from my_libs.detector.my_mediapipe_n import MyMediaPipeN
 
@@ -133,7 +134,10 @@ def main():
         if not ret:
             break
 
-        # 2. BGR画像を MediaPipe 用 Image オブジェクトへ変換 (f_flip=1で左右反転可能)
+        # 経過時間（ミリ秒）の取得
+        current_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
+
+        # 2. BGR画像を MediaPipe 用 Image オブジェクトへ変換
         mp_image = mp_nn.get_mp_image(frame, f_flip=0)
 
         # 3. 手の検出を実行
@@ -145,6 +149,10 @@ def main():
                 for pt in hand_points:
                     x, y, z, vis, pres = pt
                     cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
+
+        # タイムスタンプの画面表示
+        cv2.putText(frame, f"Time: {current_msec:.1f} ms", (20, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
         # 5. 画面表示
         cv2.imshow("MediaPipe Hands (my_cap_av2)", frame)
@@ -181,14 +189,14 @@ if __name__ == '__main__':
 | `get_iris(mp_image)` | `mp_image` | 左右の虹彩（瞳孔周辺）座標 `{'leye': [...], 'reye': [...]}` |
 | `get_hand(mp_image)` | `mp_image` | 左右別の手関節座標群 `{'left': [...], 'right': [...]}` |
 | `get_pose(mp_image)` | `mp_image` | 身体の姿勢ランドマーク（33点）座標群 `[x, y, z, visibility]` |
-| `get_gesture_data(mp_image, gesture_name, side)` | `mp_image`, `"Open_Palm"`, `"Left"` など | 指定ジェスチャの信頼度スコア (`float`) と手関節座標 |
+| `get_gesture_data(mp_image, gesture_name, side)` | `mp_image`, `"Open_Palm"`, `"Left"` など | 指定ジェスチャの信頼度スコアと手関節座標 |
 | `get_segment_image(mp_image, dep=0.5)` | `mp_image`, 閾値 `dep` | 人物領域の背景切り抜き用ブールマスク (`bool ndarray`) |
 
 ### 表情・変換行列の取得（ゲッター）
 
 | メソッド | 説明 |
 | --- | --- |
-| `get_blendshapes()` | 直近の `get_face_mesh` または `get_dlib_landmark` 実行時に更新された表情スコア（BlendShapes辞書リスト）を取得 |
+| `get_blendshapes()` | 直近の `get_face_mesh` または `get_dlib_landmark` 実行時に更新された表情スコアを取得 |
 | `get_transformation_matrices()` | 顔の 4x4 姿勢変換行列リストを取得 |
 
 ---
@@ -215,6 +223,7 @@ def main():
         if not ret:
             break
 
+        current_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
         mp_image = mp_nn.get_mp_image(frame)
 
         # 1. 姿勢推定の描画
@@ -222,19 +231,22 @@ def main():
         for pose in pose_list:
             for pt in pose:
                 x, y, z, vis = pt
-                if vis > 0.5: # 信頼度が50%以上の点のみ描画
+                if vis > 0.5:
                     cv2.circle(frame, (x, y), 3, (255, 0, 0), -1)
 
-        # 2. 顔メッシュ実行 (内部で表情BlendShapesスコアが更新される)
+        # 2. 顔メッシュ実行
         _ = mp_nn.get_face_mesh(mp_image)
         blendshapes = mp_nn.get_blendshapes()
 
-        # 3. 笑顔 (jawOpen や smile) などのスコア表示
+        # 3. 笑顔スコアの表示
         if blendshapes:
             face0 = blendshapes[0]
             smile_score = face0.get("mouthSmileLeft", 0.0)
-            cv2.putText(frame, f"Smile Score: {smile_score:.2f}", (20, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
+            cv2.putText(frame, f"Smile: {smile_score:.2f}", (20, 50),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+
+        cv2.putText(frame, f"Time: {current_msec:.1f} ms", (20, 90),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
         cv2.imshow("Pose & Expression", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
