@@ -51,6 +51,7 @@
 <hr>
 
 自作ライブラリ `my_libs.analysis` 内の呼吸信号処理クラス `MyAnalysisRespiration` を活用し、顔領域と Depth 画像から胸部・腹部の ROI 抽出、生デプス平均値の算出、および呼吸運動の検知を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
 
 <hr>
 
