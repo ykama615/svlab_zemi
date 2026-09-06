@@ -40,9 +40,11 @@
 20. [デジタル信号処理 (`my_digital_filter.py`)](articles/lecnote/lecnote_tl03.md)
 </details>
 
-<details><summary><b>その他（1項目）</b></summary>
+<details><summary><b>その他（3項目）</b></summary>
 
-21. [Minecraftコントロール(1)](articles/minecraft/mcbot_01.md)
+21. [ドローン/RTPキャプチャ](../drone/lecnote_dr01.md)
+22. [スクリーンキャプチャ](../minecraft/lecnote_mc01.md)
+23. [【旧】Minecraftコントロール(1)](../minecraft/mcbot_01.md)    
 </details>
 
 <hr>
