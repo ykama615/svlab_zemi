@@ -56,29 +56,36 @@
 
 ## 概要
 
-* 本ドキュメントでは、`my_cap_av2.py` の `VideoCapture` クラスを用いて映像を取り込み、`my_mmface.py`（`MyMMFace` クラス）を使用して OpenMMLab (MMDetection / MMPose) による高精度な顔検出および顔キーポイント抽出を行う方法について解説します。
-* **専用の顔検出・キーポイントモデル（Face）**のほか、**DWPose**や**RTMW**といった**全身モデル（WholeBody系）からの顔パーツ抽出**もサポートしています。
-
-## 前提条件
-
 * `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+* **【標準との違い】** OpenCV標準の `cv2.VideoCapture` でも同様のメソッドは存在しますが、環境や入力ソースによって経過時間の取得が不安定になったり正確性を欠く場合があります。本自作クラスでは `time.perf_counter()` や PTS を用いて一貫した正確なミリ秒タイムスタンプを担保し、実験ログの出力やイベント同期に活用します。
+
+
 * `./my_libs/detector/my_mmface.py` 内の `MyMMFace` クラスを使用し、OpenMMLab (MMDetection / MMPose) による以下の機能を処理します。
 * **RTMDet等による高速・高精度な検出処理**
-* **選択したモデルに応じた顔キーポイント（68点ランドマーク相当等）の抽出**
+* **専用の顔モデル（Face）や全身モデル（DWPose, RTMW）からの顔キーポイント抽出**
 * **輪郭描画用の骨格接続データ自動生成**
 
 
 
+## 前提条件
+
+* **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+* `my_cap_av2.py`: `./my_libs/video_capture/`
+* `my_mmface.py`: `./my_libs/detector/`
+
+
+* **【重要】** OpenMMLab関連のモデルウェイトや実行環境が正しく構築されている必要があります。
+
 ---
 
-## 🟥 my_mmface.py の概要と特徴
+## :red_square: my_mmface.py の概要と特徴
 
 `MyMMFace` は、OpenMMLab の物体検出ライブラリ（MMDetection）と姿勢推定ライブラリ（MMPose）を組み合わせ、Top-down 方式で高精度な顔領域検出とキーポイント検出を実行するカスタムクラスです。
 
 ### 主な特徴
 
 1. **柔軟なモデル切り替え (`model` 引数)**:
-* 初期化時の `model` 引数（`'face'`, `'dwpose'`, `'rtmw'`）に応じて、専用の顔モデルを使用するか、全身モデルから顔領域を抽出するかを自動で切り替えます。
+* 初期化時の `model` 引数（`'face'`, `'dwpose'`, `'rtmw'`) に応じて、専用の顔モデルを使用するか、全身モデルから顔領域を抽出するかを自動で切り替えます。
 
 
 2. **顔検出 (`getFaceDet`)**:
@@ -90,7 +97,7 @@
 
 
 4. **描画用の接続データ生成 (`get_connection`)**:
-* 抽出されたキーポイント間を結ぶ骨格ライン（顎線、眉、鼻、目、唇）のインデックスペアリストを自動生成し、輪郭描画を容易にします。
+* 抽出されたキーポイント間を結ぶ骨格ラインのインデックスペアリストを自動生成し、輪郭描画を容易にします。
 
 
 5. **計算デバイス（CPU/GPU）の切り替え**:
@@ -100,9 +107,9 @@
 
 ---
 
-## 🟥 my_cap_av2 と連携した基本サンプルコード
+## :red_square: my_cap_av2 と連携した基本サンプルコード
 
-`my_cap_av2.py` の `VideoCapture` で映像を入力し、`MyMMFace` で顔とキーポイントをリアルタイム検出し描画する基本プログラムです。
+`my_cap_av2.py` の `VideoCapture` で正確な経過時間を取得しながら、`MyMMFace` で顔とキーポイントをリアルタイム検出し描画するプログラムです。
 
 ### mm_face_viewer.py
 
@@ -135,6 +142,9 @@ def main():
         if not ret:
             break
 
+        # 経過時間（ミリ秒）の取得
+        current_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
+
         # 2. 顔バウンディングボックスの検出
         bbox, score = mm_face.getFaceDet(frame)
 
@@ -161,6 +171,10 @@ def main():
                     if k_score > 0.3:
                         cv2.circle(frame, tuple(pt.astype(int)), 2, (0, 0, 255), -1)
 
+        # タイムスタンプの画面表示
+        cv2.putText(frame, f"Time: {current_msec:.1f} ms", (20, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
         # 4. 画面表示
         cv2.imshow("MMFace Detection & Landmark (my_cap_av2)", frame)
 
@@ -177,7 +191,7 @@ if __name__ == '__main__':
 
 ---
 
-## 🟥 MyMMFace の主なメソッド一覧
+## :red_square: MyMMFace の主なメソッド一覧
 
 | メソッド | 引数 | 戻り値 | 説明 |
 | --- | --- | --- | --- |
@@ -185,12 +199,12 @@ if __name__ == '__main__':
 
 <br>`model`: モデル種別 (`'face'`, `'dwpose'`, `'rtmw'`) | なし | 検出器および姿勢推定モデルの構成ファイル・重みを初期化 |
 | `getFaceDet(frame)` | `frame`: BGR画像 (`ndarray`) | `(bbox, score)` | 最高スコアの顔（または人物）枠 `[x1, y1, x2, y2]` と信頼度スコアを返却。未検出時は `(None, None)` |
-| `getFacePose(frame, bbox)` | `frame`: BGR画像, `bbox`: 検出枠 | `(kpts, scores)` | モデル仕様（専用モデルまたは全身モデルのインデックススライス）に応じた顔キーポイント座標配列と各点のスコアを返却 |
-| `get_connection()` | なし | `connections` | 輪郭・目・口・鼻を結ぶインデックスペアリスト `[(0, 1), ...]` を取得 |
+| `getFacePose(frame, bbox)` | `frame`: BGR画像, `bbox`: 検出枠 | `(kpts, scores)` | モデル仕様に応じた顔キーポイント座標配列と各点のスコアを返却 |
+| `get_connection()` | なし | `connections` | 輪郭・目・口・鼻を結ぶインデックスペアリストを取得 |
 
 ---
 
-## 🟥 演習 (`mm_face_crop.py`)
+## :red_square: 演習 (`mm_face_crop.py`)
 
 * `mm_face_viewer.py` を参考にして、検出された顔領域（BBox）をトリミングし、別ウィンドウ `"Cropped Face"` に拡大表示する `mm_face_crop.py` を作成してください。
 * **ヒントコード**:
@@ -212,4 +226,3 @@ if bbox is not None and score > 0.5:
         cv2.imshow("Cropped Face", face_crop)
 
 ```
-
