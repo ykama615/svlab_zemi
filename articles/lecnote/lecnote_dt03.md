@@ -56,11 +56,10 @@
 
 ## 概要
 
-* 本ドキュメントでは、`my_cap_av2.py` の `VideoCapture` クラスを用いてカメラ映像を取り込み、`my_mmpose.py`（`MyMMPose` クラス）を使用して OpenMMLab (MMDetection / MMPose) による高精度な姿勢推定および全身（身体・顔・手・足）のキーポイント抽出を行う方法について解説します。
-
-## 前提条件
-
 * `./my_libs/video_capture/my_cap_av2.py` 内の `VideoCapture` クラスを用いてカメラ映像を取り込みます。
+* **【標準との違い】** OpenCV標準の `cv2.VideoCapture` でも同様のメソッドは存在しますが、環境や入力ソースによって経過時間の取得が不安定になったり正確性を欠く場合があります。本自作クラスでは `time.perf_counter()` や PTS を用いて一貫した正確なミリ秒タイムスタンプを担保し、実験ログの出力やイベント同期に活用します。
+
+
 * `./my_libs/detector/my_mmpose.py` 内の `MyMMPose` クラスを使用し、OpenMMLab (MMDetection / MMPose) による以下の姿勢推定機能を処理します。
 * **身体 17 箇所キーポイントの標準検出（`coco` モード）**
 * **全身・手・足・顔を含む全 133 箇所の一括検出（`whole`, `dwpose`, `rtmw` モード）**
@@ -71,7 +70,18 @@
 
 ---
 
-## 🟥 my_mmpose.py の概要と特徴
+## 前提条件
+
+* **【重要】** ライブラリ用スクリプトが以下の相対パス配下に配置されていることを確認してください。
+* `my_cap_av2.py`: `./my_libs/video_capture/`
+* `my_mmpose.py`: `./my_libs/detector/`
+
+
+* **【重要】** OpenMMLab関連のモデルウェイトや実行環境が正しく構築されている必要があります。
+
+---
+
+## :red_square: my_mmpose.py の概要と特徴
 
 `MyMMPose` は、RTMDet（人物検出器）と RTMPose（姿勢推定器）を分離制御し、標準の 17 点検出から WholeBody系の高精度な全身・手・顔・足の 133 点検出まで柔軟に切り替えられる高度な姿勢推定ラップクラスです。
 
@@ -79,7 +89,7 @@
 
 1. **多彩なモデル・モード選択（`model` 引数）**:
 * `model='coco'`: 身体の主要 17 関節点を高速に推論します。
-* `model='whole'`, `'dwpose'`, `'rtmw'`: 身体、足、顔、手を含む最大 133 箇所の WholeBody キーポイントを一括抽出します（内部で共通の Wholebody系スライス処理を実行）。
+* `model='whole'`, `'dwpose'`, `'rtmw'`: 身体、足、顔、手を含む最大 133 箇所の WholeBody キーポイントを一括抽出します。
 
 
 2. **Detector と Pose の分離設計**:
@@ -87,19 +97,19 @@
 
 
 3. **パーツ別の専用ゲッターと接続データ自動生成**:
-* 推論後、`get_RTMFace()`, `get_RTMHands()`, `get_RTMFeet()` により顔・手・足をそれぞれ個別に取り出せます。また、各パーツの相対インデックスに対応した接続ペアリスト取得メソッドを備えています。
+* 推論後、`get_RTMFace()`, `get_RTMHands()`, `get_RTMFeet()` により顔・手・足をそれぞれ個別に取り出せます。また、各パーツの接続ペアリスト取得メソッドを備えています。
 
 
 4. **ヒートマップ（確率マップ）出力機能**:
-* 初期化時にテスト設定等の条件を満たすことで、関節の存在確率を示すサーモグラフィ画像（JETカラーマップ）を取得可能です。
+* 初期化時の設定条件を満たすことで、関節の存在確率を示すサーモグラフィ画像を取得可能です。
 
 
 
 ---
 
-## 🟥 my_cap_av2 と連携した基本サンプルコード
+## :red_square: my_cap_av2 と連携した基本サンプルコード
 
-`my_cap_av2.py` の `VideoCapture` で映像を入力し、WholeBody モード（`model='whole'`）で全身・手・足の関節点を描画する基本プログラムです。
+`my_cap_av2.py` の `VideoCapture` で正確な経過時間を取得しながら、WholeBody モード（推奨モデル）で全身・手・足の関節点を描画するプログラムです。
 
 ### mm_pose_viewer.py
 
@@ -132,6 +142,9 @@ def main():
         if not ret:
             break
 
+        # 経過時間（ミリ秒）の取得
+        current_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
+
         # 2. 人物バウンディングボックスの検出
         bbox, score = mm_pose.get_RTMDet(frame)
 
@@ -160,6 +173,10 @@ def main():
                                 pt2 = tuple(h_kpts[p2].astype(int))
                                 cv2.line(frame, pt1, pt2, (255, 128, 0), 1)
 
+        # タイムスタンプの画面表示
+        cv2.putText(frame, f"Time: {current_msec:.1f} ms", (20, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
         # 4. 画面表示
         cv2.imshow("MMPose Wholebody (my_cap_av2)", frame)
 
@@ -176,7 +193,7 @@ if __name__ == '__main__':
 
 ---
 
-## 🟥 MyMMPose の主なメソッド一覧
+## :red_square: MyMMPose の主なメソッド一覧
 
 ### モデル・推論メソッド
 
@@ -200,41 +217,31 @@ if __name__ == '__main__':
 | --- | --- | --- |
 | `get_pose_connections()` | `list` | 標準身体 17 関節の接続ペアリストを取得 |
 | `get_foot_connections()` | `dict` | 足パーツ（左右）の三角形接続ペアリストを取得 |
-| `get_hand_connections()` | `dict` | 手（左右各21点）の接続ペアリスト（相対インデックス補正済み）を取得 |
+| `get_hand_connections()` | `dict` | 手（左右各21点）の接続ペアリストを取得 |
 | `get_face_connections()` | `list` | 顔（68点）の輪郭・パーツ接続ペアリストを取得 |
-| `make_face_bbox(kpts, scores, expand)` | `list` | 身体キーポイント（目・耳・鼻）から顔部分の拡大 BBox を算出 |
-| `get_template_score(frame, bbox, template_img)` | `float` | 指定領域とテンプレート画像との類似度（NCC）を算出 |
+| `make_face_bbox(kpts, scores, expand)` | `list` | 身体キーポイントから顔部分の拡大 BBox を算出 |
+| `get_template_score(frame, bbox, template_img)` | `float` | 指定領域とテンプレート画像との類似度を算出 |
 
 ---
 
-## 🟥 ノート：モデル・環境に関する補足事項
+## :red_square: ノート：モデル・環境に関する補足事項
 
 ### 1. RTMW と DWPose の特徴と違い
 
-MMPoseエコシステムにおいて、全身（WholeBody）を高精度に検出できる代表的なモデルとして `rtmw` と `dwpose` があります。これらはバックボーンや利用するキーポイント定義のアプローチに違いがあります。
-
 * **RTMW (`rtmw`)**:
-* **特徴**: MMPose公式が提供する軽量かつ高精度な全身モデル（Cocktail14スキーマ等）です。姿勢推定に特化した最適化が進んでおり、動作が軽快で、手や足先、顔のパーツまでバランスよく追従します。
-* **用途**: リアルタイム性を重視しつつ、手先や全身のモーションを綺麗に取得したい場合に最適です。
+* MMPose公式が提供する軽量かつ高精度な全身モデルです。動作が軽快で、手や足先、顔のパーツまでバランスよく追従します。リアルタイム性を重視する場合に最適です。
 
 
 * **DWPose (`dwpose`)**:
-* **特徴**: 元々はControlNet（Stable Diffusion向け）などの骨格入力用として一躍有名になった高精度ポーズ推定パイプライン（DW-Pose）のMMPose実装です。優れた顔・手検出性能を持つモデル（Yolox/DW-Renderer派生等）を組み合わせ、極めて高いロバスト性（隠れに強い）を持ちます。
-* **用途**: 人体が一部隠れていたり、手の細かなジェスチャーや顔の向きの変化を正確に捉えたい高精度な解析に向いています。
+* ControlNet等で広く使われる高精度ポーズ推定パイプラインの実装です。極めて高いロバスト性（隠れに強い）を持ち、手の細かなジェスチャーや顔の向きの変化を正確に捉えたい場合に適しています。
 
 
-
----
 
 ### 2. CPU 推論と GPU 推論の違い
 
-本ライブラリの初期化時に指定する `device`（`'cpu'` または `'cuda:0'`）によって、処理性能や実行環境に大きな違いが生じます。
-
 * **CPU 推論 (`device='cpu'`)**:
-* **メリット**: 追加のハードウェア設定が不要で、通常のPC環境があればすぐに動作します。
-* **デメリット**: 検出器（RTMDet）と姿勢推定器（RTMPose）の双方が重いため、特に `model='whole'` などの 133 点モデルではフレームレート（FPS）が大幅に低下します（リアルタイム処理が難しくなるケースが多いです）。
+* 追加の設定が不要ですぐ実行できますが、`model='whole'` などの 133 点モデルではフレームレート（FPS）が大きく低下します。
 
 
 * **GPU 推論 (`device='cuda:0'`)**:
-* **メリット**: NVIDIA製GPU（CUDA対応）の並列演算能力を利用するため、推論速度が劇的に向上します。`model='whole'` を用いた全身・手・顔のフル推定でも、滑らかなリアルタイム映像処理（30FPS以上）が可能になります。
-* **前提条件**: 事前に PyTorch の CUDA版 が正しくインストールされ、PCに互換性のあるGPU環境が整っている必要があります。
+* NVIDIA製GPUの並列演算により推論速度が劇的に向上し、フル推定でも滑らかなリアルタイム処理が可能になります。
