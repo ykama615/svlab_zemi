@@ -51,6 +51,7 @@
 <hr>
 
 自作ライブラリ `my_libs.capture` 内の `my_cap_rtp.py` の `VideoCapture` を活用し、RTP ストリーミングの受信、重複フレームの破棄、およびVFR対応の録画機能を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
 
 <hr>
 
