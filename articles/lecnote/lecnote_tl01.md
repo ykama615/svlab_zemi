@@ -27,7 +27,7 @@
 13. [dlib 顔検出・68点ランドマーク抽出 (`my_dlib.py`)](lecnote_dt04.md)
 </details>
 
-<details><summary><b>生体・動作解析（4項目）</b></summary>summary>
+<details><summary><b>生体・動作解析（4項目）</b></summary>
 
 14. [3D頭部姿勢・視線・顔正面化 (`my_analysis_head.py`)](lecnote_an01.md)
 15. [3D身体姿勢・背骨・移動量 (`my_analysis_body.py`)](lecnote_an01.md)
