@@ -50,7 +50,7 @@
 
 <hr>
 
-自作ライブラリ my_libs.capture 内の VideoCapture を活用し、RTP ストリーミングの受信、重複フレームの破棄、およびVFR対応の録画機能を実装するための解説ドキュメントです。
+自作ライブラリ `my_libs.capture` 内の `my_cap_rtp.py` の `VideoCapture` を活用し、RTP ストリーミングの受信、重複フレームの破棄、およびVFR対応の録画機能を実装するための解説ドキュメントです。
 
 <hr>
 
