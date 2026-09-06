@@ -51,6 +51,7 @@
 <hr>
 
 自作ライブラリ my_libs.analysis 内の頭部解析クラス MyAnalysisHead を活用し、2D ランドマークから 3D 頭部姿勢角（Pitch/Yaw/Roll）の推定、瞳孔の 3D 空間マッピング、視線ベクトルの抽出、およびデバッグ用の顔正面化再構成描画を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
 
 <hr>
 
