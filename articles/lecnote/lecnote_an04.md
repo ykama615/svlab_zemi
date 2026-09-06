@@ -51,6 +51,7 @@
 <hr>
 
 自作ライブラリ `my_libs.analysis` 内の非接触脈波解析クラス `MyAnalysisrPPG` を活用し、顔ランドマークから両頬の関心領域（ROI）の抽出、平均 RGB 値の算出、および POS 法を用いた非接触脈波（rPPG）信号の推定を実装するための解説ドキュメントです。
+<br>**`my_libs` を利用するには `mylibspack.7z` を展開し、`my_libs`・`learned_models`・`img` の 3 つのフォルダをソースディレクトリ直下に並列に配置する必要があります。**
 
 <hr>
 
