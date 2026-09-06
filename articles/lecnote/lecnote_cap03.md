@@ -41,14 +41,16 @@
 20. [デジタル信号処理 (`my_digital_filter.py`)](lecnote_tl03.md)
 </details>
 
-<details><summary><b>その他（1項目）</b></summary>
+<details><summary><b>その他（3項目）</b></summary>
 
-21. [Minecraftコントロール(1)](../minecraft/mcbot_01.md)
+21. [ドローン/RTPキャプチャ](../drone/lecnote_dr01.md)
+22. [スクリーンキャプチャ](../minecraft/lecnote_mc01.md)
+23. [【旧】Minecraftコントロール(1)](../minecraft/mcbot_01.md)    
 </details>
 
 <hr>
 
-自作ライブラリ `my_libs` 内の Orbbec 用キャプチャクラス `VideoCapture` を活用し、カラー画像・深度（Depth）画像の一括取得、バッファ遅延防止処理、および `.mkv` ファイルの再生・シーク機能を実装するための解説ドキュメントです。
+自作ライブラリ `my_libs` 内の Orbbec 用キャプチャクラス `VideoCapture` を活用し、カラー画像・深度（Depth）画像の一括取得、バッファ遅延防止処理、および `.mkv` ファイルの再生・シーク機能を実装するための解説ドキュメントです。<br>
 **Orbbec Femto Bolt またはその録画ファイル（`.mkv`）が必要です。**
 
 <hr>
