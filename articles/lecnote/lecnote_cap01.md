@@ -41,14 +41,16 @@
 20. [デジタル信号処理 (`my_digital_filter.py`)](lecnote_tl03.md)
 </details>
 
-<details><summary><b>その他（1項目）</b></summary>
+<details><summary><b>その他（3項目）</b></summary>
 
-21. [Minecraftコントロール(1)](../minecraft/mcbot_01.md)
+21. [ドローン/RTPキャプチャ](../drone/lecnote_dr01.md)
+22. [スクリーンキャプチャ](../minecraft/lecnote_mc01.md)
+23. [【旧】Minecraftコントロール(1)](../minecraft/mcbot_01.md)    
 </details>
 
 <hr>
 
-自作ライブラリ my_libs 内の標準Webカメラおよび動画ファイル用キャプチャクラス VideoCapture を活用し、入力ソースの自動判別、PTSに基づく高精度タイムスタンプ取得、シーク・範囲読み出し、および H.264 録画・ログ出力を実装するための解説ドキュメントです。
+自作ライブラリ `my_libs.capture` 内の `my_cap_av2.py` の標準Webカメラおよび動画ファイル用キャプチャクラス `VideoCapture` を活用し、入力ソースの自動判別、PTSに基づく高精度タイムスタンプ取得、シーク・範囲読み出し、および H.264 録画・ログ出力を実装するための解説ドキュメントです。
 
 <hr>
 
