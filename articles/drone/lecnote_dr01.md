@@ -42,7 +42,7 @@
 20. [デジタル信号処理 (`my_digital_filter.py`)](../lecnote/lecnote_tl03.md)
 </details>
 
-<details><summary><b>その他（1項目）</b></summary>
+<b>➡その他（3項目）</b>
 
 21. ドローン/RTPキャプチャ（↓）
 22. [スクリーンキャプチャ](../minecraft/lecnote_mc01.md)
